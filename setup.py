@@ -1,5 +1,3 @@
-                                from setuptools import setup, find_packages
-
 setup(
     name="capella_tools",
     version="0.1",
