@@ -1,6 +1,0 @@
-capellambse
-capellambse_context_diagrams
-cairosvg
-polarion
-openai
-ipywidgets
