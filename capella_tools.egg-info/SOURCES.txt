@@ -1,0 +1,7 @@
+LICENSE
+setup.py
+capella_tools.egg-info/PKG-INFO
+capella_tools.egg-info/SOURCES.txt
+capella_tools.egg-info/dependency_links.txt
+capella_tools.egg-info/requires.txt
+capella_tools.egg-info/top_level.txt

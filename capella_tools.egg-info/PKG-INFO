@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: capella_tools
+Version: 0.1
+License-File: LICENSE
+Requires-Dist: capellambse
+Requires-Dist: capellambse_context_diagrams
+Requires-Dist: cairosvg
+Requires-Dist: polarion
+Requires-Dist: openai
+Requires-Dist: ipywidgets
