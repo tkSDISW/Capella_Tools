@@ -56,7 +56,7 @@ class EmbeddingManager :
         with open(self.embedding_file, "w") as f:
             json.dump(self.embeddings, f)
 
-    def set_files(self,  embedding_file, model_file) :
+    def set_files(self,  model_file, embedding_file) :
         """Set model file and ebedding fie."""
         self.embedding_file = embedding_file
         self.model_path = model_file
