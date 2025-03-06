@@ -56,10 +56,10 @@ class EmbeddingManager :
         with open(self.embedding_file, "w") as f:
             json.dump(self.embeddings, f)
 
-    def set_files(self,  model_file, embedding_file) :
+    def set_files(self, model_file, embedding_file ) :
         """Set model file and ebedding fie."""
+        self.model_file = model_file
         self.embedding_file = embedding_file
-        self.model_path = model_file
 
     def is_embedding_up_to_date(self):
         """Checks if the embedding file exists and is up to date with the model."""
