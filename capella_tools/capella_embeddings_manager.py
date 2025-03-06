@@ -287,7 +287,7 @@ class EmbeddingManager :
             query = input("Enter query for objects to be analyzed: ")
     
             # Step 2: Filter and rank objects
-            ranked_objects = embeddings.find_similar_objects(query)
+            ranked_objects = self.find_similar_objects(query)
     
             # Step 3: Display ranked objects
             print("\nThis is a list of ranked Objects Based on Query:")
