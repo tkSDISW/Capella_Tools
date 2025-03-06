@@ -62,16 +62,22 @@ class EmbeddingManager :
         self.model_path = model_file
 
     def is_embedding_up_to_date(self):
-        """Check if the embedding file is up-to-date with the model file."""
-        if not os.path.exists(self.embedding_file):
-            # Return False if the embedding file is not present
-            print("Embedding file not found.")
-            return False
-        model_time = os.path.getmtime(self.model_path)
+        """Checks if the embedding file exists and is up to date with the model."""
         
+        # ✅ Ensure embedding file exists before accessing it
+        if not os.path.exists(self.embedding_file):
+            print("❌ Embedding file not found. A new one will be created.")
+            return False
+    
+        if not os.path.exists(self.model_file):
+            print("❌ Model file not found. Check the file path.")
+            return False
+    
+        # ✅ Compare timestamps only if both files exist
+        model_time = os.path.getmtime(self.model_file)
         embedding_time = os.path.getmtime(self.embedding_file)
-        #print("embedding time:",embedding_time, "model time:", model_time) 
-        return embedding_time > model_time
+    
+        return embedding_time >= model_time
     
     def generate_object_embeddings(self, objects):
         for obj in objects:
