@@ -112,6 +112,18 @@ class EmbeddingManager :
                     "target_component": obj.target.owner.name 
                 }
             return object_info
+
+
+        def get_diagram_info(object, phase ) :
+            object_info = {
+                    "uuid": object.uuid,
+                    "name": object.name,
+                    "type": object.type,
+                    "phase" : phase,
+                    "source_component": "",
+                    "target_component": ""
+                }
+            return object_info
             
         def add_unique_object(obj_list, new_obj):
             """
@@ -146,6 +158,9 @@ class EmbeddingManager :
             for obj in model.oa.all_processes:  
                 object_info = get_object_info(obj,phase)
                 add_unique_object(object_data,object_info)
+            for obj in model.oa.diagrams:  
+                object_info = get_diagram_info(obj,phase)
+                add_unique_object(object_data,object_info)
             #SA
             phase = "System Analysis SA"
             for component in model.sa.all_components: 
@@ -165,6 +180,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             for obj in model.sa.all_functional_chains:  
                 object_info = get_object_info(obj,phase)
+                add_unique_object(object_data,object_info)
+            for obj in model.sa.diagrams:  
+                object_info = get_diagram_info(obj,phase)
                 add_unique_object(object_data,object_info)
             #LA
             phase = "Logical Architecture LA"
@@ -188,6 +206,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             for obj in model.la.actor_exchanges:  
                 object_info =  get_component_exchange_info(obj,phase)
+                add_unique_object(object_data,object_info)
+            for obj in model.la.diagrams:  
+                object_info = get_diagram_info(obj,phase)
                 add_unique_object(object_data,object_info)
             #PA
             phase = "Physical Architecture PA"
@@ -217,6 +238,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             for obj in model.pa.all_physical_exchanges:  
                 object_info = get_component_exchange_info(obj,phase)
+                add_unique_object(object_data,object_info)
+            for obj in model.pa.diagrams:  
+                object_info = get_diagram_info(obj,phase)
                 add_unique_object(object_data,object_info)
             
             model_embeddings = self.generate_object_embeddings(object_data)
@@ -284,7 +308,7 @@ class EmbeddingManager :
         embeddings = self.embeddings
         while True:
             # Step 1: Prompt for query
-            query = input("Enter query for objects to be analyzed: ")
+            query = input("Enter query for objects or diagrams to be analyzed: ")
     
             # Step 2: Filter and rank objects
             ranked_objects = self.find_similar_objects(query)
