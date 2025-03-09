@@ -118,7 +118,7 @@ class EmbeddingManager :
             object_info = {
                     "uuid": object.uuid,
                     "name": object.name,
-                    "type": object.type,
+                    "type": type(object).__name__,
                     "phase" : phase,
                     "source_component": "",
                     "target_component": ""
