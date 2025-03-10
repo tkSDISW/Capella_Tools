@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 import asyncio
 from ipywidgets import widgets
 from IPython.display import display
+from IPython.core.display import Javascript
 
 def get_api_key():
     """Retrieve the OpenAI API key from a hidden file."""
@@ -98,19 +99,39 @@ Please format the response in .html format.
     def interactive_chat(self):
         """Start an interactive chat session."""
         print("Starting interactive chat...")
-        while True:
-            user_prompt = input("Enter your prompt (or type 'exit' to quit): ")
+        chat_history = widgets.Output()
+        user_input = widgets.Textarea(placeholder="Type your prompt...", rows=3)
+        send_button = widgets.Button(description="Execute")
+        exit_button = widgets.Button(description="Exit")
+ 
+        # Function to process and send user message
+        def send_message(_):
 
-            if user_prompt.lower() == "exit":
-                print("Exiting...")
-                break
+            prompt = user_input.value.strip()
+            if not prompt:
+                return
 
-            self.follow_up_prompt(user_prompt)
-            response = self.get_response()
+            # Generate a normal chatbot response (Replace with real logic)
 
-            display(Markdown(f"**Your Prompt:**\n\n{user_prompt}\n"))
-            if "<table" in response or "<html" in response:
-                display(HTML(response))  # Render HTML
-            else:
-                display(Markdown(f"**ChatGPT Response:**\n\n{response}\n"))
+            with chat_history:
+                display(Markdown(f"**Your prompt:** {prompt}"))
+                display(Markdown(f"**Generating a response..** "))
+                self.follow_up_prompt(prompt)
+                chatbot_response = self.get_response()
+                if "<table" in  chatbot_response or "<html" in chatbot_response:
+                    display(HTML(chatbot_response))  # Render HTML
+                else:
+                    display(Markdown(f"**ChatGPT Response:**\n\n{ chatbot_response}\n"))
+            
+            user_input.value = ""  # Clear input box
+        
+        # Function to exit and execute the next cell
+        def exit_chat(_):
+            display(Javascript('Jupyter.notebook.execute_cells_below();'))
 
+
+        send_button.on_click(send_message)
+        exit_button.on_click(exit_chat)
+        
+        # Display the chat UI
+        display(chat_history, user_input, widgets.HBox([send_button, exit_button]))

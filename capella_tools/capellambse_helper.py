@@ -2,7 +2,6 @@
 import capellambse
 import pandas as pd 
 from IPython.display import Markdown
-
 from IPython.core.display import HTML
 from IPython import display
 import pandas as pd 
@@ -1036,11 +1035,75 @@ def Generate_Physical_Node_Components_Report( model ):
     """
     return templ
 
-def Display_Component_Report( pc ):
-   
+def Display_Component_Report( pc , artifacts = None ):
+    """
+    Displays a component report for the given 'pc' object.
+    
+    :param pc: The primary component to display in the report.
+    :param artifacts: (Optional) A list of artifacts related to the component. Defaults to None.
+    """
+
     template = """
     <h1>{{ node.name }} - <span style="font-size: 10px" > UUID: {{ node.uuid }} </span> </h2>
     <p>{{ node.description }}</p> 
+    {% if artifacts %}
+    <p  >The table below identifies artifacts of {{ node.name }}.</p>
+        <table  style="border: 2px solid black; width:100% " >
+            <tr>
+                <th style="text-align:left ;border: 1px solid black" >Req ID </th>
+                <th style="text-align:left ;border: 1px solid black" >Name </th>
+                <th style="text-align:left ; border: 1px solid black">Req URL</th>
+            </tr>
+               {% for art in artifacts %}
+                <tr>
+                    <td style="text-align:left ; border: 1px solid black">{{ art.identifier }}</td>
+                    <td style="text-align:left ; border: 1px solid black">{{ art.name  }}</td>
+                    <td style="text-align:left ; border: 1px solid black"> <a href= {{art.url}} target="_blank">url</a></td>
+                </tr>
+                <tr>
+                    <td style="text-align:right ; border: 1px solid black"> SI Unit Properties extracted from {{ art.name  }}</td>
+                    <td style="text-align:right ; border: 1px solid black"> </td>
+                    <td style="text-align:left ; border: 1px solid black"> 
+                            <table  style="border: 1px solid black; width:100% " >
+                                <tr>
+                                    <th style="text-align:left ;border: 1px solid black">Property Name  </th>
+                                    <th style="text-align:left ; border: 1px solid black"> Property Value </th>
+                                </tr>
+                            {% for pvs in art.property_values %}
+                            <tr>
+                                <td style="text-align:left ; border: 1px solid black">{{ pvs.name }} </td>
+                                <td style="text-align:left ; border: 1px solid black">{{ pvs.value }}</td>
+                            </tr>
+                           {% endfor %}
+                           </table>
+    
+                  </td>
+                </tr>
+               {% endfor %}
+    
+           </table>
+         <p style="text-align: center;"><strong>Artifacts {{ node.name }}</strong></p>
+    {% else %}
+        <p style="text-align: left;">No Artifacts were identified.</p>
+    {% endif %} 
+    {% if node.applied_property_values %}
+    <p  >The table below identifies property values of {{ node.name }}.</p>
+        <table  style="border: 2px solid black; width:100% " >
+            <tr>
+                <th style="text-align:left ;border: 1px solid black" >Property Name </th>
+                <th style="text-align:left ; border: 1px solid black">Property Value</th>
+            </tr>
+           {% for pv in node.applied_property_values %}
+            <tr>
+                <td style="text-align:left ; border: 1px solid black">{{ pv.name }}</td>
+                <td style="text-align:left ; border: 1px solid black">{{ pv.value }}</td>
+            </tr>
+          {% endfor %}
+           </table>
+         <p style="text-align: center;"><strong>Property Values of {{ node.name }}</strong></p>
+    {% else %}
+        <p style="text-align: left;">No property values were identified.</p>
+    {% endif %}   
     {% if node.applied_property_values %}
     <p  >The table below identifies property values of {{ node.name }}.</p>
         <table  style="border: 2px solid black; width:100% " >
@@ -1193,7 +1256,7 @@ def Display_Component_Report( pc ):
     """
     env = jinja2.Environment()
     #print(template)
-    rendered_template = env.from_string(template).render(node=pc,  filter_property_value=filter_property_value)
+    rendered_template = env.from_string(template).render(node=pc, artifacts= artifacts, filter_property_value=filter_property_value)
     #print(rendered_template )
     display.display(HTML(rendered_template ))
     for func in pc.allocated_functions :

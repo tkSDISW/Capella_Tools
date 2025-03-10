@@ -11,6 +11,24 @@ class Traceability_Store:
         self._link_types = []
         self._load_data()
 
+    # Existing methods remain unchanged...
+
+    def get_artifacts_for_model_element(self, model_element_uuid):
+        """
+        Returns a list of artifacts linked to the given model element UUID.
+        
+        :param model_element_uuid: UUID of the model element to search for.
+        :return: List of Traceability_Artifact objects linked to the model element.
+        """
+        linked_artifacts = [
+            artifact for artifact in self._artifacts
+            if any(link.model_element_uuid == model_element_uuid for link in artifact.artifact_links)
+        ]
+        return linked_artifacts
+
+    
+    
+
     def _load_data(self):
         """Loads and processes the XML file."""
         if not os.path.exists(self.file_path):
@@ -97,6 +115,8 @@ class Traceability_ArtifactLink:
                 f"artifact_uuid={self.artifact_uuid}, model_element_uuid={self.model_element_uuid})")
 
 
+
+
 class Traceability_Artifact:
     def __init__(self, name, artifact_id, url):
         self.name = name
@@ -105,11 +125,42 @@ class Traceability_Artifact:
         self.uuid = None
         self.identifier = ""
         self.artifact_links = []
+        self.property_values = []
 
     def add_link(self, link_type, artifact_uuid, model_element_uuid):
         link = Traceability_ArtifactLink(link_type, artifact_uuid, model_element_uuid)
         self.artifact_links.append(link)
 
+    def add_property_value(self, requirement_title, name_value_pairs):
+        """
+        Adds a new property value entry.
+        
+        :param requirement_title: The title of the requirement.
+        :param name_value_pairs: List of dictionaries containing name-value pairs.
+        """
+        print(name_value_pairs)
+        property_value = PropertyValue(requirement_title)
+        property_value.add_pair("value", name_value_pairs[0]['value'].strip())
+        property_value.add_pair("unit",  name_value_pairs[0]['unit'])
+        self.property_values.append(property_value)
+        
+    def add_property_value(self, requirement_title, name_value_pairs):
+        """
+        Adds a new property value entry formatted for Jinja.
+        
+        :param requirement_title: The title of the requirement.
+        :param name_value_pairs: List of dictionaries containing name-value pairs.
+        """
+        print("name_value_pairs:",name_value_pairs)
+        self.property_values.append({ "name": "value",   "value": name_value_pairs[0]['value'].strip()})
+        self.property_values.append({ "name": "unit",   "value": name_value_pairs[0]['unit']})
+    
+    def get_property_values(self):
+        """
+        Returns the list of property values.
+        """
+        return self.property_values
+        
     def __getitem__(self, key):
         return getattr(self, key)
 
@@ -118,7 +169,7 @@ class Traceability_Artifact:
 
     def __repr__(self):
         return (f"Traceability_Artifact(name={self.name}, artifact_id={self.artifact_id}, url={self.url}, "
-                f"uuid={self.uuid}, artifact_links={self.artifact_links})")
+                f"uuid={self.uuid}, artifact_links={self.artifact_links}, property_values={self.property_values})")
 
 
 class Traceability_LinkType:
