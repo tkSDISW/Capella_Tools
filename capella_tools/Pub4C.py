@@ -151,7 +151,7 @@ class Traceability_Artifact:
         :param requirement_title: The title of the requirement.
         :param name_value_pairs: List of dictionaries containing name-value pairs.
         """
-        print("name_value_pairs:",name_value_pairs)
+        #print("name_value_pairs:",name_value_pairs)
         self.property_values.append({ "name": "value",   "value": name_value_pairs[0]['value'].strip()})
         self.property_values.append({ "name": "unit",   "value": name_value_pairs[0]['unit']})
     
