@@ -298,12 +298,14 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
 
+
+
     async def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
-        Stores the selected objects for later retrieval and **allows execution to continue after submission**.
+        Stores the selected objects for later retrieval and ensures execution continues.
         """
-        self.future = asyncio.Future()  # Future to wait for user selection
+        self.future = asyncio.Future()  # Future to store user selection
 
         # Create input widget for user query
         query_input = widgets.Text(
@@ -367,6 +369,7 @@ class EmbeddingManager :
         
             # Retrieve selected objects from stored ranked results
             self.selected_objects_output = [self.ranked_objects[i][0] for i in selected_indices]
+            
             with output_area:
                 print("\n✅ Selected Object Details:")
                 for obj in self.selected_objects_output:
@@ -376,7 +379,7 @@ class EmbeddingManager :
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
             
-            # ✅ Resolve the Future to allow execution to continue
+            # ✅ Resolve the Future with selected objects
             if not self.future.done():
                 self.future.set_result(self.selected_objects_output)
 
@@ -398,10 +401,6 @@ class EmbeddingManager :
 
         # ✅ Wait for selection to complete before continuing execution
         return await self.future
-
-
-
-
 
     def get_selected_objects(self):
         """
