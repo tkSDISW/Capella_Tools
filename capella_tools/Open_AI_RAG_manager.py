@@ -100,7 +100,11 @@ Please format the response in .html format.
         """Start an interactive chat session."""
         print("Starting interactive chat...")
         chat_history = widgets.Output()
-        user_input = widgets.Textarea(placeholder="Type your prompt...", rows=3)
+        user_input = widgets.Textarea(
+            placeholder="Type your prompt...",
+            rows=3,
+            layout=widgets.Layout(width="100%")  # Set width to full
+        )
         send_button = widgets.Button(description="Execute")
         exit_button = widgets.Button(description="Exit")
  
