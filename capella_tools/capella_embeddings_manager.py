@@ -52,6 +52,7 @@ class EmbeddingManager :
         self.model_file = ''
         self.selected_objects_output = []  # Stores selected objects persistently
         self.ranked_objects = []  # Store ranked results from the query    
+        self.selection_done = threading.Event()  # ✅ Event to signal completion 
         
     def save_embeddings(self ):
         """Save embeddings to a file."""
@@ -298,12 +299,13 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
 
-
     def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
-        Execution will be manually controlled using a polling loop.
+        Uses a callback to signal when user selection is complete.
         """
+        self.selection_done.clear()  # ✅ Reset the event before starting
+
         # Create input widget for user query
         query_input = widgets.Text(
             placeholder="Enter query for objects...",
@@ -375,6 +377,9 @@ class EmbeddingManager :
                     print(f"   Phase: {obj['phase']}")
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
+            
+            # ✅ Signal that selection is complete
+            self.selection_done.set()
 
         # Function to reset selection
         def on_reset_clicked(b):
@@ -382,7 +387,7 @@ class EmbeddingManager :
             multi_select.options = []
             output_area.clear_output()
             self.ranked_objects = []  # Clear stored results
-            self.selected_objects_output = None  # Clear selections
+            self.selected_objects_output = []  # Clear selections
 
         # Attach handlers to widgets
         query_input.observe(on_query_submit, names="value")
