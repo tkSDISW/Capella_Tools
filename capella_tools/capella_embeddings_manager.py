@@ -361,14 +361,23 @@ class EmbeddingManager :
         def on_submit_clicked(b):
             output_area.clear_output()
             selected_indices = list(multi_select.value)
-            
+        
             if not selected_indices:
                 with output_area:
                     print("⚠️ No objects selected.")
                 return
-            
-            # Retrieve selected objects **from stored ranked results**
-            self.selected_objects_output = [self.ranked_objects[i][0]
+        
+            # Retrieve selected objects from stored ranked results
+            self.selected_objects_output = [self.ranked_objects[i][0] for i in selected_indices]  # ✅ Fixed
+        
+            with output_area:
+                print("\n✅ Selected Object Details:")
+                for obj in self.selected_objects_output:
+                    print(f"\n🔹 Name: {obj['name']}")
+                    print(f"   Type: {obj['type']}")
+                    print(f"   Phase: {obj['phase']}")
+                    print(f"   Source Component: {obj.get('source_component', 'N/A')}")
+                    print(f"   Target Component: {obj.get('target_component', 'N/A')}")
 
 
     def get_selected_objects(self):
