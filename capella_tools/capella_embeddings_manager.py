@@ -296,10 +296,14 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
         
+    
     def interactive_query_and_selection_widgets(self):
         """
-        Interactive widget-based function for querying objects and selecting results.
+        Interactive widget-based function for querying objects and selecting multiple results.
+        Returns the list of selected objects.
         """
+        selected_objects_output = []  # Stores selected objects
+        
         # Create input widget for user query
         query_input = widgets.Text(
             placeholder="Enter query for objects...",
@@ -309,13 +313,26 @@ class EmbeddingManager :
         # Create output widget to display ranked results
         output_area = widgets.Output()
         
-        # Create dropdown for selection
-        dropdown = widgets.Dropdown(
+        # Create a multi-select widget
+        multi_select = widgets.SelectMultiple(
             options=[],
             description="Select:",
-            layout=widgets.Layout(width="50%")
+            layout=widgets.Layout(width="80%", height="200px")
         )
         
+        # Create submit and reset buttons
+        submit_button = widgets.Button(
+            description="Submit Selection",
+            button_style="primary",
+            icon="check"
+        )
+        
+        reset_button = widgets.Button(
+            description="Reset",
+            button_style="warning",
+            icon="times"
+        )
+
         # Function to handle query submission
         def on_query_submit(change):
             output_area.clear_output()
@@ -329,40 +346,56 @@ class EmbeddingManager :
             # Get ranked objects
             ranked_objects = self.find_similar_objects(query)
             
-            # Update dropdown options
-            dropdown.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(ranked_objects)]
+            # Update multi-select options
+            multi_select.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(ranked_objects)]
             
             with output_area:
                 print("\n🔍 Ranked Objects Based on Query:")
                 for i, (obj, similarity) in enumerate(ranked_objects):
                     print(f"{i}: {obj['name']} | Type: {obj['type']} | Phase: {obj['phase']} | Similarity: {similarity:.2f}")
         
-        # Function to handle dropdown selection
-        def on_dropdown_change(change):
+        # Function to handle submission
+        def on_submit_clicked(b):
             output_area.clear_output()
-            selected_index = dropdown.value
+            selected_indices = list(multi_select.value)
             
-            if selected_index is None:
+            if not selected_indices:
+                with output_area:
+                    print("⚠️ No objects selected.")
                 return
             
-            # Retrieve selected object
-            selected_obj = self.find_similar_objects(query_input.value)[selected_index][0]
+            # Retrieve selected objects
+            nonlocal selected_objects_output
+            selected_objects_output = [self.find_similar_objects(query_input.value)[i][0] for i in selected_indices]
             
             with output_area:
                 print("\n✅ Selected Object Details:")
-                print(f"Name: {selected_obj['name']}")
-                print(f"Type: {selected_obj['type']}")
-                print(f"Phase: {selected_obj['phase']}")
-                print(f"Source Component: {selected_obj.get('source_component', 'N/A')}")
-                print(f"Target Component: {selected_obj.get('target_component', 'N/A')}")
+                for obj in selected_objects_output:
+                    print(f"\n🔹 Name: {obj['name']}")
+                    print(f"   Type: {obj['type']}")
+                    print(f"   Phase: {obj['phase']}")
+                    print(f"   Source Component: {obj.get('source_component', 'N/A')}")
+                    print(f"   Target Component: {obj.get('target_component', 'N/A')}")
+            
+            return selected_objects_output  # Ensure the function returns selected objects
         
+        # Function to reset selection
+        def on_reset_clicked(b):
+            query_input.value = ""
+            multi_select.options = []
+            output_area.clear_output()
+
         # Attach handlers to widgets
         query_input.observe(on_query_submit, names="value")
-        dropdown.observe(on_dropdown_change, names="value")
+        submit_button.on_click(on_submit_clicked)
+        reset_button.on_click(on_reset_clicked)
         
         # Display widgets
-        display(widgets.VBox([query_input, dropdown, output_area]))
-    
+        display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
+        
+        return selected_objects_output  # Ensure the function returns the selected objects
+
+        
     def interactive_query_and_selection(self):
         """
         Interactive function to query objects, review responses, and select indices for further processing.
