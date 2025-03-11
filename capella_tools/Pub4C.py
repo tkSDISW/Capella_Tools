@@ -26,7 +26,22 @@ class Traceability_Store:
         ]
         return linked_artifacts
 
-    
+    def get_artifact_by_identifier(self, identifier):
+        """
+        Retrieves a traceability artifact by its identifier.
+
+        :param identifier: The unique identifier of the artifact.
+        :return: Traceability_Artifact object if found.
+        :raises ValueError: If no artifact is found.
+        """
+        for artifact in self._artifacts:
+            if artifact.identifier == identifier:
+                return artifact
+
+        # Artifact not found: Raise an error
+        error_message = f"Error: No traceability artifact found with identifier '{identifier}'."
+        print(error_message)
+        raise ValueError(error_message)   
     
 
     def _load_data(self):

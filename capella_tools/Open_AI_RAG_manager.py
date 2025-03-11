@@ -105,10 +105,13 @@ Please format the response in .html format.
             rows=3,
             layout=widgets.Layout(
                 width="100%",
-                border="5px solid blue",  # Blue border
-                border_radius="10px",     # Rounded corners
-                padding="10px"            # Extra space inside the box
-            )
+                border="2px solid #4A90E2",  # ChatGPT-style blue border
+                border_radius="8px",         # Smooth rounded corners
+                padding="12px",              # Extra padding for a spacious feel
+                background_color="#F7F9FC",  # Soft white-blue background
+                box_shadow="3px 3px 10px rgba(0, 0, 0, 0.1)"  # Subtle shadow for depth
+            ),
+            style={'description_width': 'initial'}
         )
         send_button = widgets.Button(description="Execute")
         exit_button = widgets.Button(description="Exit")
