@@ -310,12 +310,14 @@ class EmbeddingManager :
         """
         return self.selected_objects_output
        
+import ipywidgets as widgets
+from IPython.display import display
 
-
-    def interactive_query_and_selection_widgets(self):
+    def interactive_query_and_selection_widgets(self, callback=None):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
         Stores the selected objects for later retrieval.
+        Calls a callback function (if provided) once selection is made.
         """
         # Create input widget for user query
         query_input = widgets.Text(
@@ -389,6 +391,10 @@ class EmbeddingManager :
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
 
+            # Call the callback function with selected objects
+            if callback:
+                callback(self.selected_objects_output)
+
         # Function to reset selection
         def on_reset_clicked(b):
             query_input.value = ""
@@ -410,6 +416,7 @@ class EmbeddingManager :
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
+
 
     def interactive_query_and_selection(self):
         """
