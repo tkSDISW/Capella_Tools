@@ -299,7 +299,6 @@ class EmbeddingManager :
         return ranked_objects
 
 
-
     async def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
@@ -309,8 +308,9 @@ class EmbeddingManager :
 
         # Create input widget for user query
         query_input = widgets.Text(
-            placeholder="Enter query for objects...",
-            layout=widgets.Layout(width="80%")
+            placeholder="Type to search for objects...",
+            layout=widgets.Layout(width="80%"),
+            continuous_update=True  # ✅ Ensures updates occur on each keystroke
         )
         
         # Create output widget to display ranked results
@@ -349,7 +349,7 @@ class EmbeddingManager :
             # Get ranked objects **only once** and store them
             self.ranked_objects = self.find_similar_objects(query)
             
-            # Update multi-select options
+            # Update multi-select options dynamically
             multi_select.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(self.ranked_objects)]
             
             with output_area:
@@ -392,7 +392,7 @@ class EmbeddingManager :
             self.selected_objects_output = []  # Clear selections
 
         # Attach handlers to widgets
-        query_input.observe(on_query_submit, names="value")
+        query_input.observe(on_query_submit, names="value")  # ✅ Triggers dynamically on text input
         submit_button.on_click(on_submit_clicked)
         reset_button.on_click(on_reset_clicked)
         
@@ -407,7 +407,7 @@ class EmbeddingManager :
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
-       
+
 
 
     def interactive_query_and_selection(self):
