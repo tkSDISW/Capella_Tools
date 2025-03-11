@@ -298,15 +298,6 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
 
-import ipywidgets as widgets
-from IPython.display import display
-
-class EmbeddingManager:
-    
-    def __init__(self):
-        self.selected_objects_output = []  # Stores selected objects persistently
-        self.ranked_objects = []  # Store ranked results from the query
-
     def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
