@@ -51,6 +51,7 @@ class EmbeddingManager :
         self.embedding_file =''
         self.model_file = ''
         self.selected_objects_output = []  # Stores selected objects persistently
+        self.ranked_objects = []  # Store ranked results from the query    
         
     def save_embeddings(self ):
         """Save embeddings to a file."""
@@ -298,7 +299,7 @@ class EmbeddingManager :
         return ranked_objects
 
 
-    
+
 
 
     def interactive_query_and_selection_widgets(self):
@@ -335,7 +336,7 @@ class EmbeddingManager :
             icon="times"
         )
 
-        # Function to handle query submission
+        # Function to handle query submission (stores ranked objects)
         def on_query_submit(change):
             output_area.clear_output()
             query = query_input.value.strip()
@@ -345,18 +346,18 @@ class EmbeddingManager :
                     print("⚠️ Please enter a query.")
                 return
             
-            # Get ranked objects
-            ranked_objects = self.find_similar_objects(query)
+            # Get ranked objects **only once** and store them
+            self.ranked_objects = self.find_similar_objects(query)
             
             # Update multi-select options
-            multi_select.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(ranked_objects)]
+            multi_select.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(self.ranked_objects)]
             
             with output_area:
                 print("\n🔍 Ranked Objects Based on Query:")
-                for i, (obj, similarity) in enumerate(ranked_objects):
+                for i, (obj, similarity) in enumerate(self.ranked_objects):
                     print(f"{i}: {obj['name']} | Type: {obj['type']} | Phase: {obj['phase']} | Similarity: {similarity:.2f}")
         
-        # Function to handle submission
+        # Function to handle submission (uses stored ranked objects)
         def on_submit_clicked(b):
             output_area.clear_output()
             selected_indices = list(multi_select.value)
@@ -366,31 +367,9 @@ class EmbeddingManager :
                     print("⚠️ No objects selected.")
                 return
             
-            # Store selected objects persistently
-            self.selected_objects_output = [self.find_similar_objects(query_input.value)[i][0] for i in selected_indices]
-            
-            with output_area:
-                print("\n✅ Selected Object Details:")
-                for obj in self.selected_objects_output:
-                    print(f"\n🔹 Name: {obj['name']}")
-                    print(f"   Type: {obj['type']}")
-                    print(f"   Phase: {obj['phase']}")
-                    print(f"   Source Component: {obj.get('source_component', 'N/A')}")
-                    print(f"   Target Component: {obj.get('target_component', 'N/A')}")
+            # Retrieve selected objects **from stored ranked results**
+            self.selected_objects_output = [self.ranked_objects[i][0]
 
-        # Function to reset selection
-        def on_reset_clicked(b):
-            query_input.value = ""
-            multi_select.options = []
-            output_area.clear_output()
-
-        # Attach handlers to widgets
-        query_input.observe(on_query_submit, names="value")
-        submit_button.on_click(on_submit_clicked)
-        reset_button.on_click(on_reset_clicked)
-        
-        # Display widgets
-        display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
 
     def get_selected_objects(self):
         """
