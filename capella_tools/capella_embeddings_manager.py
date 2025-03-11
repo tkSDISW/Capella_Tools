@@ -9,9 +9,9 @@ import json
 import os
 from datetime import datetime
 from bs4 import BeautifulSoup
-import asyncio
 from ipywidgets import widgets
 from IPython.display import display
+import threading
 
 def get_api_key():
     """Retrieve the OpenAI API key from a hidden file."""
