@@ -103,7 +103,12 @@ Please format the response in .html format.
         user_input = widgets.Textarea(
             placeholder="Type your prompt...",
             rows=3,
-            layout=widgets.Layout(width="100%")  # Set width to full
+            layout=widgets.Layout(
+                width="100%",
+                border="5px solid blue",  # Blue border
+                border_radius="10px",     # Rounded corners
+                padding="10px"            # Extra space inside the box
+            )
         )
         send_button = widgets.Button(description="Execute")
         exit_button = widgets.Button(description="Exit")

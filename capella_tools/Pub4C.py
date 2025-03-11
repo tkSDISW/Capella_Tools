@@ -123,6 +123,7 @@ class Traceability_Artifact:
         self.artifact_id = artifact_id
         self.url = url
         self.uuid = None
+        self.description = ""
         self.identifier = ""
         self.artifact_links = []
         self.property_values = []
@@ -131,19 +132,10 @@ class Traceability_Artifact:
         link = Traceability_ArtifactLink(link_type, artifact_uuid, model_element_uuid)
         self.artifact_links.append(link)
 
-    def add_property_value(self, requirement_title, name_value_pairs):
-        """
-        Adds a new property value entry.
-        
-        :param requirement_title: The title of the requirement.
-        :param name_value_pairs: List of dictionaries containing name-value pairs.
-        """
-        #print(name_value_pairs)
-        property_value = PropertyValue(requirement_title)
-        property_value.add_pair("value", name_value_pairs[0]['value'].strip())
-        property_value.add_pair("unit",  name_value_pairs[0]['unit'])
-        self.property_values.append(property_value)
-        
+    def add_description(self, requirement_text):
+        self.description = requirement_text
+    
+    
     def add_property_value(self, requirement_title, name_value_pairs):
         """
         Adds a new property value entry formatted for Jinja.
@@ -168,7 +160,7 @@ class Traceability_Artifact:
         setattr(self, key, value)
 
     def __repr__(self):
-        return (f"Traceability_Artifact(name={self.name}, artifact_id={self.artifact_id}, url={self.url}, "
+        return (f"Traceability_Artifact(name={self.name}, description={self.description},artifact_id={self.artifact_id}, url={self.url}, "
                 f"uuid={self.uuid}, artifact_links={self.artifact_links}, property_values={self.property_values})")
 
 
