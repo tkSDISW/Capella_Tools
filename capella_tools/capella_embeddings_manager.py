@@ -14,7 +14,8 @@ from IPython.display import display
 import threading
 import time
 import threading
-from IPython.kernel.zmq.kernelbase import Kernel
+from IPython import get_ipython
+
 
 def get_api_key():
     """Retrieve the OpenAI API key from a hidden file."""
