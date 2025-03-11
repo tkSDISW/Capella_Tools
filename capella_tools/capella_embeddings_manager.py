@@ -296,7 +296,7 @@ class EmbeddingManager :
                   f"Target: {obj.get('target_component', 'N/A')}")
         #print(ranked_objects)
         return ranked_objects
- import ipywidgets as widgets
+
 
     
 
