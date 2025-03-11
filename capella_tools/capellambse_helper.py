@@ -1061,8 +1061,8 @@ def Display_Component_Report( pc , artifacts = None ):
                     <td style="text-align:left ; border: 1px solid black"> <a href= {{art.url}} target="_blank">url</a></td>
                 </tr>
                 <tr>
-                    <td style="text-align:right ; border: 1px solid black"> SI Unit Properties extracted from {{ art.name  }}</td>
-                    <td style="text-align:right ; border: 1px solid black"> </td>
+                    <td style="text-align:right ; border: 1px solid black">  {{ art.description  }}</td>
+                    <td style="text-align:right ; border: 1px solid black"> SI Unit Properties extracted from {{ art.name  }} </td>
                     <td style="text-align:left ; border: 1px solid black"> 
                             <table  style="border: 1px solid black; width:100% " >
                                 <tr>

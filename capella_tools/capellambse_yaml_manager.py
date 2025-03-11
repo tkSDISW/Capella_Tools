@@ -156,6 +156,7 @@ class CapellaYAMLHandler:
                  if model_element in self.referenced_objects or  model_element in self.primary_objects :
                     #print("Adding Artifact",artifact.name,artifact.uuid)
                     self.referenced_objects.append(artifact)
+
                 
 
                
