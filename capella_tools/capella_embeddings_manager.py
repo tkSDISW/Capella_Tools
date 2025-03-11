@@ -298,25 +298,13 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
 
-
-
-
-
-
-
-    def get_selected_objects(self):
-        """
-        Retrieve the selected objects after the widget interaction is complete.
-        """
-        return self.selected_objects_output
-       
-
-    def interactive_query_and_selection_widgets(self):
+    async def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
-        Stores the selected objects for later retrieval.
-        Calls a callback function (if provided) once selection is made.
+        Stores the selected objects for later retrieval and **allows execution to continue after submission**.
         """
+        self.future = asyncio.Future()  # Future to wait for user selection
+
         # Create input widget for user query
         query_input = widgets.Text(
             placeholder="Enter query for objects...",
@@ -335,7 +323,7 @@ class EmbeddingManager :
         
         # Create submit and reset buttons
         submit_button = widgets.Button(
-            description="Submit Query",
+            description="Submit Selection",
             button_style="primary",
             icon="check"
         )
@@ -345,7 +333,6 @@ class EmbeddingManager :
             button_style="warning",
             icon="times"
         )
-
 
         # Function to handle query submission (stores ranked objects)
         def on_query_submit(change):
@@ -388,7 +375,10 @@ class EmbeddingManager :
                     print(f"   Phase: {obj['phase']}")
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
-
+            
+            # ✅ Resolve the Future to allow execution to continue
+            if not self.future.done():
+                self.future.set_result(self.selected_objects_output)
 
         # Function to reset selection
         def on_reset_clicked(b):
@@ -406,12 +396,19 @@ class EmbeddingManager :
         # Display widgets
         display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
 
-    
+        # ✅ Wait for selection to complete before continuing execution
+        return await self.future
+
+
+
+
+
     def get_selected_objects(self):
         """
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
+       
 
 
     def interactive_query_and_selection(self):
