@@ -298,19 +298,24 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
 
+import ipywidgets as widgets
+from IPython.display import display
 
-    async def interactive_query_and_selection_widgets(self):
+class EmbeddingManager:
+    
+    def __init__(self):
+        self.selected_objects_output = []  # Stores selected objects persistently
+        self.ranked_objects = []  # Store ranked results from the query
+
+    def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
-        Stores the selected objects for later retrieval and ensures execution continues.
+        Stores the selected objects for later retrieval.
         """
-        self.future = asyncio.Future()  # Future to store user selection
-
         # Create input widget for user query
         query_input = widgets.Text(
-            placeholder="Type to search for objects...",
-            layout=widgets.Layout(width="80%"),
-            continuous_update=True  # ✅ Ensures updates occur on each keystroke
+            placeholder="Enter query for objects...",
+            layout=widgets.Layout(width="80%")
         )
         
         # Create output widget to display ranked results
@@ -349,7 +354,7 @@ class EmbeddingManager :
             # Get ranked objects **only once** and store them
             self.ranked_objects = self.find_similar_objects(query)
             
-            # Update multi-select options dynamically
+            # Update multi-select options
             multi_select.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(self.ranked_objects)]
             
             with output_area:
@@ -369,7 +374,7 @@ class EmbeddingManager :
         
             # Retrieve selected objects from stored ranked results
             self.selected_objects_output = [self.ranked_objects[i][0] for i in selected_indices]
-            
+        
             with output_area:
                 print("\n✅ Selected Object Details:")
                 for obj in self.selected_objects_output:
@@ -378,10 +383,6 @@ class EmbeddingManager :
                     print(f"   Phase: {obj['phase']}")
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
-            
-            # ✅ Resolve the Future with selected objects
-            if not self.future.done():
-                self.future.set_result(self.selected_objects_output)
 
         # Function to reset selection
         def on_reset_clicked(b):
@@ -392,22 +393,18 @@ class EmbeddingManager :
             self.selected_objects_output = []  # Clear selections
 
         # Attach handlers to widgets
-        query_input.observe(on_query_submit, names="value")  # ✅ Triggers dynamically on text input
+        query_input.observe(on_query_submit, names="value")
         submit_button.on_click(on_submit_clicked)
         reset_button.on_click(on_reset_clicked)
         
         # Display widgets
         display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
 
-        # ✅ Wait for selection to complete before continuing execution
-        return await self.future
-
     def get_selected_objects(self):
         """
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
-
 
 
     def interactive_query_and_selection(self):
