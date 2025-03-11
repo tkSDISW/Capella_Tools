@@ -50,6 +50,7 @@ class EmbeddingManager :
         self.model = "text-embedding-3-small"
         self.embedding_file =''
         self.model_file = ''
+        self.selected_objects_output = []  # Stores selected objects persistently
         
     def save_embeddings(self ):
         """Save embeddings to a file."""
@@ -295,15 +296,16 @@ class EmbeddingManager :
                   f"Target: {obj.get('target_component', 'N/A')}")
         #print(ranked_objects)
         return ranked_objects
-        
+ import ipywidgets as widgets
+
     
+
+
     def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
-        Returns the list of selected objects.
+        Stores the selected objects for later retrieval.
         """
-        selected_objects_output = []  # Stores selected objects
-        
         # Create input widget for user query
         query_input = widgets.Text(
             placeholder="Enter query for objects...",
@@ -364,21 +366,18 @@ class EmbeddingManager :
                     print("⚠️ No objects selected.")
                 return
             
-            # Retrieve selected objects
-            nonlocal selected_objects_output
-            selected_objects_output = [self.find_similar_objects(query_input.value)[i][0] for i in selected_indices]
+            # Store selected objects persistently
+            self.selected_objects_output = [self.find_similar_objects(query_input.value)[i][0] for i in selected_indices]
             
             with output_area:
                 print("\n✅ Selected Object Details:")
-                for obj in selected_objects_output:
+                for obj in self.selected_objects_output:
                     print(f"\n🔹 Name: {obj['name']}")
                     print(f"   Type: {obj['type']}")
                     print(f"   Phase: {obj['phase']}")
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
-            
-            return selected_objects_output  # Ensure the function returns selected objects
-        
+
         # Function to reset selection
         def on_reset_clicked(b):
             query_input.value = ""
@@ -392,10 +391,14 @@ class EmbeddingManager :
         
         # Display widgets
         display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
-        
-        return selected_objects_output  # Ensure the function returns the selected objects
 
-        
+    def get_selected_objects(self):
+        """
+        Retrieve the selected objects after the widget interaction is complete.
+        """
+        return self.selected_objects_output
+       
+
     def interactive_query_and_selection(self):
         """
         Interactive function to query objects, review responses, and select indices for further processing.
