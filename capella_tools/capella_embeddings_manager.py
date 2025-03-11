@@ -311,7 +311,7 @@ class EmbeddingManager :
         return self.selected_objects_output
        
 
-    def interactive_query_and_selection_widgets(self, callback=None):
+    def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
         Stores the selected objects for later retrieval.
@@ -335,7 +335,7 @@ class EmbeddingManager :
         
         # Create submit and reset buttons
         submit_button = widgets.Button(
-            description="Submit Selection",
+            description="Submit Query",
             button_style="primary",
             icon="check"
         )
@@ -345,6 +345,7 @@ class EmbeddingManager :
             button_style="warning",
             icon="times"
         )
+
 
         # Function to handle query submission (stores ranked objects)
         def on_query_submit(change):
@@ -379,7 +380,6 @@ class EmbeddingManager :
         
             # Retrieve selected objects from stored ranked results
             self.selected_objects_output = [self.ranked_objects[i][0] for i in selected_indices]
-        
             with output_area:
                 print("\n✅ Selected Object Details:")
                 for obj in self.selected_objects_output:
@@ -389,9 +389,6 @@ class EmbeddingManager :
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
 
-            # Call the callback function with selected objects
-            if callback:
-                callback(self.selected_objects_output)
 
         # Function to reset selection
         def on_reset_clicked(b):
@@ -409,6 +406,7 @@ class EmbeddingManager :
         # Display widgets
         display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
 
+    
     def get_selected_objects(self):
         """
         Retrieve the selected objects after the widget interaction is complete.
