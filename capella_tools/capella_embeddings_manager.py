@@ -3,7 +3,6 @@ from pathlib import Path
 from openai import OpenAI
 from IPython.display import display, Markdown
 from IPython.core.display import HTML
-from ipywidgets import widgets
 import numpy as np
 import json
 import os
@@ -395,7 +394,7 @@ class EmbeddingManager :
             multi_select.options = []
             output_area.clear_output()
             self.ranked_objects = []  # Clear stored results
-            self.selected_objects_output = []  # Clear selections
+            self.selected_objects_output = None  # Clear selections
 
         # Attach handlers to widgets
         query_input.observe(on_query_submit, names="value")
