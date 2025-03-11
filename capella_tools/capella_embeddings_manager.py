@@ -304,7 +304,6 @@ class EmbeddingManager :
         return ranked_objects
 
 
-
     def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
@@ -387,9 +386,8 @@ class EmbeddingManager :
             # ✅ Signal that selection is complete
             self.selection_done.set()
 
-            # ✅ Use IPython Kernel to allow execution to resume
-            kernel = get_ipython().kernel
-            kernel.do_one_iteration()
+            # ✅ Resume Jupyter execution
+            get_ipython().kernel.do_one_iteration()
 
         # Function to reset selection
         def on_reset_clicked(b):
@@ -412,6 +410,7 @@ class EmbeddingManager :
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
+
 
     def interactive_query_and_selection(self):
         """
