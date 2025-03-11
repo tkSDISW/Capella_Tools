@@ -296,7 +296,72 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
         
-
+    def interactive_query_and_selection_widgets(self):
+        """
+        Interactive widget-based function for querying objects and selecting results.
+        """
+        # Create input widget for user query
+        query_input = widgets.Text(
+            placeholder="Enter query for objects...",
+            layout=widgets.Layout(width="80%")
+        )
+        
+        # Create output widget to display ranked results
+        output_area = widgets.Output()
+        
+        # Create dropdown for selection
+        dropdown = widgets.Dropdown(
+            options=[],
+            description="Select:",
+            layout=widgets.Layout(width="50%")
+        )
+        
+        # Function to handle query submission
+        def on_query_submit(change):
+            output_area.clear_output()
+            query = query_input.value.strip()
+            
+            if not query:
+                with output_area:
+                    print("⚠️ Please enter a query.")
+                return
+            
+            # Get ranked objects
+            ranked_objects = self.find_similar_objects(query)
+            
+            # Update dropdown options
+            dropdown.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(ranked_objects)]
+            
+            with output_area:
+                print("\n🔍 Ranked Objects Based on Query:")
+                for i, (obj, similarity) in enumerate(ranked_objects):
+                    print(f"{i}: {obj['name']} | Type: {obj['type']} | Phase: {obj['phase']} | Similarity: {similarity:.2f}")
+        
+        # Function to handle dropdown selection
+        def on_dropdown_change(change):
+            output_area.clear_output()
+            selected_index = dropdown.value
+            
+            if selected_index is None:
+                return
+            
+            # Retrieve selected object
+            selected_obj = self.find_similar_objects(query_input.value)[selected_index][0]
+            
+            with output_area:
+                print("\n✅ Selected Object Details:")
+                print(f"Name: {selected_obj['name']}")
+                print(f"Type: {selected_obj['type']}")
+                print(f"Phase: {selected_obj['phase']}")
+                print(f"Source Component: {selected_obj.get('source_component', 'N/A')}")
+                print(f"Target Component: {selected_obj.get('target_component', 'N/A')}")
+        
+        # Attach handlers to widgets
+        query_input.observe(on_query_submit, names="value")
+        dropdown.observe(on_dropdown_change, names="value")
+        
+        # Display widgets
+        display(widgets.VBox([query_input, dropdown, output_area]))
     
     def interactive_query_and_selection(self):
         """
