@@ -302,6 +302,16 @@ class EmbeddingManager :
 
 
 
+
+
+    def get_selected_objects(self):
+        """
+        Retrieve the selected objects after the widget interaction is complete.
+        """
+        return self.selected_objects_output
+       
+
+
     def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
@@ -356,7 +366,7 @@ class EmbeddingManager :
                 print("\n🔍 Ranked Objects Based on Query:")
                 for i, (obj, similarity) in enumerate(self.ranked_objects):
                     print(f"{i}: {obj['name']} | Type: {obj['type']} | Phase: {obj['phase']} | Similarity: {similarity:.2f}")
-        
+
         # Function to handle submission (uses stored ranked objects)
         def on_submit_clicked(b):
             output_area.clear_output()
@@ -368,7 +378,7 @@ class EmbeddingManager :
                 return
         
             # Retrieve selected objects from stored ranked results
-            self.selected_objects_output = [self.ranked_objects[i][0] for i in selected_indices]  # ✅ Fixed
+            self.selected_objects_output = [self.ranked_objects[i][0] for i in selected_indices]
         
             with output_area:
                 print("\n✅ Selected Object Details:")
@@ -379,13 +389,27 @@ class EmbeddingManager :
                     print(f"   Source Component: {obj.get('source_component', 'N/A')}")
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
 
+        # Function to reset selection
+        def on_reset_clicked(b):
+            query_input.value = ""
+            multi_select.options = []
+            output_area.clear_output()
+            self.ranked_objects = []  # Clear stored results
+            self.selected_objects_output = []  # Clear selections
+
+        # Attach handlers to widgets
+        query_input.observe(on_query_submit, names="value")
+        submit_button.on_click(on_submit_clicked)
+        reset_button.on_click(on_reset_clicked)
+        
+        # Display widgets
+        display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
 
     def get_selected_objects(self):
         """
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
-       
 
     def interactive_query_and_selection(self):
         """
