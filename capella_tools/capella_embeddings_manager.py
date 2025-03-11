@@ -310,8 +310,6 @@ class EmbeddingManager :
         """
         return self.selected_objects_output
        
-import ipywidgets as widgets
-from IPython.display import display
 
     def interactive_query_and_selection_widgets(self, callback=None):
         """
