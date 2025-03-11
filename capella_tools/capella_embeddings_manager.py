@@ -12,6 +12,9 @@ from bs4 import BeautifulSoup
 from ipywidgets import widgets
 from IPython.display import display
 import threading
+import time
+import threading
+from IPython.kernel.zmq.kernelbase import Kernel
 
 def get_api_key():
     """Retrieve the OpenAI API key from a hidden file."""
@@ -299,6 +302,8 @@ class EmbeddingManager :
         #print(ranked_objects)
         return ranked_objects
 
+
+
     def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
@@ -381,6 +386,10 @@ class EmbeddingManager :
             # ✅ Signal that selection is complete
             self.selection_done.set()
 
+            # ✅ Use IPython Kernel to allow execution to resume
+            kernel = get_ipython().kernel
+            kernel.do_one_iteration()
+
         # Function to reset selection
         def on_reset_clicked(b):
             query_input.value = ""
@@ -402,7 +411,6 @@ class EmbeddingManager :
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
-
 
     def interactive_query_and_selection(self):
         """
