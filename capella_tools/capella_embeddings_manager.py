@@ -10,10 +10,10 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from ipywidgets import widgets
 from IPython.display import display
-import threading
 import time
-import threading
 from IPython import get_ipython
+from jupyter_ui_poll import ui_events
+import time
 
 
 def get_api_key():
@@ -303,12 +303,13 @@ class EmbeddingManager :
         return ranked_objects
 
 
+
     def interactive_query_and_selection_widgets(self):
         """
         Interactive widget-based function for querying objects and selecting multiple results.
-        Uses a callback to signal when user selection is complete.
+        Uses `jupyter_ui_poll` to ensure non-blocking UI interactions.
         """
-        self.selection_done.clear()  # ✅ Reset the event before starting
+        self.selection_done = False  # ✅ Reset flag before starting
 
         # Create input widget for user query
         query_input = widgets.Text(
@@ -383,10 +384,7 @@ class EmbeddingManager :
                     print(f"   Target Component: {obj.get('target_component', 'N/A')}")
             
             # ✅ Signal that selection is complete
-            self.selection_done.set()
-
-            # ✅ Resume Jupyter execution
-            get_ipython().kernel.do_one_iteration()
+            self.selection_done = True  
 
         # Function to reset selection
         def on_reset_clicked(b):
@@ -394,7 +392,8 @@ class EmbeddingManager :
             multi_select.options = []
             output_area.clear_output()
             self.ranked_objects = []  # Clear stored results
-            self.selected_objects_output = None  # Clear selections
+            self.selected_objects_output = []  # Clear selections
+            self.selection_done = False  # Reset completion flag
 
         # Attach handlers to widgets
         query_input.observe(on_query_submit, names="value")
@@ -409,7 +408,6 @@ class EmbeddingManager :
         Retrieve the selected objects after the widget interaction is complete.
         """
         return self.selected_objects_output
-
 
     def interactive_query_and_selection(self):
         """
