@@ -13,6 +13,8 @@ import asyncio
 from ipywidgets import widgets
 from IPython.display import display
 from IPython.core.display import Javascript
+from jupyter_ui_poll import ui_events
+import time
 
 def get_api_key():
     """Retrieve the OpenAI API key from a hidden file."""
@@ -45,6 +47,7 @@ class ChatGPTAnalyzer:
             sys.exit(1)  # Exit with an error code
 
         self.yaml_content = yaml_content
+        self.chat_active = True  # ✅ Flag to manage chat session
         self.messages = [
             {
                 "role": "system",
@@ -96,8 +99,10 @@ Please format the response in .html format.
         except Exception as e:
             return f"Error communicating with OpenAI API: {e}"
 
+
+
     def interactive_chat(self):
-        """Start an interactive chat session."""
+        """Start an interactive chat session using `jupyter_ui_poll`."""
         print("Starting interactive chat...")
         chat_history = widgets.Output()
         user_input = widgets.Textarea(
@@ -113,37 +118,43 @@ Please format the response in .html format.
             ),
             style={'description_width': 'initial'}
         )
-        send_button = widgets.Button(description="Execute")
-        exit_button = widgets.Button(description="Exit")
+        send_button = widgets.Button(description="Execute", button_style="primary")
+        exit_button = widgets.Button(description="Exit", button_style="danger")
  
         # Function to process and send user message
         def send_message(_):
-
             prompt = user_input.value.strip()
             if not prompt:
                 return
-
-            # Generate a normal chatbot response (Replace with real logic)
 
             with chat_history:
                 display(Markdown(f"**Your prompt:** {prompt}"))
                 display(Markdown(f"**Generating a response..** "))
                 self.follow_up_prompt(prompt)
                 chatbot_response = self.get_response()
-                if "<table" in  chatbot_response or "<html" in chatbot_response:
+                if "<table" in chatbot_response or "<html" in chatbot_response:
                     display(HTML(chatbot_response))  # Render HTML
                 else:
-                    display(Markdown(f"**ChatGPT Response:**\n\n{ chatbot_response}\n"))
-            
+                    display(Markdown(f"**ChatGPT Response:**\n\n{chatbot_response}\n"))
+
             user_input.value = ""  # Clear input box
         
-        # Function to exit and execute the next cell
+        # Function to exit and allow execution to move to the next cell
         def exit_chat(_):
-            display(Javascript('Jupyter.notebook.execute_cells_below();'))
-
+            self.chat_active = False  # ✅ Ends the chat session
 
         send_button.on_click(send_message)
         exit_button.on_click(exit_chat)
         
         # Display the chat UI
         display(chat_history, user_input, widgets.HBox([send_button, exit_button]))
+
+        # ✅ Wait using `jupyter_ui_poll` to keep UI responsive
+        print("Waiting for chat interactions...")
+        with ui_events() as poll:
+            while self.chat_active:  # ✅ Only exits when user clicks "Exit"
+                poll(10)  # ✅ Process up to 10 UI events (keeps UI interactive)
+                time.sleep(1)  # ✅ Non-blocking pause before rechecking
+
+        print("Chat session ended. Moving to the next cell.")
+
