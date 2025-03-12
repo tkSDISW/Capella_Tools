@@ -55,7 +55,7 @@ class EmbeddingManager :
         self.model_file = ''
         self.selected_objects_output = []  # Stores selected objects persistently
         self.ranked_objects = []  # Store ranked results from the query    
-        self.selection_done = threading.Event()  # ✅ Event to signal completion 
+        self.selection_done = False  # ✅ Flag to signal completion
         
     def save_embeddings(self ):
         """Save embeddings to a file."""
