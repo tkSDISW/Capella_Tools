@@ -181,11 +181,12 @@ from bs4 import BeautifulSoup
 def strip_html_tags(text):
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
+
 def spectext(self):
    
     return strip_html_tags(str(self.specification))
     
-capellambse.metamodel.capellacore.Constraint.spectext = spectext
+#capellambse.metamodel.capellacore.Constraint.spectext = spectext
 
 def display_function_property_values(model):
     df = pd.DataFrame({

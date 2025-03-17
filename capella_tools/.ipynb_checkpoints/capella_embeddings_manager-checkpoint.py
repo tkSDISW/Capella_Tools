@@ -3,15 +3,18 @@ from pathlib import Path
 from openai import OpenAI
 from IPython.display import display, Markdown
 from IPython.core.display import HTML
-from ipywidgets import widgets
 import numpy as np
 import json
 import os
 from datetime import datetime
 from bs4 import BeautifulSoup
-import asyncio
 from ipywidgets import widgets
 from IPython.display import display
+import time
+from IPython import get_ipython
+from jupyter_ui_poll import ui_events
+import time
+
 
 def get_api_key():
     """Retrieve the OpenAI API key from a hidden file."""
@@ -50,6 +53,9 @@ class EmbeddingManager :
         self.model = "text-embedding-3-small"
         self.embedding_file =''
         self.model_file = ''
+        self.selected_objects_output = []  # Stores selected objects persistently
+        self.ranked_objects = []  # Store ranked results from the query    
+        self.selection_done = False  # ✅ Flag to signal completion
         
     def save_embeddings(self ):
         """Save embeddings to a file."""
@@ -112,6 +118,18 @@ class EmbeddingManager :
                     "target_component": obj.target.owner.name 
                 }
             return object_info
+
+
+        def get_diagram_info(object, phase ) :
+            object_info = {
+                    "uuid": object.uuid,
+                    "name": object.name,
+                    "type": type(object).__name__,
+                    "phase" : phase,
+                    "source_component": "",
+                    "target_component": ""
+                }
+            return object_info
             
         def add_unique_object(obj_list, new_obj):
             """
@@ -146,6 +164,9 @@ class EmbeddingManager :
             for obj in model.oa.all_processes:  
                 object_info = get_object_info(obj,phase)
                 add_unique_object(object_data,object_info)
+            for obj in model.oa.diagrams:  
+                object_info = get_diagram_info(obj,phase)
+                add_unique_object(object_data,object_info)
             #SA
             phase = "System Analysis SA"
             for component in model.sa.all_components: 
@@ -165,6 +186,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             for obj in model.sa.all_functional_chains:  
                 object_info = get_object_info(obj,phase)
+                add_unique_object(object_data,object_info)
+            for obj in model.sa.diagrams:  
+                object_info = get_diagram_info(obj,phase)
                 add_unique_object(object_data,object_info)
             #LA
             phase = "Logical Architecture LA"
@@ -188,6 +212,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             for obj in model.la.actor_exchanges:  
                 object_info =  get_component_exchange_info(obj,phase)
+                add_unique_object(object_data,object_info)
+            for obj in model.la.diagrams:  
+                object_info = get_diagram_info(obj,phase)
                 add_unique_object(object_data,object_info)
             #PA
             phase = "Physical Architecture PA"
@@ -217,6 +244,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             for obj in model.pa.all_physical_exchanges:  
                 object_info = get_component_exchange_info(obj,phase)
+                add_unique_object(object_data,object_info)
+            for obj in model.pa.diagrams:  
+                object_info = get_diagram_info(obj,phase)
                 add_unique_object(object_data,object_info)
             
             model_embeddings = self.generate_object_embeddings(object_data)
@@ -271,9 +301,114 @@ class EmbeddingManager :
                   f"Target: {obj.get('target_component', 'N/A')}")
         #print(ranked_objects)
         return ranked_objects
-        
 
-    
+
+
+    def interactive_query_and_selection_widgets(self):
+        """
+        Interactive widget-based function for querying objects and selecting multiple results.
+        Uses `jupyter_ui_poll` to ensure non-blocking UI interactions.
+        """
+        self.selection_done = False  # ✅ Reset flag before starting
+
+        # Create input widget for user query
+        query_input = widgets.Text(
+            placeholder="Enter query for objects...",
+            layout=widgets.Layout(width="80%")
+        )
+        
+        # Create output widget to display ranked results
+        output_area = widgets.Output()
+        
+        # Create a multi-select widget
+        multi_select = widgets.SelectMultiple(
+            options=[],
+            description="Select:",
+            layout=widgets.Layout(width="80%", height="200px")
+        )
+        
+        # Create submit and reset buttons
+        submit_button = widgets.Button(
+            description="Submit Selection",
+            button_style="primary",
+            icon="check"
+        )
+        
+        reset_button = widgets.Button(
+            description="Reset",
+            button_style="warning",
+            icon="times"
+        )
+
+        # Function to handle query submission (stores ranked objects)
+        def on_query_submit(change):
+            output_area.clear_output()
+            query = query_input.value.strip()
+            
+            if not query:
+                with output_area:
+                    print("⚠️ Please enter a query.")
+                return
+            
+            # Get ranked objects **only once** and store them
+            self.ranked_objects = self.find_similar_objects(query)
+            
+            # Update multi-select options dynamically
+            multi_select.options = [(f"{obj['name']} ({obj['type']})", i) for i, (obj, _) in enumerate(self.ranked_objects)]
+            
+            with output_area:
+                print("\n🔍 Ranked Objects Based on Query:")
+                for i, (obj, similarity) in enumerate(self.ranked_objects):
+                    print(f"{i}: {obj['name']} | Type: {obj['type']} | Phase: {obj['phase']} | Similarity: {similarity:.2f}")
+
+        # Function to handle submission (uses stored ranked objects)
+        def on_submit_clicked(b):
+            output_area.clear_output()
+            selected_indices = list(multi_select.value)
+        
+            if not selected_indices:
+                with output_area:
+                    print("⚠️ No objects selected.")
+                return
+        
+            # Retrieve selected objects from stored ranked results
+            self.selected_objects_output = [self.ranked_objects[i][0] for i in selected_indices]
+        
+            with output_area:
+                print("\n✅ Selected Object Details:")
+                for obj in self.selected_objects_output:
+                    print(f"\n🔹 Name: {obj['name']}")
+                    print(f"   Type: {obj['type']}")
+                    print(f"   Phase: {obj['phase']}")
+                    print(f"   Source Component: {obj.get('source_component', 'N/A')}")
+                    print(f"   Target Component: {obj.get('target_component', 'N/A')}")
+            
+            # ✅ Signal that selection is complete
+            self.selection_done = True  
+
+        # Function to reset selection
+        def on_reset_clicked(b):
+            query_input.value = ""
+            multi_select.options = []
+            output_area.clear_output()
+            self.ranked_objects = []  # Clear stored results
+            self.selected_objects_output = []  # Clear selections
+            self.selection_done = False  # Reset completion flag
+
+        # Attach handlers to widgets
+        query_input.observe(on_query_submit, names="value")
+        submit_button.on_click(on_submit_clicked)
+        reset_button.on_click(on_reset_clicked)
+        
+        # Display widgets
+        display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
+
+    def get_selected_objects(self):
+        """
+        Retrieve the selected objects after the widget interaction is complete.
+        """
+        return self.selected_objects_output
+
     def interactive_query_and_selection(self):
         """
         Interactive function to query objects, review responses, and select indices for further processing.
@@ -284,10 +419,10 @@ class EmbeddingManager :
         embeddings = self.embeddings
         while True:
             # Step 1: Prompt for query
-            query = input("Enter query for objects to be analyzed: ")
+            query = input("Enter query for objects or diagrams to be analyzed: ")
     
             # Step 2: Filter and rank objects
-            ranked_objects = embeddings.find_similar_objects(query)
+            ranked_objects = self.find_similar_objects(query)
     
             # Step 3: Display ranked objects
             print("\nThis is a list of ranked Objects Based on Query:")
