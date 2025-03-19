@@ -857,7 +857,7 @@ class CapellaYAMLHandler:
           ref_uuid: {{ source_component_uuid }}
         target component:
         - name: {{ target_component }}
-          ref_uuid: {{ target_function_uuid }}
+          ref_uuid: {{ target_component_uuid  }}
           {% if applied_property_value_groups %}applied property value groups:
           {% for apvg in applied_property_value_groups %}
               - name: {{ apvg.name }}
@@ -1586,6 +1586,11 @@ class CapellaYAMLHandler:
  
             self.yaml_content = self.yaml_content + template.render(data)
         elif obj.__class__.__name__ ==  "ComponentExchange" : 
+            print(obj) 
+            print(obj.source)
+            print(obj.target)
+            print(object.source.owner)
+            print(object.target.owner)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
