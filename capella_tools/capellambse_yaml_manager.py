@@ -549,9 +549,9 @@ class CapellaYAMLHandler:
       primary_uuid: {{ uuid }}
       description : {{ description }}
       nodes or element :
-        {% for n in outgoing_transitions %}
-        - name: {{ og.name }}
-          ref_uuid : {{ og.uuid }}
+        {% for n in nodes %}
+        - name: {{ n.name }}
+          ref_uuid : {{ n.uuid }}
         {% endfor %}
 """   
 
@@ -1905,6 +1905,7 @@ class CapellaYAMLHandler:
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
+                "description" :obj.description,
                 "uuid":obj.uuid,
                 "nodes":obj.nodes              
             }
