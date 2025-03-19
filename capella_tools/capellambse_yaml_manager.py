@@ -1886,19 +1886,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template( Traceability_artifact)
             self.yaml_content = self.yaml_content + template.render(data)
-         elif obj.__class__.__name__ ==  "Traceability_Artifact" :   
-            #print("This is a Pub4C Artifact",obj)   
-            data = {
-                "type" : obj.__class__.__name__,
-                "name": obj.name,
-                "uuid":obj.uuid,
-                "url" :obj.url,
-                "identifier" :obj.identifier,
-                "artifact_links": [{  "name": link.link_type.name, "model_element_uuid": link.model_element_uuid} for link in obj.artifact_links],
-            }
-            # Render the template
-            template = Template( Traceability_artifact)
-            self.yaml_content = self.yaml_content + template.render(data)
+            
 
         elif obj.__class__.__name__ ==  "Diagram" :   
             print(obj)   
