@@ -1589,8 +1589,8 @@ class CapellaYAMLHandler:
             print(obj) 
             print(obj.source)
             print(obj.target)
-            print(object.source.owner)
-            print(object.target.owner)
+            print(obj.source.owner)
+            print(obj.target.owner)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
