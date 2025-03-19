@@ -854,7 +854,7 @@ class CapellaYAMLHandler:
         description : {{ description }}
         source component:
         - name: {{ source_component }}
-          ref_uuid: {{ source_function_uuid }}
+          ref_uuid: {{ source_component_uuid }}
         target component:
         - name: {{ target_component }}
           ref_uuid: {{ target_function_uuid }}
@@ -1889,7 +1889,7 @@ class CapellaYAMLHandler:
             
 
         elif obj.__class__.__name__ ==  "Diagram" :   
-            print(obj)   
+   
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
