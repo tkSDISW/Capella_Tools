@@ -534,10 +534,28 @@ class CapellaYAMLHandler:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
+        if obj.__class__.__name__ ==  "Diagram" :
+            for node in obj.nodes:
+                if node not in self.referenced_objects:
+                    self.referenced_objects.append(node)
     
     def generate_yaml(self, obj):
 
         """Generate YAML for primary objects and manage references."""
+
+        diagram = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      nodes or element :
+        {% for n in outgoing_transitions %}
+        - name: {{ og.name }}
+          ref_uuid : {{ og.uuid }}
+        {% endfor %}
+"""   
+
+        
         default_template = """
     - name: {{ name }}
       type: {{type}}
@@ -1868,7 +1886,33 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template( Traceability_artifact)
             self.yaml_content = self.yaml_content + template.render(data)
-            
+         elif obj.__class__.__name__ ==  "Traceability_Artifact" :   
+            #print("This is a Pub4C Artifact",obj)   
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid":obj.uuid,
+                "url" :obj.url,
+                "identifier" :obj.identifier,
+                "artifact_links": [{  "name": link.link_type.name, "model_element_uuid": link.model_element_uuid} for link in obj.artifact_links],
+            }
+            # Render the template
+            template = Template( Traceability_artifact)
+            self.yaml_content = self.yaml_content + template.render(data)
+
+        elif obj.__class__.__name__ ==  "Diagram" :   
+            print(obj)   
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid":obj.uuid,
+                "nodes":obj.nodes              
+            }
+            # Render the template
+            self._track_referenced_objects(obj)
+            template = Template(diagram)
+            self.yaml_content = self.yaml_content + template.render(data)                     
+
         else :
             #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processiong.")
            
