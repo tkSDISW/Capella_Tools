@@ -1,0 +1,4018 @@
+# YAML file for Capella objects
+      # YAML file for system model relationships
+      schema:
+        primary_uuid: Unique identifier for the primary object
+        ref_uuid: Unique identifier for a referenced object
+      - name: Deliver AC Mode
+        type: FunctionalChain
+        primary_uuid: 0737802b-988c-4e77-aaed-c8ee83755e9d
+        description : 
+        involved:
+          - name: Start
+            ref_uuid: uuid : d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+          - name: Deliver Assist/Control Mode
+            ref_uuid: uuid : b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+          - name: Sense Pat Exahale Press
+            ref_uuid: uuid : d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+          - name: Control Patient Exhale
+            ref_uuid: uuid : babf73b3-3c84-4479-8f01-b95d50c42c53
+          - name: Sense  Press at Pat
+            ref_uuid: uuid : a5aae429-240e-4cea-b7b2-73fa62850699
+          - name: Select 9
+            ref_uuid: uuid : fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: Generate Inhaltion Air
+            ref_uuid: uuid : 737c514e-9195-4425-9254-69596d9fcdce
+          - name: Source and Sink Air
+            ref_uuid: uuid : ea0699ab-9b1a-48e6-baa3-95e5c33fc540
+          - name: Route 66
+            ref_uuid: uuid : 052ea98a-247e-48cd-909f-c8c040bb4ebe
+          - name: Control O2 to Valve
+            ref_uuid: uuid : 239c3f19-e05e-4425-92b0-346a884311de
+          - name: Select O2
+            ref_uuid: uuid : 1e345882-6d76-4d68-89c9-18c5b34dc321
+          - name: Select
+            ref_uuid: uuid : b776ee26-a8f3-4add-82f9-6737edefdf68
+          - name: Supply O2
+            ref_uuid: uuid : 82018c4f-7c58-4bb7-bcff-27957e35bb0a
+          - name: Deliver Ventilation through Double Limb Circuit
+            ref_uuid: uuid : 1bb312d4-731f-4af0-8350-061f288c8b6f
+          - name: Convert Ventilator Air to Blood Oxygen
+            ref_uuid: uuid : 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+          - name: Start/Stop Ventilation
+            ref_uuid: uuid : 7c663e82-0332-42e4-ad47-c16036e32c8c
+          - name: Vent Remote UI 
+            ref_uuid: uuid : 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+          - name: Activate Operating Mode
+            ref_uuid: uuid : 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: Start/Stop
+            ref_uuid: uuid : 33cd5a28-29b5-4638-babf-48d9dcfa535b
+          - name: Exhalation Press
+            ref_uuid: uuid : f0c3617d-308e-46e2-8de8-6b1cbb54dd29
+          - name: Exhale Control
+            ref_uuid: uuid : a3b597bf-2211-4418-942f-eb9aa525f9c9
+          - name: Pressure at Pat
+            ref_uuid: uuid : d956aed0-a862-4534-99bc-1ec7dbe1f2cf
+          - name: Air Control
+            ref_uuid: uuid : 047c6a25-42c8-4ad6-b5bc-ea3b16599d36
+          - name: Air
+            ref_uuid: uuid : 9c0266ce-6f03-4e1c-aa5e-dbc2e9ef237e
+          - name: Generate Inhation Air
+            ref_uuid: uuid : 58c5e52d-eecf-4290-b40d-3bc4613fd486
+          - name: Vent O2
+            ref_uuid: uuid : f84eb140-24e1-47b3-82a8-66d6b7199c93
+          - name: O2 Control
+            ref_uuid: uuid : 7b4559f8-5998-43e6-86ef-febfb5f40b31
+          - name: O2 Control
+            ref_uuid: uuid : 00700568-c4d1-401d-846e-9be45d8aae96
+          - name: Vent
+            ref_uuid: uuid : 92277111-6fbe-470b-808a-5c518dc521ff
+          - name: O2
+            ref_uuid: uuid : 4ee31a8f-432b-4cfd-bc9b-6f842d7863bc
+          - name: Vent
+            ref_uuid: uuid : 3666acb5-bdae-4eb0-9a92-b2aab7cd5187
+          - name: Vent Double Limb
+            ref_uuid: uuid : bbc1235b-b3f5-4a6e-8ef4-b74de943f921
+          - name: Exhale Control
+            ref_uuid: uuid : 20aaf075-6290-4949-83f8-9c7be803cfde
+          - name: DC Vent
+            ref_uuid: uuid : bfe2e96a-dd7b-486b-9c04-b53ec612d14f
+          - name: Settings Start Stop
+            ref_uuid: uuid : 88ab419b-51b1-4a5b-b593-d772a23c01c0
+          - name: Mode
+            ref_uuid: uuid : 6be76466-b952-454d-8a20-30d706907b50
+          - name: Start/Stop
+            ref_uuid: uuid : c06a2add-f089-450b-ba15-199c03bdb873
+      - name: Start
+        type: LogicalFunction
+        primary_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+        description : 
+        owner :
+          - name : User Interface
+            ref_uuid : 397ec96b-d885-4179-846d-afc7dc141632
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 9a73313b-53fb-48f3-97d9-628d9bd3aed3
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  c06a2add-f089-450b-ba15-199c03bdb873
+                description :  
+                source_function_name: Start/Stop Ventilation
+                ref_uuid: 7c663e82-0332-42e4-ad47-c16036e32c8c
+                target_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 40bea553-c5ac-4914-96bc-bb9bbf8a1080
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  13b84276-9ffb-49bb-9517-f12ae0f51046
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver PSV Mode
+                ref_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+          - name: FOP 2
+            description :  
+            ref_uuid : c2909a1f-f473-4734-9829-e746785e7eef
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  47b75d57-448b-4d0f-a284-1258125bbf6e
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver CPAP Mode
+                ref_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+          - name: FOP 3
+            description :  
+            ref_uuid : f85268b7-7f49-4e15-8b49-ea783aeab8d2
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  c97e751a-9f23-4342-99dd-8be7b137e767
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+          - name: FOP 4
+            description :  
+            ref_uuid : 7f528755-e363-4816-ae3f-0d7d4d4fc811
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  33cd5a28-29b5-4638-babf-48d9dcfa535b
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+      - name: Deliver Assist/Control Mode
+        type: LogicalFunction
+        primary_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 0f57ff2a-b1a2-442c-8ca4-6d248b37fd2b
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  33cd5a28-29b5-4638-babf-48d9dcfa535b
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+          - name: FIP 2
+            description :  
+            ref_uuid : a75a68bb-f70d-4036-9ec4-a80c6ed84700
+            exchanges:
+              - name: Exhalation Press
+                ref_uuid:  f0c3617d-308e-46e2-8de8-6b1cbb54dd29
+                description :  
+                source_function_name: Sense Pat Exahale Press
+                ref_uuid: d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+          - name: FIP 3
+            description :  
+            ref_uuid : 6d547bd9-7377-4034-8098-0c3f8f229e37
+            exchanges:
+              - name: Pressure at Pat
+                ref_uuid:  d956aed0-a862-4534-99bc-1ec7dbe1f2cf
+                description :  
+                source_function_name: Sense  Press at Pat
+                ref_uuid: a5aae429-240e-4cea-b7b2-73fa62850699
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+          - name: FIP 4
+            description :  
+            ref_uuid : aee99f5e-0b22-480a-8d0c-1fed86b58bcc
+            exchanges:
+              - name: O2 Sense
+                ref_uuid:  fa4a966b-344b-42c8-a385-289d68dce44b
+                description :  
+                source_function_name: Split 10
+                ref_uuid: 30b6c798-d965-4026-ac2c-33d79bd5cca4
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+          - name: FIP 5
+            description :  
+            ref_uuid : 833595b1-97f2-43f0-bc47-5821210911e9
+            exchanges:
+              - name: Mode
+                ref_uuid:  6be76466-b952-454d-8a20-30d706907b50
+                description :  
+                source_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 27a35b9b-9172-4597-8410-e4ff2acf1c3e
+            exchanges:
+              - name: DC Vent
+                ref_uuid:  bfe2e96a-dd7b-486b-9c04-b53ec612d14f
+                description :  
+                source_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: FOP 3
+            description :  
+            ref_uuid : bef670ff-8bb2-4f25-8f0a-d78b8e5d4db9
+            exchanges:
+              - name: Exhale Control
+                ref_uuid:  a3b597bf-2211-4418-942f-eb9aa525f9c9
+                description :  
+                source_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+                target_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+          - name: FOP 4
+            description :  
+            ref_uuid : 4ddd89f6-7bb8-4570-9511-b7491dd1974f
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  7b4559f8-5998-43e6-86ef-febfb5f40b31
+                description :  
+                source_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+      - name: Sense Pat Exahale Press
+        type: LogicalFunction
+        primary_uuid: d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+        description : 
+        owner :
+          - name : Exhalation Air Sensor
+            ref_uuid : 262a7d96-f2af-44ad-a717-1c3e73865585
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 11ae39f7-ffd0-4cdf-8ea1-d773900847fd
+            exchanges:
+              - name: Exhaltion Pres
+                ref_uuid:  9d640652-3dfd-46c0-b4e7-46a714cab6e7
+                description :  
+                source_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+                target_function_name: Sense Pat Exahale Press
+                ref_uuid: d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+        outputs:
+          - name: FOP 3
+            description :  
+            ref_uuid : 2cb70289-975b-4a53-9138-58259d693b8f
+            exchanges:
+              - name: Exhalation 
+                ref_uuid:  d0fa6238-9efd-4feb-9820-0dd76a29230d
+                description :  
+                source_function_name: Sense Pat Exahale Press
+                ref_uuid: d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+                target_function_name: Provide Respiration Data
+                ref_uuid: 0e1a31f5-e10c-4eae-beb4-917103b48cda
+              - name: Exhalation Press
+                ref_uuid:  f0c3617d-308e-46e2-8de8-6b1cbb54dd29
+                description :  
+                source_function_name: Sense Pat Exahale Press
+                ref_uuid: d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+      - name: Control Patient Exhale
+        type: LogicalFunction
+        primary_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+        description : 
+        owner :
+          - name : Exahalation Valve
+            ref_uuid : 48ef6bfe-1634-40df-8210-157ee8ff476f
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : caeb3189-b402-499b-ab85-007a6ddbf820
+            exchanges:
+              - name: Exhale Control
+                ref_uuid:  a3b597bf-2211-4418-942f-eb9aa525f9c9
+                description :  
+                source_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+                target_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+              - name: Exhale COntrol
+                ref_uuid:  3cfc2a6a-2967-471b-98cb-52af13186f7e
+                description :  
+                source_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+                target_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+          - name: FIP 1
+            description :  
+            ref_uuid : a358f58c-1075-4249-8af9-bb2c340b142e
+            exchanges:
+              - name: Vent
+                ref_uuid:  92277111-6fbe-470b-808a-5c518dc521ff
+                description :  
+                source_function_name: Route 66
+                ref_uuid: 052ea98a-247e-48cd-909f-c8c040bb4ebe
+                target_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 185006cc-4221-4cb3-8afc-6a92532cd68c
+            exchanges:
+              - name: Exhale Control
+                ref_uuid:  20aaf075-6290-4949-83f8-9c7be803cfde
+                description :  
+                source_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+                target_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+      - name: Sense  Press at Pat
+        type: LogicalFunction
+        primary_uuid: a5aae429-240e-4cea-b7b2-73fa62850699
+        description : 
+        owner :
+          - name : Patient Proximal Inhalation Sensor
+            ref_uuid : f65defac-ad94-409f-9ab4-5406694b21ec
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : b16a6fa0-051b-4375-a16e-c57eaed2022a
+            exchanges:
+              - name: Prox Press
+                ref_uuid:  fd3ed49d-4e16-485f-9c80-ac63835f0627
+                description :  
+                source_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+                target_function_name: Sense  Press at Pat
+                ref_uuid: a5aae429-240e-4cea-b7b2-73fa62850699
+        outputs:
+          - name: FOP 3
+            description :  
+            ref_uuid : 118a1d68-4238-4ce5-b1c6-ae43f082da49
+            exchanges:
+              - name: Pressure at Pat
+                ref_uuid:  d956aed0-a862-4534-99bc-1ec7dbe1f2cf
+                description :  
+                source_function_name: Sense  Press at Pat
+                ref_uuid: a5aae429-240e-4cea-b7b2-73fa62850699
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+      - name: Select 9
+        type: LogicalFunction
+        primary_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 3e711e25-7d30-49ad-a149-2b14d4f6adb3
+            exchanges:
+              - name: DC Vent
+                ref_uuid:  bfe2e96a-dd7b-486b-9c04-b53ec612d14f
+                description :  
+                source_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: FIP 3
+            description :  
+            ref_uuid : 1f44d618-86ae-4935-ad24-31ac9fafbca8
+            exchanges:
+              - name: CPAP Vent
+                ref_uuid:  9123ef65-e618-4c8c-a721-81ffad2835a0
+                description :  
+                source_function_name: Deliver CPAP Mode
+                ref_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: FIP 2
+            description :  
+            ref_uuid : ba004096-6e07-4c08-bfca-450bcdcede7a
+            exchanges:
+              - name: SIMV Vent
+                ref_uuid:  e342a4f5-c9e0-4e8d-bc39-05a6d8b7d848
+                description :  
+                source_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: FIP 4
+            description :  
+            ref_uuid : 61c56fa3-c31a-4c72-bedb-fcd1edf28377
+            exchanges:
+              - name: PSV Vent
+                ref_uuid:  109ac95a-9317-497a-9310-97a694647074
+                description :  
+                source_function_name: Deliver PSV Mode
+                ref_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 484ee7e3-aed3-4189-91c8-3752701269d1
+            exchanges:
+              - name: Air Control
+                ref_uuid:  047c6a25-42c8-4ad6-b5bc-ea3b16599d36
+                description :  
+                source_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+                target_function_name: Generate Inhaltion Air
+                ref_uuid: 737c514e-9195-4425-9254-69596d9fcdce
+      - name: Generate Inhaltion Air
+        type: LogicalFunction
+        primary_uuid: 737c514e-9195-4425-9254-69596d9fcdce
+        description : 
+        owner :
+          - name : Inhalation Air Generator
+            ref_uuid : 8be8d9c4-d07c-40e5-987d-e01bbeae86ae
+        child functions:
+        inputs:
+          - name: FIP 2
+            description :  
+            ref_uuid : 1007a889-c81e-4f59-80a0-65d8b5e58adc
+            exchanges:
+              - name: Air
+                ref_uuid:  9c0266ce-6f03-4e1c-aa5e-dbc2e9ef237e
+                description :  
+                source_function_name: Source and Sink Air
+                ref_uuid: ea0699ab-9b1a-48e6-baa3-95e5c33fc540
+                target_function_name: Generate Inhaltion Air
+                ref_uuid: 737c514e-9195-4425-9254-69596d9fcdce
+          - name: FIP 3
+            description :  
+            ref_uuid : af3e37e4-7bed-4689-b0d8-d000689ebd78
+            exchanges:
+              - name: Air Control
+                ref_uuid:  047c6a25-42c8-4ad6-b5bc-ea3b16599d36
+                description :  
+                source_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+                target_function_name: Generate Inhaltion Air
+                ref_uuid: 737c514e-9195-4425-9254-69596d9fcdce
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : d5278c86-f1d0-4f22-b2a6-5f05e0afb2ec
+            exchanges:
+              - name: Generate Inhation Air
+                ref_uuid:  58c5e52d-eecf-4290-b40d-3bc4613fd486
+                description :  
+                source_function_name: Generate Inhaltion Air
+                ref_uuid: 737c514e-9195-4425-9254-69596d9fcdce
+                target_function_name: Route 66
+                ref_uuid: 052ea98a-247e-48cd-909f-c8c040bb4ebe
+      - name: Source and Sink Air
+        type: LogicalFunction
+        primary_uuid: ea0699ab-9b1a-48e6-baa3-95e5c33fc540
+        description : 
+        owner :
+          - name : Environment
+            ref_uuid : d9da8a16-5867-4a29-a368-48a5d7f06e9b
+        child functions:
+        inputs:
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : ab8e7bf0-08b8-4547-bffe-907330bcb2ae
+            exchanges:
+              - name: Air
+                ref_uuid:  9c0266ce-6f03-4e1c-aa5e-dbc2e9ef237e
+                description :  
+                source_function_name: Source and Sink Air
+                ref_uuid: ea0699ab-9b1a-48e6-baa3-95e5c33fc540
+                target_function_name: Generate Inhaltion Air
+                ref_uuid: 737c514e-9195-4425-9254-69596d9fcdce
+      - name: Route 66
+        type: LogicalFunction
+        primary_uuid: 052ea98a-247e-48cd-909f-c8c040bb4ebe
+        description : 
+        owner :
+          - name : Housing
+            ref_uuid : 16193167-a2cd-4dc4-a7b3-ab761302df6c
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 991367e4-5e70-4333-ac16-8a25afbdf5e8
+            exchanges:
+              - name: Generate Inhation Air
+                ref_uuid:  58c5e52d-eecf-4290-b40d-3bc4613fd486
+                description :  
+                source_function_name: Generate Inhaltion Air
+                ref_uuid: 737c514e-9195-4425-9254-69596d9fcdce
+                target_function_name: Route 66
+                ref_uuid: 052ea98a-247e-48cd-909f-c8c040bb4ebe
+          - name: FIP 1
+            description :  
+            ref_uuid : 0b2713e8-7255-40d8-bc2c-ea79bb8d504f
+            exchanges:
+              - name: Vent O2
+                ref_uuid:  f84eb140-24e1-47b3-82a8-66d6b7199c93
+                description :  
+                source_function_name: Control O2 to Valve
+                ref_uuid: 239c3f19-e05e-4425-92b0-346a884311de
+                target_function_name: Route 66
+                ref_uuid: 052ea98a-247e-48cd-909f-c8c040bb4ebe
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 28cba93a-bb99-4472-be0f-e0db38644a74
+            exchanges:
+              - name: Vent
+                ref_uuid:  92277111-6fbe-470b-808a-5c518dc521ff
+                description :  
+                source_function_name: Route 66
+                ref_uuid: 052ea98a-247e-48cd-909f-c8c040bb4ebe
+                target_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+      - name: Control O2 to Valve
+        type: LogicalFunction
+        primary_uuid: 239c3f19-e05e-4425-92b0-346a884311de
+        description : 
+        owner :
+          - name : O2 Valve
+            ref_uuid : 459dc000-2d77-4325-8df0-ebfa6fbbfaf9
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 0be307af-0f59-4531-9399-e8a1125829e0
+            exchanges:
+              - name: O2
+                ref_uuid:  4ee31a8f-432b-4cfd-bc9b-6f842d7863bc
+                description :  
+                source_function_name: Supply O2
+                ref_uuid: 82018c4f-7c58-4bb7-bcff-27957e35bb0a
+                target_function_name: Control O2 to Valve
+                ref_uuid: 239c3f19-e05e-4425-92b0-346a884311de
+          - name: FIP 2
+            description :  
+            ref_uuid : 35ed44a3-7d55-405b-9342-905c2d568ffc
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  00700568-c4d1-401d-846e-9be45d8aae96
+                description :  
+                source_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+                target_function_name: Control O2 to Valve
+                ref_uuid: 239c3f19-e05e-4425-92b0-346a884311de
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : cbfe63ce-7a38-447e-86d8-4ce12863721e
+            exchanges:
+              - name: Vent O2
+                ref_uuid:  f84eb140-24e1-47b3-82a8-66d6b7199c93
+                description :  
+                source_function_name: Control O2 to Valve
+                ref_uuid: 239c3f19-e05e-4425-92b0-346a884311de
+                target_function_name: Route 66
+                ref_uuid: 052ea98a-247e-48cd-909f-c8c040bb4ebe
+      - name: Select O2
+        type: LogicalFunction
+        primary_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 40eeb05d-146c-4f00-ab85-637675e7eafc
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  7b4559f8-5998-43e6-86ef-febfb5f40b31
+                description :  
+                source_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+          - name: FIP 2
+            description :  
+            ref_uuid : 4d7f059d-07aa-4ab3-ad41-99d624dd515e
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  a8179497-814d-48e2-a540-382e7199a9f5
+                description :  
+                source_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+          - name: FIP 3
+            description :  
+            ref_uuid : c2de3db2-fce8-46d1-a005-9c75429e51d6
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  9be657d8-99a5-4501-8c93-5b6130d4333f
+                description :  
+                source_function_name: Deliver CPAP Mode
+                ref_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+          - name: FIP 4
+            description :  
+            ref_uuid : d4e9ff70-d836-411b-acf5-34e20a620c82
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  838b6f52-d8b4-4641-811c-4278399eeb2d
+                description :  
+                source_function_name: Deliver PSV Mode
+                ref_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+          - name: FIP 5
+            description :  
+            ref_uuid : 7b99e93c-9b8d-4feb-bdc7-da6d4617de60
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  528205cf-a65f-4762-a1cb-c794f96dac45
+                description :  
+                source_function_name: Provide Respiration Data
+                ref_uuid: 0e1a31f5-e10c-4eae-beb4-917103b48cda
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+        outputs:
+          - name: FOP 2
+            description :  
+            ref_uuid : e902dcff-2176-4956-a2a4-f94a18a35e62
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  00700568-c4d1-401d-846e-9be45d8aae96
+                description :  
+                source_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+                target_function_name: Control O2 to Valve
+                ref_uuid: 239c3f19-e05e-4425-92b0-346a884311de
+      - name: Select
+        type: LogicalFunction
+        primary_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+        description : 
+        owner :
+          - name : Disposable Circuit Components
+            ref_uuid : fe6bf5ab-54d7-4dff-a9e4-31223564e7ac
+        child functions:
+        inputs:
+          - name: FIP 2
+            description :  
+            ref_uuid : 33b1d1f9-f040-4a33-8dc2-9e388ea8f73d
+            exchanges:
+              - name: Exhale Control
+                ref_uuid:  20aaf075-6290-4949-83f8-9c7be803cfde
+                description :  
+                source_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+                target_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 4a26d158-c051-4bb8-a49c-07c2c63ef043
+            exchanges:
+              - name: Vent
+                ref_uuid:  8dbcbb16-d210-43c4-a571-1da81687b708
+                description :  
+                source_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+                target_function_name: Deliver Ventilation Single Limb Circuti
+                ref_uuid: 900a83fd-86c6-4acc-974b-b1cb98b04003
+          - name: FOP 2
+            description :  
+            ref_uuid : 19cb236c-77f6-49a1-bab6-522095f9f2f9
+            exchanges:
+              - name: Vent
+                ref_uuid:  3666acb5-bdae-4eb0-9a92-b2aab7cd5187
+                description :  
+                source_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+                target_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+          - name: FOP 3
+            description :  
+            ref_uuid : 62b6ff89-d2f4-4da2-826d-0c625459fbd1
+            exchanges:
+              - name: Vent
+                ref_uuid:  fb9f91c6-c16a-43ea-b0ec-b7301cd249e6
+                description :  
+                source_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+                target_function_name: Deliver Ventaltion Single Limb with EV
+                ref_uuid: d8830276-9479-4289-8892-a75e7faddca6
+          - name: FOP 4
+            description :  
+            ref_uuid : 2cfdb989-c195-4317-aeff-dd414333a0fe
+            exchanges:
+              - name: Air
+                ref_uuid:  9ce1dd93-8457-4075-80ad-659c759a5f2a
+                description :  
+                source_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+                target_function_name: Sense O2
+                ref_uuid: 5bb0b8bf-5d5c-43a7-bcd4-6dc38a8e337e
+      - name: Supply O2
+        type: LogicalFunction
+        primary_uuid: 82018c4f-7c58-4bb7-bcff-27957e35bb0a
+        description : 
+        owner :
+          - name : Environment
+            ref_uuid : d9da8a16-5867-4a29-a368-48a5d7f06e9b
+        child functions:
+        inputs:
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : cce77c92-6359-41dd-a74a-9a06a222de81
+            exchanges:
+              - name: O2
+                ref_uuid:  4ee31a8f-432b-4cfd-bc9b-6f842d7863bc
+                description :  
+                source_function_name: Supply O2
+                ref_uuid: 82018c4f-7c58-4bb7-bcff-27957e35bb0a
+                target_function_name: Control O2 to Valve
+                ref_uuid: 239c3f19-e05e-4425-92b0-346a884311de
+      - name: Deliver Ventilation through Double Limb Circuit
+        type: LogicalFunction
+        primary_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+        description : 
+        owner :
+          - name : Double Limb Circuit
+            ref_uuid : bb557caf-9666-4554-aa68-d75645eeb2ff
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 6d607033-839b-4970-914a-2d78998924ad
+            exchanges:
+              - name: Vent
+                ref_uuid:  3666acb5-bdae-4eb0-9a92-b2aab7cd5187
+                description :  
+                source_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+                target_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 01e78815-b3ab-492b-86c6-9c01ae721bee
+            exchanges:
+              - name: Vent Double Limb
+                ref_uuid:  bbc1235b-b3f5-4a6e-8ef4-b74de943f921
+                description :  
+                source_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+          - name: FOP 2
+            description :  
+            ref_uuid : b6f37512-d0d2-4a32-83f4-7598b2d8fdcd
+            exchanges:
+              - name: Exhaltion Pres
+                ref_uuid:  9d640652-3dfd-46c0-b4e7-46a714cab6e7
+                description :  
+                source_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+                target_function_name: Sense Pat Exahale Press
+                ref_uuid: d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+          - name: FOP 3
+            description :  
+            ref_uuid : 3d598590-96f3-45d8-a07d-cb438459feaa
+            exchanges:
+              - name: Prox Press
+                ref_uuid:  fd3ed49d-4e16-485f-9c80-ac63835f0627
+                description :  
+                source_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+                target_function_name: Sense  Press at Pat
+                ref_uuid: a5aae429-240e-4cea-b7b2-73fa62850699
+          - name: FOP 2
+            description :  
+            ref_uuid : 46d426c6-a802-4827-b22a-7cc35633fde4
+            exchanges:
+      - name: Convert Ventilator Air to Blood Oxygen
+        type: LogicalFunction
+        primary_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+        description : 
+        owner :
+          - name : Patient
+            ref_uuid : 379684a4-ebb4-4086-a6b5-4f0956c339e1
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 650ad9b6-c42e-46f2-889d-77426b51a0c7
+            exchanges:
+              - name: Vent with Single Limb
+                ref_uuid:  82e3c29c-50de-455c-9781-42bb8fc1dc52
+                description :  
+                source_function_name: Deliver Ventilation Single Limb Circuti
+                ref_uuid: 900a83fd-86c6-4acc-974b-b1cb98b04003
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+          - name: FIP 2
+            description :  
+            ref_uuid : 093debfc-ebd5-4ae7-b90d-f1d420b56054
+            exchanges:
+              - name: Vent Double Limb
+                ref_uuid:  bbc1235b-b3f5-4a6e-8ef4-b74de943f921
+                description :  
+                source_function_name: Deliver Ventilation through Double Limb Circuit
+                ref_uuid: 1bb312d4-731f-4af0-8350-061f288c8b6f
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+          - name: FIP 3
+            description :  
+            ref_uuid : 07c844d7-d0ad-4584-b6ba-c74848515be3
+            exchanges:
+              - name: Vent with Single Limb EV
+                ref_uuid:  b204c108-6851-4277-a30b-8d8c55c1e604
+                description :  
+                source_function_name: Deliver Ventaltion Single Limb with EV
+                ref_uuid: d8830276-9479-4289-8892-a75e7faddca6
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+          - name: inVentilation
+            description :  
+            ref_uuid : 3a029d0b-d967-4864-99d3-5d8b74def52f
+            exchanges:
+              - name: Ventilation
+                ref_uuid:  a0d2d071-3bc4-47e3-a0b5-3a0bb52414f3
+                description :  
+                source_function_name: Deliver Ventilation to Patient
+                ref_uuid: 5dc9217b-ff90-4a06-bcdb-edcb16eb4caf
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+          - name: inAdjusted Settings
+            description :  
+            ref_uuid : 93cebe7f-74ea-42aa-8735-b62d2c60355d
+            exchanges:
+              - name: Adjusted Settings
+                ref_uuid:  2eadfbfc-8c4c-489f-897f-6c4b24220715
+                description :  
+                source_function_name: Adjust Ventilation Settings
+                ref_uuid: 3d8c8f57-f465-4ce1-bb63-f3192ab630cd
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+        outputs:
+          - name: outPatient Response
+            description :  
+            ref_uuid : 3cf1e3fa-4dae-430c-919b-13aa3f5f4854
+            exchanges:
+          - name: outPatient Vitals
+            description :  
+            ref_uuid : 376ca745-0efe-4b3c-a1f0-90f23a2d2219
+            exchanges:
+              - name: Patient Vitals
+                ref_uuid:  857da965-19de-4d17-ae7f-9975cbe400de
+                description :  
+                source_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+                target_function_name: Distribute
+                ref_uuid: 6356e2ae-a2ab-44f9-b950-fd704c58e234
+      - name: Start/Stop Ventilation
+        type: LogicalFunction
+        primary_uuid: 7c663e82-0332-42e4-ad47-c16036e32c8c
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: IN
+            description :  
+            ref_uuid : 508e5bb5-d58d-414f-ae81-afeffee16b6d
+            exchanges:
+              - name: Start Stop
+                ref_uuid:  097659b6-6e70-45c8-a938-9c3e43c3a8d9
+                description :  
+                source_function_name: Provide Settings
+                ref_uuid: 1f189c44-81f7-4e07-a390-39a46c737da4
+                target_function_name: Start/Stop Ventilation
+                ref_uuid: 7c663e82-0332-42e4-ad47-c16036e32c8c
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : dfc55610-2491-45f9-9ba6-9589d314a717
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  c06a2add-f089-450b-ba15-199c03bdb873
+                description :  
+                source_function_name: Start/Stop Ventilation
+                ref_uuid: 7c663e82-0332-42e4-ad47-c16036e32c8c
+                target_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+      - name: Vent Remote UI 
+        type: LogicalFunction
+        primary_uuid: 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+        description : 
+        owner :
+          - name : Remote UI
+            ref_uuid : 8db95212-913f-440e-8143-e89375d03629
+        child functions:
+        inputs:
+          - name: FIP 2
+            description :  
+            ref_uuid : c14ad60f-36bf-44ca-b9f3-aadede21be43
+            exchanges:
+              - name: Respiration Data
+                ref_uuid:  f340e92b-a488-4f5b-b076-f74e9581b91f
+                description :  
+                source_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+                target_function_name: Vent Remote UI 
+                ref_uuid: 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+          - name: FIP 3
+            description :  
+            ref_uuid : 5e3f93a2-e98f-4e67-b417-15ee762fa594
+            exchanges:
+              - name: Control
+                ref_uuid:  520cf02a-7073-476c-98b2-7dab073c6df1
+                description :  
+                source_function_name: App Vent UI
+                ref_uuid: 88e77569-89f1-419b-9b16-b88fa07cf046
+                target_function_name: Vent Remote UI 
+                ref_uuid: 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+          - name: FIP 2
+            description :  
+            ref_uuid : d1c064e1-49e0-4ab3-84c7-bf956a70ebe2
+            exchanges:
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : d49b8329-3924-4d04-b297-37f2ebf4b375
+            exchanges:
+              - name: Settings Start Stop
+                ref_uuid:  88ab419b-51b1-4a5b-b593-d772a23c01c0
+                description :  
+                source_function_name: Vent Remote UI 
+                ref_uuid: 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FOP 2
+            description :  
+            ref_uuid : f0180f8f-8c0a-47cb-a0ce-4c256097a3d7
+            exchanges:
+              - name: Monitor
+                ref_uuid:  3bbbdc5e-6876-4347-ba0e-6ef8c8c7bbfc
+                description :  
+                source_function_name: Vent Remote UI 
+                ref_uuid: 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+                target_function_name: App Vent UI
+                ref_uuid: 88e77569-89f1-419b-9b16-b88fa07cf046
+      - name: Activate Operating Mode
+        type: LogicalFunction
+        primary_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 2
+            description :  
+            ref_uuid : 96788de6-0ba8-45c5-b7b1-621ac2d4f908
+            exchanges:
+              - name: Activate CPAP Mode
+                ref_uuid:  65caaf00-fd1e-4ab4-9b66-a4c0c7830613
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FIP 2
+            description :  
+            ref_uuid : 61347802-9d3e-4ce7-842d-1c7f1c1f0f9f
+            exchanges:
+              - name: Activate SIMV Mod
+                ref_uuid:  36010374-11a8-43cc-aacc-589483acd497
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FIP 2
+            description :  
+            ref_uuid : 7db1487a-a817-42cc-a645-56dcc0dc5515
+            exchanges:
+              - name: Activate A/C Mode
+                ref_uuid:  c16d3a58-50a4-43ca-bfe4-2d5c5e01917f
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FIP 4
+            description :  
+            ref_uuid : bba4918d-6cb5-4a75-aa0a-5215173a8c8c
+            exchanges:
+              - name: Activate PSV Mode
+                ref_uuid:  adff9be9-6823-4f4b-abbd-56bfea8d6d36
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FIP 5
+            description :  
+            ref_uuid : 704f8429-bfd0-47cd-9c90-01ea65df4faf
+            exchanges:
+              - name: Clear Mode
+                ref_uuid:  8ab2f9c1-3d38-47f0-9f7c-b1ae49c86fe2
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FIP 2
+            description :  
+            ref_uuid : bdc58db0-0a7e-4c23-ae76-728a87b03641
+            exchanges:
+              - name: Settings Start Stop
+                ref_uuid:  88ab419b-51b1-4a5b-b593-d772a23c01c0
+                description :  
+                source_function_name: Vent Remote UI 
+                ref_uuid: 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 5a6a8e08-208b-4805-894b-d1cf1308d7d4
+            exchanges:
+              - name: Respiration Data
+                ref_uuid:  f340e92b-a488-4f5b-b076-f74e9581b91f
+                description :  
+                source_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+                target_function_name: Vent Remote UI 
+                ref_uuid: 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+          - name: FOP 2
+            description :  
+            ref_uuid : 9262dcd5-de7c-40c1-a6af-133852e387de
+            exchanges:
+              - name: Mode
+                ref_uuid:  6be76466-b952-454d-8a20-30d706907b50
+                description :  
+                source_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+                target_function_name: Deliver Assist/Control Mode
+                ref_uuid: b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+    - name: Start/Stop
+      type: FunctionalExchange
+      primary_uuid: 33cd5a28-29b5-4638-babf-48d9dcfa535b
+      description : 
+      source function or activity:
+          - name: FOP 4
+            ref_uuid: 7f528755-e363-4816-ae3f-0d7d4d4fc811
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 0f57ff2a-b1a2-442c-8ca4-6d248b37fd2b
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Exhalation Press
+      type: FunctionalExchange
+      primary_uuid: f0c3617d-308e-46e2-8de8-6b1cbb54dd29
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 2cb70289-975b-4a53-9138-58259d693b8f
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: a75a68bb-f70d-4036-9ec4-a80c6ed84700
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Exhale Control
+      type: FunctionalExchange
+      primary_uuid: a3b597bf-2211-4418-942f-eb9aa525f9c9
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: bef670ff-8bb2-4f25-8f0a-d78b8e5d4db9
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: caeb3189-b402-499b-ab85-007a6ddbf820
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Pressure at Pat
+      type: FunctionalExchange
+      primary_uuid: d956aed0-a862-4534-99bc-1ec7dbe1f2cf
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 118a1d68-4238-4ce5-b1c6-ae43f082da49
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: 6d547bd9-7377-4034-8098-0c3f8f229e37
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Air Control
+      type: FunctionalExchange
+      primary_uuid: 047c6a25-42c8-4ad6-b5bc-ea3b16599d36
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 484ee7e3-aed3-4189-91c8-3752701269d1
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: af3e37e4-7bed-4689-b0d8-d000689ebd78
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Air
+      type: FunctionalExchange
+      primary_uuid: 9c0266ce-6f03-4e1c-aa5e-dbc2e9ef237e
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: ab8e7bf0-08b8-4547-bffe-907330bcb2ae
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 1007a889-c81e-4f59-80a0-65d8b5e58adc
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Generate Inhation Air
+      type: FunctionalExchange
+      primary_uuid: 58c5e52d-eecf-4290-b40d-3bc4613fd486
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: d5278c86-f1d0-4f22-b2a6-5f05e0afb2ec
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 991367e4-5e70-4333-ac16-8a25afbdf5e8
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Vent O2
+      type: FunctionalExchange
+      primary_uuid: f84eb140-24e1-47b3-82a8-66d6b7199c93
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: cbfe63ce-7a38-447e-86d8-4ce12863721e
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 0b2713e8-7255-40d8-bc2c-ea79bb8d504f
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: O2 Control
+      type: FunctionalExchange
+      primary_uuid: 7b4559f8-5998-43e6-86ef-febfb5f40b31
+      description : 
+      source function or activity:
+          - name: FOP 4
+            ref_uuid: 4ddd89f6-7bb8-4570-9511-b7491dd1974f
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 40eeb05d-146c-4f00-ab85-637675e7eafc
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: O2 Control
+      type: FunctionalExchange
+      primary_uuid: 00700568-c4d1-401d-846e-9be45d8aae96
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: e902dcff-2176-4956-a2a4-f94a18a35e62
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 35ed44a3-7d55-405b-9342-905c2d568ffc
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Vent
+      type: FunctionalExchange
+      primary_uuid: 92277111-6fbe-470b-808a-5c518dc521ff
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 28cba93a-bb99-4472-be0f-e0db38644a74
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: a358f58c-1075-4249-8af9-bb2c340b142e
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: O2
+      type: FunctionalExchange
+      primary_uuid: 4ee31a8f-432b-4cfd-bc9b-6f842d7863bc
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: cce77c92-6359-41dd-a74a-9a06a222de81
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 0be307af-0f59-4531-9399-e8a1125829e0
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Vent
+      type: FunctionalExchange
+      primary_uuid: 3666acb5-bdae-4eb0-9a92-b2aab7cd5187
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: 19cb236c-77f6-49a1-bab6-522095f9f2f9
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 6d607033-839b-4970-914a-2d78998924ad
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+        - name: Deliver Doubl Limb Vent
+          ref_uuid : b067e22b-a68b-42a4-8977-e658959b1b90
+    - name: Vent Double Limb
+      type: FunctionalExchange
+      primary_uuid: bbc1235b-b3f5-4a6e-8ef4-b74de943f921
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 01e78815-b3ab-492b-86c6-9c01ae721bee
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 093debfc-ebd5-4ae7-b90d-f1d420b56054
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+        - name: Deliver Doubl Limb Vent
+          ref_uuid : b067e22b-a68b-42a4-8977-e658959b1b90
+    - name: Exhale Control
+      type: FunctionalExchange
+      primary_uuid: 20aaf075-6290-4949-83f8-9c7be803cfde
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 185006cc-4221-4cb3-8afc-6a92532cd68c
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 33b1d1f9-f040-4a33-8dc2-9e388ea8f73d
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: DC Vent
+      type: FunctionalExchange
+      primary_uuid: bfe2e96a-dd7b-486b-9c04-b53ec612d14f
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 27a35b9b-9172-4597-8410-e4ff2acf1c3e
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 3e711e25-7d30-49ad-a149-2b14d4f6adb3
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Settings Start Stop
+      type: FunctionalExchange
+      primary_uuid: 88ab419b-51b1-4a5b-b593-d772a23c01c0
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: d49b8329-3924-4d04-b297-37f2ebf4b375
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: bdc58db0-0a7e-4c23-ae76-728a87b03641
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+        - name: Remote Operation
+          ref_uuid : 9a345ab1-1a95-4eec-8173-979201b1e7ef
+    - name: Mode
+      type: FunctionalExchange
+      primary_uuid: 6be76466-b952-454d-8a20-30d706907b50
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: 9262dcd5-de7c-40c1-a6af-133852e387de
+      target function or activity:
+          - name: FIP 5
+            ref_uuid: 833595b1-97f2-43f0-bc47-5821210911e9
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: Start/Stop
+      type: FunctionalExchange
+      primary_uuid: c06a2add-f089-450b-ba15-199c03bdb873
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: dfc55610-2491-45f9-9ba6-9589d314a717
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 9a73313b-53fb-48f3-97d9-628d9bd3aed3
+      involving functional chains:
+        - name: Deliver AC Mode
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+        - name: Deliver SIMV 
+          ref_uuid : 6396059d-3c9a-4f7e-8114-04e42c3fca3e
+        - name: Deliver PSV
+          ref_uuid : 807aec55-53a7-43cd-8fb3-7e23113e7657
+        - name: Deliver CPAP
+          ref_uuid : a277d56c-d7b3-488d-bec1-bd655a1ab109
+    - name: Deliver Ventilation
+      type: Traceability_Artifact Polarion Workitem Requirement
+      primary_uuid: 2b3784cd-65b5-462f-a30c-5cd53038c134
+      url : https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1520
+      identifier : VS-1520
+      linked model elements:
+        - name : satisfies
+          ref_uuid : 0e058125-99e4-4006-a8a3-c3d13430bbe2
+        - name : satisfies
+          ref_uuid : 0737802b-988c-4e77-aaed-c8ee83755e9d
+    - name: The ventilator shall provide an O2 intake port and connector which shall allow c...
+      type: Traceability_Artifact Polarion Workitem Requirement
+      primary_uuid: a46b976f-4839-47c9-986b-ae8a91f0fcd8
+      url : https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-653
+      identifier : VS-653
+      linked model elements:
+        - name : satisfies
+          ref_uuid : 4ee31a8f-432b-4cfd-bc9b-6f842d7863bc
+      - name: User Interface
+        type: LogicalComponent
+        primary_uuid: 397ec96b-d885-4179-846d-afc7dc141632
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Start
+            ref_uuid : d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+          - name: Display Status
+            ref_uuid : 4dfdd2ce-0fc2-4e0f-8677-d6c5230dce3c
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 9a73313b-53fb-48f3-97d9-628d9bd3aed3
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 40bea553-c5ac-4914-96bc-bb9bbf8a1080
+      description : 
+    - name: Start/Stop
+      type: FunctionalExchange
+      primary_uuid: 13b84276-9ffb-49bb-9517-f12ae0f51046
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 40bea553-c5ac-4914-96bc-bb9bbf8a1080
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 9275d4f5-a787-46b1-a68c-0047dd8b3b98
+      involving functional chains:
+        - name: Deliver PSV
+          ref_uuid : 807aec55-53a7-43cd-8fb3-7e23113e7657
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: c2909a1f-f473-4734-9829-e746785e7eef
+      description : 
+    - name: Start/Stop
+      type: FunctionalExchange
+      primary_uuid: 47b75d57-448b-4d0f-a284-1258125bbf6e
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: c2909a1f-f473-4734-9829-e746785e7eef
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: d03eeca4-0cf4-4a0a-95cb-feb1a4631f3f
+      involving functional chains:
+        - name: Deliver CPAP
+          ref_uuid : a277d56c-d7b3-488d-bec1-bd655a1ab109
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: f85268b7-7f49-4e15-8b49-ea783aeab8d2
+      description : 
+    - name: Start/Stop
+      type: FunctionalExchange
+      primary_uuid: c97e751a-9f23-4342-99dd-8be7b137e767
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: f85268b7-7f49-4e15-8b49-ea783aeab8d2
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: c1355bcd-77f8-423e-a478-ab7674c1cbb5
+      involving functional chains:
+        - name: Deliver SIMV 
+          ref_uuid : 6396059d-3c9a-4f7e-8114-04e42c3fca3e
+    - name: FOP 4
+      type: FunctionOutputPort
+      primary_uuid: 7f528755-e363-4816-ae3f-0d7d4d4fc811
+      description : 
+      - name: Control SW
+        type: LogicalComponent
+        primary_uuid: 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Activate Operating Mode
+            ref_uuid : 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: Deliver Assist/Control Mode
+            ref_uuid : b37681d3-3bc6-4c62-9f0a-c22924bd8a22
+          - name: Deliver CPAP Mode
+            ref_uuid : f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+          - name: Deliver PSV Mode
+            ref_uuid : cb682b4d-c186-4513-bda0-d13f33d438cd
+          - name: Deliver SIMV Mode
+            ref_uuid : a1c54878-d8c2-46e7-b785-025882ff7c2f
+          - name: Select 9
+            ref_uuid : fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: Select O2
+            ref_uuid : 1e345882-6d76-4d68-89c9-18c5b34dc321
+          - name: Prompt for Settings
+            ref_uuid : de1d9739-4f1e-406a-a14d-7120e4406ecf
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 0f57ff2a-b1a2-442c-8ca4-6d248b37fd2b
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: a75a68bb-f70d-4036-9ec4-a80c6ed84700
+      description : 
+    - name: FIP 3
+      type: FunctionInputPort
+      primary_uuid: 6d547bd9-7377-4034-8098-0c3f8f229e37
+      description : 
+    - name: FIP 4
+      type: FunctionInputPort
+      primary_uuid: aee99f5e-0b22-480a-8d0c-1fed86b58bcc
+      description : 
+    - name: O2 Sense
+      type: FunctionalExchange
+      primary_uuid: fa4a966b-344b-42c8-a385-289d68dce44b
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 83e55fb2-86fa-4cdb-9332-91de5ad88838
+      target function or activity:
+          - name: FIP 4
+            ref_uuid: aee99f5e-0b22-480a-8d0c-1fed86b58bcc
+    - name: FIP 5
+      type: FunctionInputPort
+      primary_uuid: 833595b1-97f2-43f0-bc47-5821210911e9
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 27a35b9b-9172-4597-8410-e4ff2acf1c3e
+      description : 
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: bef670ff-8bb2-4f25-8f0a-d78b8e5d4db9
+      description : 
+    - name: FOP 4
+      type: FunctionOutputPort
+      primary_uuid: 4ddd89f6-7bb8-4570-9511-b7491dd1974f
+      description : 
+      - name: Exhalation Air Sensor
+        type: LogicalComponent
+        primary_uuid: 262a7d96-f2af-44ad-a717-1c3e73865585
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Sense Pat Exahale Press
+            ref_uuid : d19d2a85-59ae-41bb-a26e-d15a05c9a2b0
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 11ae39f7-ffd0-4cdf-8ea1-d773900847fd
+      description : 
+    - name: Exhaltion Pres
+      type: FunctionalExchange
+      primary_uuid: 9d640652-3dfd-46c0-b4e7-46a714cab6e7
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: b6f37512-d0d2-4a32-83f4-7598b2d8fdcd
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 11ae39f7-ffd0-4cdf-8ea1-d773900847fd
+      involving functional chains:
+        - name: Monitor Patient  Respirations
+          ref_uuid : c8d29cf8-5765-4d2b-a447-14f55657015a
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: 2cb70289-975b-4a53-9138-58259d693b8f
+      description : 
+    - name: Exhalation 
+      type: FunctionalExchange
+      primary_uuid: d0fa6238-9efd-4feb-9820-0dd76a29230d
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 2cb70289-975b-4a53-9138-58259d693b8f
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: a0dc15c8-373a-4d4c-9fee-44e40867752e
+      involving functional chains:
+        - name: Monitor Patient  Respirations
+          ref_uuid : c8d29cf8-5765-4d2b-a447-14f55657015a
+      - name: Exahalation Valve
+        type: LogicalComponent
+        primary_uuid: 48ef6bfe-1634-40df-8210-157ee8ff476f
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Control Patient Exhale
+            ref_uuid : babf73b3-3c84-4479-8f01-b95d50c42c53
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: caeb3189-b402-499b-ab85-007a6ddbf820
+      description : 
+    - name: Exhale COntrol
+      type: FunctionalExchange
+      primary_uuid: 3cfc2a6a-2967-471b-98cb-52af13186f7e
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: bfe7739e-3b2a-4950-ba55-bbcb9a97f27b
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: caeb3189-b402-499b-ab85-007a6ddbf820
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: a358f58c-1075-4249-8af9-bb2c340b142e
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 185006cc-4221-4cb3-8afc-6a92532cd68c
+      description : 
+      - name: Patient Proximal Inhalation Sensor
+        type: LogicalComponent
+        primary_uuid: f65defac-ad94-409f-9ab4-5406694b21ec
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Sense  Press at Pat
+            ref_uuid : a5aae429-240e-4cea-b7b2-73fa62850699
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: b16a6fa0-051b-4375-a16e-c57eaed2022a
+      description : 
+    - name: Prox Press
+      type: FunctionalExchange
+      primary_uuid: fd3ed49d-4e16-485f-9c80-ac63835f0627
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 3d598590-96f3-45d8-a07d-cb438459feaa
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: b16a6fa0-051b-4375-a16e-c57eaed2022a
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: 118a1d68-4238-4ce5-b1c6-ae43f082da49
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 3e711e25-7d30-49ad-a149-2b14d4f6adb3
+      description : 
+    - name: FIP 3
+      type: FunctionInputPort
+      primary_uuid: 1f44d618-86ae-4935-ad24-31ac9fafbca8
+      description : 
+    - name: CPAP Vent
+      type: FunctionalExchange
+      primary_uuid: 9123ef65-e618-4c8c-a721-81ffad2835a0
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: b0a25577-59e4-4bd7-849e-3365931c552c
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: 1f44d618-86ae-4935-ad24-31ac9fafbca8
+      involving functional chains:
+        - name: Deliver CPAP
+          ref_uuid : a277d56c-d7b3-488d-bec1-bd655a1ab109
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: ba004096-6e07-4c08-bfca-450bcdcede7a
+      description : 
+    - name: SIMV Vent
+      type: FunctionalExchange
+      primary_uuid: e342a4f5-c9e0-4e8d-bc39-05a6d8b7d848
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 87305e76-c3f8-4a37-82af-bbb10c4f83fd
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: ba004096-6e07-4c08-bfca-450bcdcede7a
+      involving functional chains:
+        - name: Deliver SIMV 
+          ref_uuid : 6396059d-3c9a-4f7e-8114-04e42c3fca3e
+    - name: FIP 4
+      type: FunctionInputPort
+      primary_uuid: 61c56fa3-c31a-4c72-bedb-fcd1edf28377
+      description : 
+    - name: PSV Vent
+      type: FunctionalExchange
+      primary_uuid: 109ac95a-9317-497a-9310-97a694647074
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 69dd00f8-be6d-4d59-b5f5-a0e07de77248
+      target function or activity:
+          - name: FIP 4
+            ref_uuid: 61c56fa3-c31a-4c72-bedb-fcd1edf28377
+      involving functional chains:
+        - name: Deliver PSV
+          ref_uuid : 807aec55-53a7-43cd-8fb3-7e23113e7657
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 484ee7e3-aed3-4189-91c8-3752701269d1
+      description : 
+      - name: Inhalation Air Generator
+        type: LogicalComponent
+        primary_uuid: 8be8d9c4-d07c-40e5-987d-e01bbeae86ae
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Generate Inhaltion Air
+            ref_uuid : 737c514e-9195-4425-9254-69596d9fcdce
+        ports:
+        applied property value groups:
+          - name: Shaft Speed
+            ref_uuid : 9235d335-210c-498a-8b88-3ce0e9fdfced
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 1007a889-c81e-4f59-80a0-65d8b5e58adc
+      description : 
+    - name: FIP 3
+      type: FunctionInputPort
+      primary_uuid: af3e37e4-7bed-4689-b0d8-d000689ebd78
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: d5278c86-f1d0-4f22-b2a6-5f05e0afb2ec
+      description : 
+      - name: Environment
+        type: LogicalComponent
+        primary_uuid: d9da8a16-5867-4a29-a368-48a5d7f06e9b
+        description : 
+        is_human : True
+        components:
+        deployed components:
+        allocated functions:
+          - name: Source and Sink Air
+            ref_uuid : ea0699ab-9b1a-48e6-baa3-95e5c33fc540
+          - name: Supply O2
+            ref_uuid : 82018c4f-7c58-4bb7-bcff-27957e35bb0a
+        ports:
+        applied property value groups:
+          - name: Inlet Pressure
+            ref_uuid : 0c7f8c77-ae4d-4210-8e1e-eb87da9679d7
+          - name: Inlet Temp
+            ref_uuid : 3fa9897d-d684-40af-a05c-8bec979f3b9b
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: ab8e7bf0-08b8-4547-bffe-907330bcb2ae
+      description : 
+      - name: Housing
+        type: LogicalComponent
+        primary_uuid: 16193167-a2cd-4dc4-a7b3-ab761302df6c
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Route 66
+            ref_uuid : 052ea98a-247e-48cd-909f-c8c040bb4ebe
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 991367e4-5e70-4333-ac16-8a25afbdf5e8
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 0b2713e8-7255-40d8-bc2c-ea79bb8d504f
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 28cba93a-bb99-4472-be0f-e0db38644a74
+      description : 
+      - name: O2 Valve
+        type: LogicalComponent
+        primary_uuid: 459dc000-2d77-4325-8df0-ebfa6fbbfaf9
+        description : 
+The <b>O2 valve</b> is an essential component of a car's exhaust system. It regulates the amount of oxygen entering the exhaust system, allowing the engine to burn fuel more efficiently. The valve is usually located between the exhaust manifold and the catalytic converter, and is often connected to an oxygen sensor that monitors the oxygen levels in the exhaust. The valve helps to reduce emissions by allowing the engine to run at a more efficient air-fuel ratio. 
+The O2 valve is typically made from a combination of stainless steel and aluminum, and is designed to withstand high temperatures and pressures. It is important to keep the valve clean and free of debris, as build up can impede its performance. If the valve becomes stuck or damaged, it may need to be replaced. 
+<sup>1</sup>
+References: 
+1. "What is an Oxygen Sensor?". CarBibles. 2020. https://carbibles.com/what-is-an-oxygen-sensor/.
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Control O2 to Valve
+            ref_uuid : 239c3f19-e05e-4425-92b0-346a884311de
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 0be307af-0f59-4531-9399-e8a1125829e0
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 35ed44a3-7d55-405b-9342-905c2d568ffc
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: cbfe63ce-7a38-447e-86d8-4ce12863721e
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 40eeb05d-146c-4f00-ab85-637675e7eafc
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 4d7f059d-07aa-4ab3-ad41-99d624dd515e
+      description : 
+    - name: O2 Control
+      type: FunctionalExchange
+      primary_uuid: a8179497-814d-48e2-a540-382e7199a9f5
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 65b94584-9995-4450-b817-59f08ee67df4
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 4d7f059d-07aa-4ab3-ad41-99d624dd515e
+    - name: FIP 3
+      type: FunctionInputPort
+      primary_uuid: c2de3db2-fce8-46d1-a005-9c75429e51d6
+      description : 
+    - name: O2 Control
+      type: FunctionalExchange
+      primary_uuid: 9be657d8-99a5-4501-8c93-5b6130d4333f
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: f97074b7-fea1-485e-ad9b-dc1356e1def0
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: c2de3db2-fce8-46d1-a005-9c75429e51d6
+    - name: FIP 4
+      type: FunctionInputPort
+      primary_uuid: d4e9ff70-d836-411b-acf5-34e20a620c82
+      description : 
+    - name: O2 Control
+      type: FunctionalExchange
+      primary_uuid: 838b6f52-d8b4-4641-811c-4278399eeb2d
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: 83af4238-6645-44e1-8feb-72e862c0395b
+      target function or activity:
+          - name: FIP 4
+            ref_uuid: d4e9ff70-d836-411b-acf5-34e20a620c82
+    - name: FIP 5
+      type: FunctionInputPort
+      primary_uuid: 7b99e93c-9b8d-4feb-bdc7-da6d4617de60
+      description : 
+    - name: O2 Control
+      type: FunctionalExchange
+      primary_uuid: 528205cf-a65f-4762-a1cb-c794f96dac45
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: d8ee3642-4db2-4bd9-a86f-788e8c9c9725
+      target function or activity:
+          - name: FIP 5
+            ref_uuid: 7b99e93c-9b8d-4feb-bdc7-da6d4617de60
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: e902dcff-2176-4956-a2a4-f94a18a35e62
+      description : 
+      - name: Disposable Circuit Components
+        type: LogicalComponent
+        primary_uuid: fe6bf5ab-54d7-4dff-a9e4-31223564e7ac
+        description : 
+        is_human : False
+        components:
+          - component Double Limb Circuit
+            ref_uuid : bb557caf-9666-4554-aa68-d75645eeb2ff
+          - component Single Limb Circuit
+            ref_uuid : 0b63e296-5828-47d1-85cd-aa7331870b63
+        deployed components:
+        allocated functions:
+          - name: Select
+            ref_uuid : b776ee26-a8f3-4add-82f9-6737edefdf68
+        ports:
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 33b1d1f9-f040-4a33-8dc2-9e388ea8f73d
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 4a26d158-c051-4bb8-a49c-07c2c63ef043
+      description : 
+    - name: Vent
+      type: FunctionalExchange
+      primary_uuid: 8dbcbb16-d210-43c4-a571-1da81687b708
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 4a26d158-c051-4bb8-a49c-07c2c63ef043
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 2fe982ee-38b8-4384-93b5-766c9288b764
+      involving functional chains:
+        - name: Deliver Single Limb Vent
+          ref_uuid : 3dfc8749-2e76-41ec-be4f-b131bc35021e
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: 19cb236c-77f6-49a1-bab6-522095f9f2f9
+      description : 
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: 62b6ff89-d2f4-4da2-826d-0c625459fbd1
+      description : 
+    - name: Vent
+      type: FunctionalExchange
+      primary_uuid: fb9f91c6-c16a-43ea-b0ec-b7301cd249e6
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 62b6ff89-d2f4-4da2-826d-0c625459fbd1
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 5d3f223b-260d-4917-856b-a7174f3f41b3
+      involving functional chains:
+        - name: Deliver Single Limb Vent wo EV
+          ref_uuid : 1867c024-aaf7-4d38-8491-9706aa73d04f
+    - name: FOP 4
+      type: FunctionOutputPort
+      primary_uuid: 2cfdb989-c195-4317-aeff-dd414333a0fe
+      description : 
+    - name: Air
+      type: FunctionalExchange
+      primary_uuid: 9ce1dd93-8457-4075-80ad-659c759a5f2a
+      description : 
+      source function or activity:
+          - name: FOP 4
+            ref_uuid: 2cfdb989-c195-4317-aeff-dd414333a0fe
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: b1f228dd-c70c-43f4-b92b-90f9c292853d
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: cce77c92-6359-41dd-a74a-9a06a222de81
+      description : 
+      - name: Double Limb Circuit
+        type: LogicalComponent
+        primary_uuid: bb557caf-9666-4554-aa68-d75645eeb2ff
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Deliver Ventilation through Double Limb Circuit
+            ref_uuid : 1bb312d4-731f-4af0-8350-061f288c8b6f
+        ports:
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 6d607033-839b-4970-914a-2d78998924ad
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 01e78815-b3ab-492b-86c6-9c01ae721bee
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: b6f37512-d0d2-4a32-83f4-7598b2d8fdcd
+      description : 
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: 3d598590-96f3-45d8-a07d-cb438459feaa
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: 46d426c6-a802-4827-b22a-7cc35633fde4
+      description : 
+      - name: Patient
+        type: LogicalComponent
+        primary_uuid: 379684a4-ebb4-4086-a6b5-4f0956c339e1
+        description : 
+        is_human : True
+        components:
+        deployed components:
+        allocated functions:
+          - name: Receive Connection
+            ref_uuid : 3ac6dbc9-fef8-4991-939c-c541d05b4fac
+          - name: Convert Ventilator Air to Blood Oxygen
+            ref_uuid : 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+          - name: Patient Call
+            ref_uuid : abf097cb-d4b4-4511-8240-0abe5d3a8b1c
+          - name: Distribute
+            ref_uuid : 6356e2ae-a2ab-44f9-b950-fd704c58e234
+        ports:
+        applied property value groups:
+          - name: Lung Volume
+            ref_uuid : e10ca9d7-6f11-4de4-b7bd-0fab4a6af896
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 650ad9b6-c42e-46f2-889d-77426b51a0c7
+      description : 
+    - name: Vent with Single Limb
+      type: FunctionalExchange
+      primary_uuid: 82e3c29c-50de-455c-9781-42bb8fc1dc52
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 7fdef1f7-93a4-4cbe-b226-f269f735cae0
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 650ad9b6-c42e-46f2-889d-77426b51a0c7
+      involving functional chains:
+        - name: Deliver Single Limb Vent
+          ref_uuid : 3dfc8749-2e76-41ec-be4f-b131bc35021e
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 093debfc-ebd5-4ae7-b90d-f1d420b56054
+      description : 
+    - name: FIP 3
+      type: FunctionInputPort
+      primary_uuid: 07c844d7-d0ad-4584-b6ba-c74848515be3
+      description : 
+    - name: Vent with Single Limb EV
+      type: FunctionalExchange
+      primary_uuid: b204c108-6851-4277-a30b-8d8c55c1e604
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 259040ed-62b7-4e4c-9c8b-98b4e733e968
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: 07c844d7-d0ad-4584-b6ba-c74848515be3
+      involving functional chains:
+        - name: Deliver Single Limb Vent wo EV
+          ref_uuid : 1867c024-aaf7-4d38-8491-9706aa73d04f
+    - name: inVentilation
+      type: FunctionInputPort
+      primary_uuid: 3a029d0b-d967-4864-99d3-5d8b74def52f
+      description : 
+    - name: Ventilation
+      type: FunctionalExchange
+      primary_uuid: a0d2d071-3bc4-47e3-a0b5-3a0bb52414f3
+      description : 
+      source function or activity:
+          - name: outVentilation
+            ref_uuid: 366b7d66-d087-438b-ac9a-690c8344751f
+      target function or activity:
+          - name: inVentilation
+            ref_uuid: 3a029d0b-d967-4864-99d3-5d8b74def52f
+      involving functional chains:
+        - name: Deliver Ventilation
+          ref_uuid : 8140af4a-5e67-4b5b-adfd-d4460c572ee1
+    - name: inAdjusted Settings
+      type: FunctionInputPort
+      primary_uuid: 93cebe7f-74ea-42aa-8735-b62d2c60355d
+      description : 
+    - name: Adjusted Settings
+      type: FunctionalExchange
+      primary_uuid: 2eadfbfc-8c4c-489f-897f-6c4b24220715
+      description : 
+      source function or activity:
+          - name: outAdjusted Settings
+            ref_uuid: 28946a02-9736-44fd-b1ac-1c67a86dea14
+      target function or activity:
+          - name: inAdjusted Settings
+            ref_uuid: 93cebe7f-74ea-42aa-8735-b62d2c60355d
+    - name: outPatient Response
+      type: FunctionOutputPort
+      primary_uuid: 3cf1e3fa-4dae-430c-919b-13aa3f5f4854
+      description : 
+    - name: outPatient Vitals
+      type: FunctionOutputPort
+      primary_uuid: 376ca745-0efe-4b3c-a1f0-90f23a2d2219
+      description : 
+    - name: Patient Vitals
+      type: FunctionalExchange
+      primary_uuid: 857da965-19de-4d17-ae7f-9975cbe400de
+      description : 
+      source function or activity:
+          - name: outPatient Vitals
+            ref_uuid: 376ca745-0efe-4b3c-a1f0-90f23a2d2219
+      target function or activity:
+          - name: inPatient Vitals
+            ref_uuid: 8e280b7a-a4e1-4038-9475-4f6d5b0d2595
+      involving functional chains:
+        - name: Deliver Ventilation
+          ref_uuid : 8140af4a-5e67-4b5b-adfd-d4460c572ee1
+        - name: Monitor Patient Vitals
+          ref_uuid : 29bea4bf-4be4-4386-898a-d0ce195f2adf
+      - name: Patient Support Care Givers
+        type: LogicalComponent
+        primary_uuid: bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        description : 
+        is_human : True
+        components:
+        deployed components:
+        allocated functions:
+          - name: Unpack Box
+            ref_uuid : a5337c43-b3b0-4dd6-9a20-597c5c8e9df9
+          - name: Install on Utility Cart
+            ref_uuid : ccc41515-b9ca-4f5d-9992-7e666faab98a
+          - name: Use Manual Resources
+            ref_uuid : 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+          - name: Use web resources
+            ref_uuid : 46bb0126-fb5f-4f86-b01f-e7699e307154
+          - name: Install on wheel chair 
+            ref_uuid : 092b1b7a-e0ef-400d-aff1-7da907cfbd6f
+          - name: Assemble  unit
+            ref_uuid : 0bcf9f42-bc76-4fcb-8a9f-3c0eb858c49c
+          - name: Inspect Patient Circuit Packaging
+            ref_uuid : 97ed0352-aa1d-46b5-831e-4e3cf7f8ad35
+          - name: Monitor Ventilation Operation Status
+            ref_uuid : c87b2fc1-dcd4-4f83-bc7d-01cdbbbe1d31
+          - name: Repond to Ventilator Problems
+            ref_uuid : 379a205e-9ac5-476a-a13b-1a2fcb25d25b
+          - name: Purchase Circuit
+            ref_uuid : 8b269ea6-ae70-421c-9e9f-b9b7769d0509
+          - name: Purchase Ventilator
+            ref_uuid : cc0874a7-a9f3-4a21-8f7b-f7ca8962d2da
+          - name: Start/Stop Ventilation
+            ref_uuid : 7c663e82-0332-42e4-ad47-c16036e32c8c
+          - name: Monitor Patient Respiration
+            ref_uuid : fdca8818-31f0-4040-b522-503034b78508
+        ports:
+    - name: IN
+      type: FunctionInputPort
+      primary_uuid: 508e5bb5-d58d-414f-ae81-afeffee16b6d
+      description : 
+    - name: Start Stop
+      type: FunctionalExchange
+      primary_uuid: 097659b6-6e70-45c8-a938-9c3e43c3a8d9
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: d4b04ea2-99bf-491c-8c5e-a058a6307849
+      target function or activity:
+          - name: IN
+            ref_uuid: 508e5bb5-d58d-414f-ae81-afeffee16b6d
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: dfc55610-2491-45f9-9ba6-9589d314a717
+      description : 
+      - name: Remote UI
+        type: LogicalComponent
+        primary_uuid: 8db95212-913f-440e-8143-e89375d03629
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Vent Remote UI 
+            ref_uuid : 0d467c0a-92f9-4e45-ad1e-99f2bf801881
+        ports:
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: c14ad60f-36bf-44ca-b9f3-aadede21be43
+      description : 
+    - name: Respiration Data
+      type: FunctionalExchange
+      primary_uuid: f340e92b-a488-4f5b-b076-f74e9581b91f
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 5a6a8e08-208b-4805-894b-d1cf1308d7d4
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: c14ad60f-36bf-44ca-b9f3-aadede21be43
+      involving functional chains:
+        - name: Remote Monitoring
+          ref_uuid : 7950854f-7a41-4099-b9a8-b93bf56ab1d1
+    - name: FIP 3
+      type: FunctionInputPort
+      primary_uuid: 5e3f93a2-e98f-4e67-b417-15ee762fa594
+      description : 
+    - name: Control
+      type: FunctionalExchange
+      primary_uuid: 520cf02a-7073-476c-98b2-7dab073c6df1
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 03401951-e1c4-44bf-97a8-323c46263a03
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: 5e3f93a2-e98f-4e67-b417-15ee762fa594
+      involving functional chains:
+        - name: Remote Operation
+          ref_uuid : 9a345ab1-1a95-4eec-8173-979201b1e7ef
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: d1c064e1-49e0-4ab3-84c7-bf956a70ebe2
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: d49b8329-3924-4d04-b297-37f2ebf4b375
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: f0180f8f-8c0a-47cb-a0ce-4c256097a3d7
+      description : 
+    - name: Monitor
+      type: FunctionalExchange
+      primary_uuid: 3bbbdc5e-6876-4347-ba0e-6ef8c8c7bbfc
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: f0180f8f-8c0a-47cb-a0ce-4c256097a3d7
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: 092f3548-6b17-48bd-ade2-da7664f3873b
+      involving functional chains:
+        - name: Remote Monitoring
+          ref_uuid : 7950854f-7a41-4099-b9a8-b93bf56ab1d1
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 96788de6-0ba8-45c5-b7b1-621ac2d4f908
+      description : 
+    - name: Activate CPAP Mode
+      type: FunctionalExchange
+      primary_uuid: 65caaf00-fd1e-4ab4-9b66-a4c0c7830613
+      description : 
+      source function or activity:
+          - name: FOP 4
+            ref_uuid: 56423e56-637b-4741-a565-b7ab15a4967c
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 96788de6-0ba8-45c5-b7b1-621ac2d4f908
+      involving functional chains:
+        - name: Activate CPAP
+          ref_uuid : 1b40fcd9-206f-47a3-a94b-e4484f24f247
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 61347802-9d3e-4ce7-842d-1c7f1c1f0f9f
+      description : 
+    - name: Activate SIMV Mod
+      type: FunctionalExchange
+      primary_uuid: 36010374-11a8-43cc-aacc-589483acd497
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: 991f4e83-36dd-460a-8c5e-da492df46ce2
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 61347802-9d3e-4ce7-842d-1c7f1c1f0f9f
+      involving functional chains:
+        - name: Activate SIMV
+          ref_uuid : 01ec1262-85b7-47ba-aa58-d9937b96e4ea
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 7db1487a-a817-42cc-a645-56dcc0dc5515
+      description : 
+    - name: Activate A/C Mode
+      type: FunctionalExchange
+      primary_uuid: c16d3a58-50a4-43ca-bfe4-2d5c5e01917f
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: aa6947a7-9b8e-45ed-a019-bd68386154f6
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 7db1487a-a817-42cc-a645-56dcc0dc5515
+      involving functional chains:
+        - name: Activate A/C Mode
+          ref_uuid : 690265a1-5dbf-418a-88f2-a22f2dfd5534
+    - name: FIP 4
+      type: FunctionInputPort
+      primary_uuid: bba4918d-6cb5-4a75-aa0a-5215173a8c8c
+      description : 
+    - name: Activate PSV Mode
+      type: FunctionalExchange
+      primary_uuid: adff9be9-6823-4f4b-abbd-56bfea8d6d36
+      description : 
+      source function or activity:
+          - name: FOP 5
+            ref_uuid: 526a6da9-b7c2-4121-972d-c63d1b56f480
+      target function or activity:
+          - name: FIP 4
+            ref_uuid: bba4918d-6cb5-4a75-aa0a-5215173a8c8c
+      involving functional chains:
+        - name: Activate PSV
+          ref_uuid : 7ec5df10-6874-4c44-8e2c-79da87e76fe1
+    - name: FIP 5
+      type: FunctionInputPort
+      primary_uuid: 704f8429-bfd0-47cd-9c90-01ea65df4faf
+      description : 
+    - name: Clear Mode
+      type: FunctionalExchange
+      primary_uuid: 8ab2f9c1-3d38-47f0-9f7c-b1ae49c86fe2
+      description : 
+      source function or activity:
+          - name: FOP 6
+            ref_uuid: be02686b-c1ae-4a77-b3ca-638a26993a24
+      target function or activity:
+          - name: FIP 5
+            ref_uuid: 704f8429-bfd0-47cd-9c90-01ea65df4faf
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: bdc58db0-0a7e-4c23-ae76-728a87b03641
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 5a6a8e08-208b-4805-894b-d1cf1308d7d4
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: 9262dcd5-de7c-40c1-a6af-133852e387de
+      description : 
+      - name: Display Status
+        type: LogicalFunction
+        primary_uuid: 4dfdd2ce-0fc2-4e0f-8677-d6c5230dce3c
+        description : 
+        owner :
+          - name : User Interface
+            ref_uuid : 397ec96b-d885-4179-846d-afc7dc141632
+        child functions:
+        inputs:
+          - name: inMode
+            description :  
+            ref_uuid : c8926358-d9f3-421b-ae76-ce76a00c9c4b
+            exchanges:
+              - name: Mode
+                ref_uuid:  bf8d6d06-6ba1-4058-bc04-1560cbcff295
+                description :  
+                source_function_name: Connect to Patient
+                ref_uuid: e95ed482-e19a-46b5-8d8d-7bf8715755c3
+                target_function_name: Display Status
+                ref_uuid: 4dfdd2ce-0fc2-4e0f-8677-d6c5230dce3c
+              - name: Operation Status
+                ref_uuid:  16e579f0-3942-4a60-8dc2-76a57dd0ee4a
+                description :  
+                source_function_name: Provide Respiration Data
+                ref_uuid: 0e1a31f5-e10c-4eae-beb4-917103b48cda
+                target_function_name: Display Status
+                ref_uuid: 4dfdd2ce-0fc2-4e0f-8677-d6c5230dce3c
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : ee62e66e-7932-40b5-b3fc-b2a237e68d1d
+            exchanges:
+              - name: Repiration Data
+                ref_uuid:  e0a55d64-b5dd-4681-820b-b6e96a9b8e0a
+                description :  
+                source_function_name: Display Status
+                ref_uuid: 4dfdd2ce-0fc2-4e0f-8677-d6c5230dce3c
+                target_function_name: Monitor Patient Respiration
+                ref_uuid: fdca8818-31f0-4040-b522-503034b78508
+      - name: Deliver CPAP Mode
+        type: LogicalFunction
+        primary_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : d03eeca4-0cf4-4a0a-95cb-feb1a4631f3f
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  47b75d57-448b-4d0f-a284-1258125bbf6e
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver CPAP Mode
+                ref_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+          - name: FIP 2
+            description :  
+            ref_uuid : 249bf567-9ebd-468b-ad49-eaca67214011
+            exchanges:
+              - name: O2 Sense
+                ref_uuid:  6e93f176-764b-4a62-ae15-636078d9a441
+                description :  
+                source_function_name: Split 10
+                ref_uuid: 30b6c798-d965-4026-ac2c-33d79bd5cca4
+                target_function_name: Deliver CPAP Mode
+                ref_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : b0a25577-59e4-4bd7-849e-3365931c552c
+            exchanges:
+              - name: CPAP Vent
+                ref_uuid:  9123ef65-e618-4c8c-a721-81ffad2835a0
+                description :  
+                source_function_name: Deliver CPAP Mode
+                ref_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: FOP 2
+            description :  
+            ref_uuid : f97074b7-fea1-485e-ad9b-dc1356e1def0
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  9be657d8-99a5-4501-8c93-5b6130d4333f
+                description :  
+                source_function_name: Deliver CPAP Mode
+                ref_uuid: f6b5f2a1-237f-4ae2-a610-1ea3475049dd
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+      - name: Deliver PSV Mode
+        type: LogicalFunction
+        primary_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 9275d4f5-a787-46b1-a68c-0047dd8b3b98
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  13b84276-9ffb-49bb-9517-f12ae0f51046
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver PSV Mode
+                ref_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+          - name: FIP 2
+            description :  
+            ref_uuid : 3b867645-dbb4-4387-90de-d5c2267b534d
+            exchanges:
+              - name: O2 Sense
+                ref_uuid:  28b51c0d-0fb7-49ba-b26b-bdafca93ac5d
+                description :  
+                source_function_name: Split 10
+                ref_uuid: 30b6c798-d965-4026-ac2c-33d79bd5cca4
+                target_function_name: Deliver PSV Mode
+                ref_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 69dd00f8-be6d-4d59-b5f5-a0e07de77248
+            exchanges:
+              - name: PSV Vent
+                ref_uuid:  109ac95a-9317-497a-9310-97a694647074
+                description :  
+                source_function_name: Deliver PSV Mode
+                ref_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: FOP 2
+            description :  
+            ref_uuid : 83af4238-6645-44e1-8feb-72e862c0395b
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  838b6f52-d8b4-4641-811c-4278399eeb2d
+                description :  
+                source_function_name: Deliver PSV Mode
+                ref_uuid: cb682b4d-c186-4513-bda0-d13f33d438cd
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+      - name: Deliver SIMV Mode
+        type: LogicalFunction
+        primary_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : c1355bcd-77f8-423e-a478-ab7674c1cbb5
+            exchanges:
+              - name: Start/Stop
+                ref_uuid:  c97e751a-9f23-4342-99dd-8be7b137e767
+                description :  
+                source_function_name: Start
+                ref_uuid: d1817b7c-8e9f-4c08-9fc3-a254bfdb377e
+                target_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+          - name: FIP 2
+            description :  
+            ref_uuid : 27fc112b-d3f3-48de-afb3-cc564f225864
+            exchanges:
+              - name: O2 Sense
+                ref_uuid:  06c95d07-8342-499e-a68a-c69febd463e9
+                description :  
+                source_function_name: Split 10
+                ref_uuid: 30b6c798-d965-4026-ac2c-33d79bd5cca4
+                target_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 87305e76-c3f8-4a37-82af-bbb10c4f83fd
+            exchanges:
+              - name: SIMV Vent
+                ref_uuid:  e342a4f5-c9e0-4e8d-bc39-05a6d8b7d848
+                description :  
+                source_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+                target_function_name: Select 9
+                ref_uuid: fdff8c25-823c-41b6-8bf0-7b718f148dfd
+          - name: FOP 2
+            description :  
+            ref_uuid : bfe7739e-3b2a-4950-ba55-bbcb9a97f27b
+            exchanges:
+              - name: Exhale COntrol
+                ref_uuid:  3cfc2a6a-2967-471b-98cb-52af13186f7e
+                description :  
+                source_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+                target_function_name: Control Patient Exhale
+                ref_uuid: babf73b3-3c84-4479-8f01-b95d50c42c53
+          - name: FOP 3
+            description :  
+            ref_uuid : 65b94584-9995-4450-b817-59f08ee67df4
+            exchanges:
+              - name: O2 Control
+                ref_uuid:  a8179497-814d-48e2-a540-382e7199a9f5
+                description :  
+                source_function_name: Deliver SIMV Mode
+                ref_uuid: a1c54878-d8c2-46e7-b785-025882ff7c2f
+                target_function_name: Select O2
+                ref_uuid: 1e345882-6d76-4d68-89c9-18c5b34dc321
+      - name: Prompt for Settings
+        type: LogicalFunction
+        primary_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+        description : 
+        owner :
+          - name : Control SW
+            ref_uuid : 8d3b2451-d32f-41bc-ad2c-311f0477cea0
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : b0048c84-428a-469c-895e-c45cadc9daa7
+            exchanges:
+              - name: Settings
+                ref_uuid:  f6a03474-831e-42e0-9e4b-d47d24a8e4c0
+                description :  
+                source_function_name: Provide Settings
+                ref_uuid: 1f189c44-81f7-4e07-a390-39a46c737da4
+                target_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+        outputs:
+          - name: FOP 4
+            description :  
+            ref_uuid : 56423e56-637b-4741-a565-b7ab15a4967c
+            exchanges:
+              - name: Activate CPAP Mode
+                ref_uuid:  65caaf00-fd1e-4ab4-9b66-a4c0c7830613
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FOP 3
+            description :  
+            ref_uuid : 991f4e83-36dd-460a-8c5e-da492df46ce2
+            exchanges:
+              - name: Activate SIMV Mod
+                ref_uuid:  36010374-11a8-43cc-aacc-589483acd497
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FOP 2
+            description :  
+            ref_uuid : aa6947a7-9b8e-45ed-a019-bd68386154f6
+            exchanges:
+              - name: Activate A/C Mode
+                ref_uuid:  c16d3a58-50a4-43ca-bfe4-2d5c5e01917f
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FOP 1
+            description :  
+            ref_uuid : 785d26f8-98fc-4bb3-84f1-1c3855ad3b1c
+            exchanges:
+              - name: Prompts
+                ref_uuid:  873fab64-d018-4133-be56-0222e58efcfc
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Provide Settings
+                ref_uuid: 1f189c44-81f7-4e07-a390-39a46c737da4
+          - name: FOP 5
+            description :  
+            ref_uuid : 526a6da9-b7c2-4121-972d-c63d1b56f480
+            exchanges:
+              - name: Activate PSV Mode
+                ref_uuid:  adff9be9-6823-4f4b-abbd-56bfea8d6d36
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+          - name: FOP 6
+            description :  
+            ref_uuid : be02686b-c1ae-4a77-b3ca-638a26993a24
+            exchanges:
+              - name: Clear Mode
+                ref_uuid:  8ab2f9c1-3d38-47f0-9f7c-b1ae49c86fe2
+                description :  
+                source_function_name: Prompt for Settings
+                ref_uuid: de1d9739-4f1e-406a-a14d-7120e4406ecf
+                target_function_name: Activate Operating Mode
+                ref_uuid: 1345d26a-242f-4578-9ce8-050651efa65b
+      - name: Shaft Speed
+        type: PropertyValueGroup
+        primary_uuid: 9235d335-210c-498a-8b88-3ce0e9fdfced
+        description : 
+        property value groups:
+        property values:
+        - name: Units
+          ref_uuid: uuid : caba76df-5fee-4b9a-af96-141501043eea
+        - name: Value
+          ref_uuid: uuid : eb5c903b-dd8f-42b8-920a-03aa67c365ee
+      - name: Units
+        type: StringPropertyValue
+        primary_uuid: caba76df-5fee-4b9a-af96-141501043eea
+        description : 
+        value :  RPM
+      - name: Value
+        type: FloatPropertyValue
+        primary_uuid: eb5c903b-dd8f-42b8-920a-03aa67c365ee
+        description : 
+        value :  1500.0
+      - name: Inlet Pressure
+        type: PropertyValueGroup
+        primary_uuid: 0c7f8c77-ae4d-4210-8e1e-eb87da9679d7
+        description : 
+        property value groups:
+        property values:
+        - name: Units
+          ref_uuid: uuid : 0696ed3e-02ac-4b9f-94c3-919b8edfc06e
+        - name: Value
+          ref_uuid: uuid : e717a2c3-91b8-4a0b-a7fb-716c2cc51141
+      - name: Units
+        type: StringPropertyValue
+        primary_uuid: 0696ed3e-02ac-4b9f-94c3-919b8edfc06e
+        description : 
+        value :  BarA
+      - name: Value
+        type: FloatPropertyValue
+        primary_uuid: e717a2c3-91b8-4a0b-a7fb-716c2cc51141
+        description : 
+        value :  6.013
+      - name: Inlet Temp
+        type: PropertyValueGroup
+        primary_uuid: 3fa9897d-d684-40af-a05c-8bec979f3b9b
+        description : 
+        property value groups:
+        property values:
+        - name: Units
+          ref_uuid: uuid : b1b8c119-90e2-48e2-855f-886ef05fb047
+        - name: Value
+          ref_uuid: uuid : f10edd20-1874-44aa-8dcc-566ae3704b38
+      - name: Units
+        type: StringPropertyValue
+        primary_uuid: b1b8c119-90e2-48e2-855f-886ef05fb047
+        description : 
+        value :  deg C
+      - name: Value
+        type: FloatPropertyValue
+        primary_uuid: f10edd20-1874-44aa-8dcc-566ae3704b38
+        description : 
+        value :  20.0
+      - name: Single Limb Circuit
+        type: LogicalComponent
+        primary_uuid: 0b63e296-5828-47d1-85cd-aa7331870b63
+        description : 
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Deliver Ventaltion Single Limb with EV
+            ref_uuid : d8830276-9479-4289-8892-a75e7faddca6
+          - name: Deliver Ventilation Single Limb Circuti
+            ref_uuid : 900a83fd-86c6-4acc-974b-b1cb98b04003
+        ports:
+      - name: Receive Connection
+        type: LogicalFunction
+        primary_uuid: 3ac6dbc9-fef8-4991-939c-c541d05b4fac
+        description : 
+        owner :
+          - name : Patient
+            ref_uuid : 379684a4-ebb4-4086-a6b5-4f0956c339e1
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 9c828852-1db7-445d-9a09-dd39437f2783
+            exchanges:
+              - name: Interface to Patient
+                ref_uuid:  4cf7e301-7680-45fe-9a2f-71e55b3c616f
+                description :  
+                source_function_name: Connect Patient to Circuit
+                ref_uuid: 29f9e8a8-26d7-45ac-a3a2-a39c9e479890
+                target_function_name: Receive Connection
+                ref_uuid: 3ac6dbc9-fef8-4991-939c-c541d05b4fac
+          - name: inPatient Connection
+            description :  
+            ref_uuid : f5036466-d1ca-4aaf-964a-982e93b4f44d
+            exchanges:
+              - name: Mask
+                ref_uuid:  d845a9e9-944e-412a-8f9c-731fe9f5fc01
+                description :  
+                source_function_name: Connect to Patient
+                ref_uuid: e95ed482-e19a-46b5-8d8d-7bf8715755c3
+                target_function_name: Receive Connection
+                ref_uuid: 3ac6dbc9-fef8-4991-939c-c541d05b4fac
+        outputs:
+      - name: Patient Call
+        type: LogicalFunction
+        primary_uuid: abf097cb-d4b4-4511-8240-0abe5d3a8b1c
+        description : 
+        owner :
+          - name : Patient
+            ref_uuid : 379684a4-ebb4-4086-a6b5-4f0956c339e1
+        child functions:
+        inputs:
+        outputs:
+          - name: outPatient Call
+            description :  
+            ref_uuid : 3b5ef914-fd89-46a9-900f-35ae3e4ce7ea
+            exchanges:
+              - name: Patient Call
+                ref_uuid:  dbd69cea-656c-4343-adad-1dc07eb58603
+                description :  
+                source_function_name: Patient Call
+                ref_uuid: abf097cb-d4b4-4511-8240-0abe5d3a8b1c
+                target_function_name: Accept Patient Calls 
+                ref_uuid: 4e80de42-1a36-4d13-9e0f-958cad7a278e
+      - name: Distribute
+        type: LogicalFunction
+        primary_uuid: 6356e2ae-a2ab-44f9-b950-fd704c58e234
+        description : 
+        owner :
+          - name : Patient
+            ref_uuid : 379684a4-ebb4-4086-a6b5-4f0956c339e1
+        child functions:
+        inputs:
+          - name: inPatient Vitals
+            description :  
+            ref_uuid : 8e280b7a-a4e1-4038-9475-4f6d5b0d2595
+            exchanges:
+              - name: Patient Vitals
+                ref_uuid:  857da965-19de-4d17-ae7f-9975cbe400de
+                description :  
+                source_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+                target_function_name: Distribute
+                ref_uuid: 6356e2ae-a2ab-44f9-b950-fd704c58e234
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 21bd78ae-4ff5-46b5-8f68-cb436fc1c718
+            exchanges:
+              - name: Vitals
+                ref_uuid:  545f25e2-2819-4a6a-b6ce-10ff24872cd2
+                description :  
+                source_function_name: Distribute
+                ref_uuid: 6356e2ae-a2ab-44f9-b950-fd704c58e234
+                target_function_name: Monitor Patient Vitals
+                ref_uuid: b37853ed-cb18-4f4d-a535-128f0aa9d248
+          - name: outVitals
+            description :  
+            ref_uuid : eaa47d60-6ebd-4f2f-b4d1-038b2fc76297
+            exchanges:
+              - name: Vitals
+                ref_uuid:  a99a7881-80e3-40d1-bcfa-21d1b0fb7d37
+                description :  
+                source_function_name: Distribute
+                ref_uuid: 6356e2ae-a2ab-44f9-b950-fd704c58e234
+                target_function_name: Review Patient Vitals
+                ref_uuid: 71a40ba1-9ac4-4e50-b7a0-ec1012f397fb
+      - name: Lung Volume
+        type: PropertyValueGroup
+        primary_uuid: e10ca9d7-6f11-4de4-b7bd-0fab4a6af896
+        description : 
+        property value groups:
+        property values:
+        - name: Value
+          ref_uuid: uuid : 5f132292-78a7-4fef-b151-55196260d7fd
+        - name: Max Value
+          ref_uuid: uuid : 1dcecb71-e786-4bbb-a40b-74ba15c3fb02
+        - name: Min Value
+          ref_uuid: uuid : 2be40578-1d6a-4343-8111-1ba861209687
+        - name: Units
+          ref_uuid: uuid : 0b67dfa2-c595-4e28-95b1-5212a66d5980
+      - name: Value
+        type: FloatPropertyValue
+        primary_uuid: 5f132292-78a7-4fef-b151-55196260d7fd
+        description : 
+        value :  3.2
+      - name: Max Value
+        type: FloatPropertyValue
+        primary_uuid: 1dcecb71-e786-4bbb-a40b-74ba15c3fb02
+        description : 
+        value :  4.0
+      - name: Min Value
+        type: FloatPropertyValue
+        primary_uuid: 2be40578-1d6a-4343-8111-1ba861209687
+        description : 
+        value :  1.5
+      - name: Units
+        type: StringPropertyValue
+        primary_uuid: 0b67dfa2-c595-4e28-95b1-5212a66d5980
+        description : 
+        value :  L
+      - name: Unpack Box
+        type: LogicalFunction
+        primary_uuid: a5337c43-b3b0-4dd6-9a20-597c5c8e9df9
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inVentilator
+            description :  
+            ref_uuid : 5b588f6f-4168-494e-bfc8-3dbb428e8327
+            exchanges:
+              - name: Ventilator
+                ref_uuid:  aa6f941c-387a-4169-a42b-06d25f407ea1
+                description :  
+                source_function_name: Purchase Ventilator
+                ref_uuid: cc0874a7-a9f3-4a21-8f7b-f7ca8962d2da
+                target_function_name: Unpack Box
+                ref_uuid: a5337c43-b3b0-4dd6-9a20-597c5c8e9df9
+          - name: inVentilator
+            description :  
+            ref_uuid : 2609e49a-c7c7-412b-bf15-ba1340659d9c
+            exchanges:
+              - name: Ventilator
+                ref_uuid:  b92567c3-939b-402e-be18-7eb04cd0525e
+                description :  
+                source_function_name: Receive Ventilator
+                ref_uuid: 5b9fb231-eb03-4586-96b5-fc9c539abd3e
+                target_function_name: Unpack Box
+                ref_uuid: a5337c43-b3b0-4dd6-9a20-597c5c8e9df9
+        outputs:
+          - name: outComponents and Manual
+            description :  
+            ref_uuid : e792c197-6e0d-435d-b4e3-4a8d2c0be711
+            exchanges:
+              - name: Components and Manual
+                ref_uuid:  05922314-29ec-40f3-88f6-f650aa42bdef
+                description :  
+                source_function_name: Unpack Box
+                ref_uuid: a5337c43-b3b0-4dd6-9a20-597c5c8e9df9
+                target_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+      - name: Install on Utility Cart
+        type: LogicalFunction
+        primary_uuid: ccc41515-b9ca-4f5d-9992-7e666faab98a
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inInstructions
+            description :  
+            ref_uuid : 4ecf1691-32af-43cb-bfb8-3415393e1a33
+            exchanges:
+              - name: Instructions
+                ref_uuid:  21375e64-3fe8-4406-90ea-4085282e74fe
+                description :  
+                source_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+                target_function_name: Install on Utility Cart
+                ref_uuid: ccc41515-b9ca-4f5d-9992-7e666faab98a
+          - name: inInstructions
+            description :  
+            ref_uuid : b347b48f-14a7-421b-ac03-e047ebaef2c3
+            exchanges:
+              - name: Instructions
+                ref_uuid:  fab691b5-1be5-47a8-889e-afb7cbfef7b6
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Install on Utility Cart
+                ref_uuid: ccc41515-b9ca-4f5d-9992-7e666faab98a
+          - name: FIP 3
+            description :  
+            ref_uuid : 43bb8a15-ebc2-4928-adbe-a5fe67163bf9
+            exchanges:
+              - name: Cart Install HW 
+                ref_uuid:  a1145807-f846-4c92-95e2-a1ef157a7d0e
+                description :  
+                source_function_name: Faciliate Cart Installation
+                ref_uuid: e84001fe-7de9-48e2-a381-640abf65ed46
+                target_function_name: Install on Utility Cart
+                ref_uuid: ccc41515-b9ca-4f5d-9992-7e666faab98a
+        outputs:
+      - name: Use Manual Resources
+        type: LogicalFunction
+        primary_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inComponents and Manual
+            description :  
+            ref_uuid : b4b42af9-859a-47c8-ad01-62963b920ecd
+            exchanges:
+              - name: Components and Manual
+                ref_uuid:  05922314-29ec-40f3-88f6-f650aa42bdef
+                description :  
+                source_function_name: Unpack Box
+                ref_uuid: a5337c43-b3b0-4dd6-9a20-597c5c8e9df9
+                target_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+          - name: FIP 2
+            description :  
+            ref_uuid : cfcc738e-8042-437e-95e9-88a73ad2718f
+            exchanges:
+              - name: Manual
+                ref_uuid:  0509c411-04e1-4bfb-b5eb-4ff7b2777205
+                description :  
+                source_function_name: Provide Manual
+                ref_uuid: 496d68a6-f0db-4a4f-823f-042138b7e7c4
+                target_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+        outputs:
+          - name: outWeb Links
+            description :  
+            ref_uuid : d97b75fa-d6ec-4533-8fe4-492fdccb4e63
+            exchanges:
+              - name: Web Links
+                ref_uuid:  97f6cfd6-2e4f-4b04-9970-1f6e4de9c86e
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+          - name: outInstructions
+            description :  
+            ref_uuid : 369a240c-6b4f-499c-a400-5b510477e4b0
+            exchanges:
+              - name: Instructions
+                ref_uuid:  fab691b5-1be5-47a8-889e-afb7cbfef7b6
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Install on Utility Cart
+                ref_uuid: ccc41515-b9ca-4f5d-9992-7e666faab98a
+          - name: outInstructions
+            description :  
+            ref_uuid : 1cac51aa-dd83-410c-b0b7-8383ca5862e6
+            exchanges:
+              - name: Instructions
+                ref_uuid:  fbfb2153-93f0-48af-9741-83e01f1abdb6
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Install on wheel chair 
+                ref_uuid: 092b1b7a-e0ef-400d-aff1-7da907cfbd6f
+          - name: outInstructions
+            description :  
+            ref_uuid : 2718acd6-fae5-425f-9cbf-c54df64771ca
+            exchanges:
+              - name: Instructions
+                ref_uuid:  0fd1d95c-b5ff-47b7-aca0-34b2a0da7d6c
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Assemble  unit
+                ref_uuid: 0bcf9f42-bc76-4fcb-8a9f-3c0eb858c49c
+          - name: outCircuit Info 
+            description :  
+            ref_uuid : 2d992b11-dfbe-4bae-b6b0-d5a5eed1d1cf
+            exchanges:
+              - name: Circuit Info 
+                ref_uuid:  d97ec16c-4e9b-4b15-8bec-f5bd0a242303
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Choose the Patient Circuit Type
+                ref_uuid: 27e1ed86-0af1-47a8-bfe5-b177e9c7c80b
+      - name: Use web resources
+        type: LogicalFunction
+        primary_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inWeb Links
+            description :  
+            ref_uuid : 7b7eb115-9190-46ee-bfaa-02a3ba48daf2
+            exchanges:
+              - name: Web Links
+                ref_uuid:  97f6cfd6-2e4f-4b04-9970-1f6e4de9c86e
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+          - name: FIP 2
+            description :  
+            ref_uuid : ad54e784-6478-497c-9964-dbacc264b67b
+            exchanges:
+              - name: Web Resource
+                ref_uuid:  3d7bde03-9e68-4c96-9c91-83f3ed8f566b
+                description :  
+                source_function_name: Provide Web Resources
+                ref_uuid: a9bed4d4-2561-4398-ae8f-95eb146087b3
+                target_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+        outputs:
+          - name: outInstructions
+            description :  
+            ref_uuid : 59cb266a-53fc-4d4a-acfd-f1acc789ffc6
+            exchanges:
+              - name: Instructions
+                ref_uuid:  21375e64-3fe8-4406-90ea-4085282e74fe
+                description :  
+                source_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+                target_function_name: Install on Utility Cart
+                ref_uuid: ccc41515-b9ca-4f5d-9992-7e666faab98a
+          - name: outInstructions
+            description :  
+            ref_uuid : 613a9276-b8ef-4c53-b1a5-a8de4e70e06e
+            exchanges:
+              - name: Instructions
+                ref_uuid:  8aea2162-ddbb-4132-8a81-943f192a3a8f
+                description :  
+                source_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+                target_function_name: Install on wheel chair 
+                ref_uuid: 092b1b7a-e0ef-400d-aff1-7da907cfbd6f
+          - name: outCircuit Info
+            description :  
+            ref_uuid : ece61b5c-279f-478f-906f-33f155861b69
+            exchanges:
+              - name: Circuit Info
+                ref_uuid:  13e1821e-263f-44ee-a7e5-edafda74ef79
+                description :  
+                source_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+                target_function_name: Choose the Patient Circuit Type
+                ref_uuid: 27e1ed86-0af1-47a8-bfe5-b177e9c7c80b
+      - name: Install on wheel chair 
+        type: LogicalFunction
+        primary_uuid: 092b1b7a-e0ef-400d-aff1-7da907cfbd6f
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inInstructions
+            description :  
+            ref_uuid : 1b58a8dd-1744-4491-b024-33349db4a19f
+            exchanges:
+              - name: Instructions
+                ref_uuid:  fbfb2153-93f0-48af-9741-83e01f1abdb6
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Install on wheel chair 
+                ref_uuid: 092b1b7a-e0ef-400d-aff1-7da907cfbd6f
+          - name: inInstructions
+            description :  
+            ref_uuid : d3261c63-989e-4c53-b5d9-a1f87eb4611a
+            exchanges:
+              - name: Instructions
+                ref_uuid:  8aea2162-ddbb-4132-8a81-943f192a3a8f
+                description :  
+                source_function_name: Use web resources
+                ref_uuid: 46bb0126-fb5f-4f86-b01f-e7699e307154
+                target_function_name: Install on wheel chair 
+                ref_uuid: 092b1b7a-e0ef-400d-aff1-7da907cfbd6f
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : f29b9bb3-13ce-4302-8531-cb1b03203369
+            exchanges:
+              - name: Wheel Chair Install HW
+                ref_uuid:  9c532b69-e11d-4071-8ed2-105d2b820108
+                description :  
+                source_function_name: Install on wheel chair 
+                ref_uuid: 092b1b7a-e0ef-400d-aff1-7da907cfbd6f
+                target_function_name: Faciltate Wheelchair Install
+                ref_uuid: 1eb11a83-03c6-4f23-9f8e-b1f565af5268
+      - name: Assemble  unit
+        type: LogicalFunction
+        primary_uuid: 0bcf9f42-bc76-4fcb-8a9f-3c0eb858c49c
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inInstructions
+            description :  
+            ref_uuid : b76ab31b-f3e6-47f9-a564-5c30e64e0941
+            exchanges:
+              - name: Instructions
+                ref_uuid:  0fd1d95c-b5ff-47b7-aca0-34b2a0da7d6c
+                description :  
+                source_function_name: Use Manual Resources
+                ref_uuid: 834218b6-74f8-4c9c-8c69-6cb9e6dd0fc1
+                target_function_name: Assemble  unit
+                ref_uuid: 0bcf9f42-bc76-4fcb-8a9f-3c0eb858c49c
+        outputs:
+      - name: Inspect Patient Circuit Packaging
+        type: LogicalFunction
+        primary_uuid: 97ed0352-aa1d-46b5-831e-4e3cf7f8ad35
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : f40a07f3-0395-4504-957a-7112dfa72bc2
+            exchanges:
+              - name: Circuit Materials
+                ref_uuid:  aee13016-8620-46f0-b3d8-67b4f3e51914
+                description :  
+                source_function_name: Provide Circuit Content
+                ref_uuid: 614f6b81-033d-4802-a8b5-8c6f9211930f
+                target_function_name: Inspect Patient Circuit Packaging
+                ref_uuid: 97ed0352-aa1d-46b5-831e-4e3cf7f8ad35
+          - name: inCircuit
+            description :  
+            ref_uuid : 7f9b3dd4-a574-4201-b0c6-5ed2a3e800b7
+            exchanges:
+              - name: Circuit
+                ref_uuid:  2b6ae6b7-1187-4930-853e-ecbdffb1a184
+                description :  
+                source_function_name: Purchase Circuit
+                ref_uuid: 8b269ea6-ae70-421c-9e9f-b9b7769d0509
+                target_function_name: Inspect Patient Circuit Packaging
+                ref_uuid: 97ed0352-aa1d-46b5-831e-4e3cf7f8ad35
+          - name: inCircuit
+            description :  
+            ref_uuid : b31d23eb-eb6e-4a80-9770-78ba941ef8bb
+            exchanges:
+              - name: Circuit
+                ref_uuid:  6446dfee-6e07-4c8b-b1f7-a71341ae53e9
+                description :  
+                source_function_name: Recieve Circuit
+                ref_uuid: 2e8ee8b1-faa5-414e-a7c7-8bdf217e83c6
+                target_function_name: Inspect Patient Circuit Packaging
+                ref_uuid: 97ed0352-aa1d-46b5-831e-4e3cf7f8ad35
+        outputs:
+          - name: outInteraction 11
+            description :  
+            ref_uuid : 0cab4501-dbbd-404e-9e1a-c6455a2f86e8
+            exchanges:
+              - name: Interaction 11
+                ref_uuid:  7de04022-7957-4763-b11a-9d6278bfd0e7
+                description :  
+                source_function_name: Inspect Patient Circuit Packaging
+                ref_uuid: 97ed0352-aa1d-46b5-831e-4e3cf7f8ad35
+                target_function_name: Choose the Patient Circuit Type
+                ref_uuid: 27e1ed86-0af1-47a8-bfe5-b177e9c7c80b
+      - name: Monitor Ventilation Operation Status
+        type: LogicalFunction
+        primary_uuid: c87b2fc1-dcd4-4f83-bc7d-01cdbbbe1d31
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inPatient Response
+            description :  
+            ref_uuid : 1a44ace5-7d12-4ed2-a44a-64eb5fec4652
+            exchanges:
+        outputs:
+          - name: outVentilator Status
+            description :  
+            ref_uuid : f0e2e0b1-3811-4e43-8e6b-1b75f5bd609f
+            exchanges:
+              - name: Ventilator Issues
+                ref_uuid:  d3bdce1a-7d67-4f3a-bc0d-fe02681a7d74
+                description :  
+                source_function_name: Monitor Ventilation Operation Status
+                ref_uuid: c87b2fc1-dcd4-4f83-bc7d-01cdbbbe1d31
+                target_function_name: Repond to Ventilator Problems
+                ref_uuid: 379a205e-9ac5-476a-a13b-1a2fcb25d25b
+      - name: Repond to Ventilator Problems
+        type: LogicalFunction
+        primary_uuid: 379a205e-9ac5-476a-a13b-1a2fcb25d25b
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: inVentilator Status
+            description :  
+            ref_uuid : 642c56c0-ecdd-4194-9ee7-8803c2fb3181
+            exchanges:
+              - name: Ventilator Issues
+                ref_uuid:  d3bdce1a-7d67-4f3a-bc0d-fe02681a7d74
+                description :  
+                source_function_name: Monitor Ventilation Operation Status
+                ref_uuid: c87b2fc1-dcd4-4f83-bc7d-01cdbbbe1d31
+                target_function_name: Repond to Ventilator Problems
+                ref_uuid: 379a205e-9ac5-476a-a13b-1a2fcb25d25b
+        outputs:
+      - name: Purchase Circuit
+        type: LogicalFunction
+        primary_uuid: 8b269ea6-ae70-421c-9e9f-b9b7769d0509
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+        outputs:
+          - name: outCircuit
+            description :  
+            ref_uuid : e6d8ef73-3799-4c13-8ff3-b634f70a99bb
+            exchanges:
+              - name: Circuit
+                ref_uuid:  015f427f-3330-4738-856f-58b2bc5a7152
+                description :  
+                source_function_name: Purchase Circuit
+                ref_uuid: 8b269ea6-ae70-421c-9e9f-b9b7769d0509
+                target_function_name: Replenish Circuit
+                ref_uuid: 9738bc73-d74b-4ee2-bdd9-09571b95b08d
+          - name: outCircuit
+            description :  
+            ref_uuid : cd0544d6-785c-4479-8453-fec254e7349a
+            exchanges:
+              - name: Circuit
+                ref_uuid:  2b6ae6b7-1187-4930-853e-ecbdffb1a184
+                description :  
+                source_function_name: Purchase Circuit
+                ref_uuid: 8b269ea6-ae70-421c-9e9f-b9b7769d0509
+                target_function_name: Inspect Patient Circuit Packaging
+                ref_uuid: 97ed0352-aa1d-46b5-831e-4e3cf7f8ad35
+      - name: Purchase Ventilator
+        type: LogicalFunction
+        primary_uuid: cc0874a7-a9f3-4a21-8f7b-f7ca8962d2da
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+        outputs:
+          - name: outPurchase
+            description :  
+            ref_uuid : 53047d35-9cac-47f8-aabc-bd784e81712a
+            exchanges:
+              - name: Purchase
+                ref_uuid:  cb838204-8ade-4670-b8c1-ac0a4b6d7825
+                description :  
+                source_function_name: Purchase Ventilator
+                ref_uuid: cc0874a7-a9f3-4a21-8f7b-f7ca8962d2da
+                target_function_name: Replenish Ventilator
+                ref_uuid: 423578ef-0a42-4e47-90d4-2b821cdb0adf
+          - name: outVentilator
+            description :  
+            ref_uuid : d4930664-7af0-4c0e-9ae6-dab269e32228
+            exchanges:
+              - name: Ventilator
+                ref_uuid:  aa6f941c-387a-4169-a42b-06d25f407ea1
+                description :  
+                source_function_name: Purchase Ventilator
+                ref_uuid: cc0874a7-a9f3-4a21-8f7b-f7ca8962d2da
+                target_function_name: Unpack Box
+                ref_uuid: a5337c43-b3b0-4dd6-9a20-597c5c8e9df9
+      - name: Monitor Patient Respiration
+        type: LogicalFunction
+        primary_uuid: fdca8818-31f0-4040-b522-503034b78508
+        description : 
+        owner :
+          - name : Patient Support Care Givers
+            ref_uuid : bdc767b7-b02f-4e45-8766-60ce8d5d5bdf
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 54a14dfb-3e2e-49c3-a643-dd483db164d4
+            exchanges:
+              - name: Repiration Data
+                ref_uuid:  e0a55d64-b5dd-4681-820b-b6e96a9b8e0a
+                description :  
+                source_function_name: Display Status
+                ref_uuid: 4dfdd2ce-0fc2-4e0f-8677-d6c5230dce3c
+                target_function_name: Monitor Patient Respiration
+                ref_uuid: fdca8818-31f0-4040-b522-503034b78508
+          - name: FIP 1
+            description :  
+            ref_uuid : 2c873dae-a8b4-4122-999d-3f10383de47d
+            exchanges:
+        outputs:
+    - name: inMode
+      type: FunctionInputPort
+      primary_uuid: c8926358-d9f3-421b-ae76-ce76a00c9c4b
+      description : 
+    - name: Mode
+      type: FunctionalExchange
+      primary_uuid: bf8d6d06-6ba1-4058-bc04-1560cbcff295
+      description : 
+      source function or activity:
+          - name: outMode
+            ref_uuid: eceed0be-1e2d-44c9-bd4a-a7d807e4a587
+      target function or activity:
+          - name: inMode
+            ref_uuid: c8926358-d9f3-421b-ae76-ce76a00c9c4b
+      involving functional chains:
+        - name: Establish Operating Mode
+          ref_uuid : 4cedf43f-ecb9-4c8c-9321-7f618f9b475b
+        - name: Deliver Ventilation
+          ref_uuid : 8140af4a-5e67-4b5b-adfd-d4460c572ee1
+    - name: Operation Status
+      type: FunctionalExchange
+      primary_uuid: 16e579f0-3942-4a60-8dc2-76a57dd0ee4a
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: cf918c08-e436-49d9-bb68-ceba584dc710
+      target function or activity:
+          - name: inMode
+            ref_uuid: c8926358-d9f3-421b-ae76-ce76a00c9c4b
+      involving functional chains:
+        - name: Monitor Patient  Respirations
+          ref_uuid : c8d29cf8-5765-4d2b-a447-14f55657015a
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: ee62e66e-7932-40b5-b3fc-b2a237e68d1d
+      description : 
+    - name: Repiration Data
+      type: FunctionalExchange
+      primary_uuid: e0a55d64-b5dd-4681-820b-b6e96a9b8e0a
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: ee62e66e-7932-40b5-b3fc-b2a237e68d1d
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 54a14dfb-3e2e-49c3-a643-dd483db164d4
+      involving functional chains:
+        - name: Monitor Patient  Respirations
+          ref_uuid : c8d29cf8-5765-4d2b-a447-14f55657015a
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: d03eeca4-0cf4-4a0a-95cb-feb1a4631f3f
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 249bf567-9ebd-468b-ad49-eaca67214011
+      description : 
+    - name: O2 Sense
+      type: FunctionalExchange
+      primary_uuid: 6e93f176-764b-4a62-ae15-636078d9a441
+      description : 
+      source function or activity:
+          - name: FOP 3
+            ref_uuid: fd6a65b1-f1bf-4feb-a256-035711249a7a
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 249bf567-9ebd-468b-ad49-eaca67214011
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: b0a25577-59e4-4bd7-849e-3365931c552c
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: f97074b7-fea1-485e-ad9b-dc1356e1def0
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 9275d4f5-a787-46b1-a68c-0047dd8b3b98
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 3b867645-dbb4-4387-90de-d5c2267b534d
+      description : 
+    - name: O2 Sense
+      type: FunctionalExchange
+      primary_uuid: 28b51c0d-0fb7-49ba-b26b-bdafca93ac5d
+      description : 
+      source function or activity:
+          - name: FOP 4
+            ref_uuid: 63c500bf-dc29-4673-be1a-216b81005fc6
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 3b867645-dbb4-4387-90de-d5c2267b534d
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 69dd00f8-be6d-4d59-b5f5-a0e07de77248
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: 83af4238-6645-44e1-8feb-72e862c0395b
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: c1355bcd-77f8-423e-a478-ab7674c1cbb5
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: 27fc112b-d3f3-48de-afb3-cc564f225864
+      description : 
+    - name: O2 Sense
+      type: FunctionalExchange
+      primary_uuid: 06c95d07-8342-499e-a68a-c69febd463e9
+      description : 
+      source function or activity:
+          - name: FOP 2
+            ref_uuid: 2ce579bd-c1f6-43e2-9bf7-196e36ca4dc4
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 27fc112b-d3f3-48de-afb3-cc564f225864
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 87305e76-c3f8-4a37-82af-bbb10c4f83fd
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: bfe7739e-3b2a-4950-ba55-bbcb9a97f27b
+      description : 
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: 65b94584-9995-4450-b817-59f08ee67df4
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: b0048c84-428a-469c-895e-c45cadc9daa7
+      description : 
+    - name: Settings
+      type: FunctionalExchange
+      primary_uuid: f6a03474-831e-42e0-9e4b-d47d24a8e4c0
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 0b0b5705-ea7b-4306-bdbe-19b7ad7de818
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: b0048c84-428a-469c-895e-c45cadc9daa7
+      involving functional chains:
+        - name: Activate A/C Mode
+          ref_uuid : 690265a1-5dbf-418a-88f2-a22f2dfd5534
+        - name: Activate SIMV
+          ref_uuid : 01ec1262-85b7-47ba-aa58-d9937b96e4ea
+        - name: Activate CPAP
+          ref_uuid : 1b40fcd9-206f-47a3-a94b-e4484f24f247
+    - name: FOP 4
+      type: FunctionOutputPort
+      primary_uuid: 56423e56-637b-4741-a565-b7ab15a4967c
+      description : 
+    - name: FOP 3
+      type: FunctionOutputPort
+      primary_uuid: 991f4e83-36dd-460a-8c5e-da492df46ce2
+      description : 
+    - name: FOP 2
+      type: FunctionOutputPort
+      primary_uuid: aa6947a7-9b8e-45ed-a019-bd68386154f6
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 785d26f8-98fc-4bb3-84f1-1c3855ad3b1c
+      description : 
+    - name: Prompts
+      type: FunctionalExchange
+      primary_uuid: 873fab64-d018-4133-be56-0222e58efcfc
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 785d26f8-98fc-4bb3-84f1-1c3855ad3b1c
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 547c5204-889b-4c95-ac88-50ef75df56b7
+      involving functional chains:
+        - name: Establish Operating Mode
+          ref_uuid : 4cedf43f-ecb9-4c8c-9321-7f618f9b475b
+        - name: Activate A/C Mode
+          ref_uuid : 690265a1-5dbf-418a-88f2-a22f2dfd5534
+    - name: FOP 5
+      type: FunctionOutputPort
+      primary_uuid: 526a6da9-b7c2-4121-972d-c63d1b56f480
+      description : 
+    - name: FOP 6
+      type: FunctionOutputPort
+      primary_uuid: be02686b-c1ae-4a77-b3ca-638a26993a24
+      description : 
+      - name: Deliver Ventaltion Single Limb with EV
+        type: LogicalFunction
+        primary_uuid: d8830276-9479-4289-8892-a75e7faddca6
+        description : 
+        owner :
+          - name : Single Limb Circuit
+            ref_uuid : 0b63e296-5828-47d1-85cd-aa7331870b63
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 5d3f223b-260d-4917-856b-a7174f3f41b3
+            exchanges:
+              - name: Vent
+                ref_uuid:  fb9f91c6-c16a-43ea-b0ec-b7301cd249e6
+                description :  
+                source_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+                target_function_name: Deliver Ventaltion Single Limb with EV
+                ref_uuid: d8830276-9479-4289-8892-a75e7faddca6
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 259040ed-62b7-4e4c-9c8b-98b4e733e968
+            exchanges:
+              - name: Vent with Single Limb EV
+                ref_uuid:  b204c108-6851-4277-a30b-8d8c55c1e604
+                description :  
+                source_function_name: Deliver Ventaltion Single Limb with EV
+                ref_uuid: d8830276-9479-4289-8892-a75e7faddca6
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+      - name: Deliver Ventilation Single Limb Circuti
+        type: LogicalFunction
+        primary_uuid: 900a83fd-86c6-4acc-974b-b1cb98b04003
+        description : 
+        owner :
+          - name : Single Limb Circuit
+            ref_uuid : 0b63e296-5828-47d1-85cd-aa7331870b63
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : 2fe982ee-38b8-4384-93b5-766c9288b764
+            exchanges:
+              - name: Vent
+                ref_uuid:  8dbcbb16-d210-43c4-a571-1da81687b708
+                description :  
+                source_function_name: Select
+                ref_uuid: b776ee26-a8f3-4add-82f9-6737edefdf68
+                target_function_name: Deliver Ventilation Single Limb Circuti
+                ref_uuid: 900a83fd-86c6-4acc-974b-b1cb98b04003
+        outputs:
+          - name: FOP 1
+            description :  
+            ref_uuid : 7fdef1f7-93a4-4cbe-b226-f269f735cae0
+            exchanges:
+              - name: Vent with Single Limb
+                ref_uuid:  82e3c29c-50de-455c-9781-42bb8fc1dc52
+                description :  
+                source_function_name: Deliver Ventilation Single Limb Circuti
+                ref_uuid: 900a83fd-86c6-4acc-974b-b1cb98b04003
+                target_function_name: Convert Ventilator Air to Blood Oxygen
+                ref_uuid: 0b0c7bfc-a3bb-410e-b65e-a1359760878d
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 9c828852-1db7-445d-9a09-dd39437f2783
+      description : 
+    - name: Interface to Patient
+      type: FunctionalExchange
+      primary_uuid: 4cf7e301-7680-45fe-9a2f-71e55b3c616f
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 61c3d2df-95c0-4b29-9a7e-19df08a4cadc
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 9c828852-1db7-445d-9a09-dd39437f2783
+      involving functional chains:
+        - name: Connect to Patient
+          ref_uuid : 02705122-ccd6-4de0-b606-7d7fc1f6a384
+    - name: inPatient Connection
+      type: FunctionInputPort
+      primary_uuid: f5036466-d1ca-4aaf-964a-982e93b4f44d
+      description : 
+    - name: Mask
+      type: FunctionalExchange
+      primary_uuid: d845a9e9-944e-412a-8f9c-731fe9f5fc01
+      description : 
+      source function or activity:
+          - name: outPatient Connection
+            ref_uuid: 2a0f0a1c-82c5-45ab-a567-041e7d5dd76d
+      target function or activity:
+          - name: inPatient Connection
+            ref_uuid: f5036466-d1ca-4aaf-964a-982e93b4f44d
+      involving functional chains:
+        - name: Connect to Patient
+          ref_uuid : 02705122-ccd6-4de0-b606-7d7fc1f6a384
+    - name: outPatient Call
+      type: FunctionOutputPort
+      primary_uuid: 3b5ef914-fd89-46a9-900f-35ae3e4ce7ea
+      description : 
+    - name: Patient Call
+      type: FunctionalExchange
+      primary_uuid: dbd69cea-656c-4343-adad-1dc07eb58603
+      description : 
+      source function or activity:
+          - name: outPatient Call
+            ref_uuid: 3b5ef914-fd89-46a9-900f-35ae3e4ce7ea
+      target function or activity:
+          - name: inPatient Call
+            ref_uuid: 316a46b0-d000-4df7-a5a8-c293b43f68cc
+      involving functional chains:
+        - name: Support Hosptial Call System
+          ref_uuid : 9f5b0471-291b-4267-b6bd-00c7d34d823e
+    - name: inPatient Vitals
+      type: FunctionInputPort
+      primary_uuid: 8e280b7a-a4e1-4038-9475-4f6d5b0d2595
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 21bd78ae-4ff5-46b5-8f68-cb436fc1c718
+      description : 
+    - name: Vitals
+      type: FunctionalExchange
+      primary_uuid: 545f25e2-2819-4a6a-b6ce-10ff24872cd2
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 21bd78ae-4ff5-46b5-8f68-cb436fc1c718
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 7662b6dc-b438-48ed-a9d3-f87123b9489c
+      involving functional chains:
+        - name: Monitor Patient Vitals
+          ref_uuid : 29bea4bf-4be4-4386-898a-d0ce195f2adf
+    - name: outVitals
+      type: FunctionOutputPort
+      primary_uuid: eaa47d60-6ebd-4f2f-b4d1-038b2fc76297
+      description : 
+    - name: Vitals
+      type: FunctionalExchange
+      primary_uuid: a99a7881-80e3-40d1-bcfa-21d1b0fb7d37
+      description : 
+      source function or activity:
+          - name: outVitals
+            ref_uuid: eaa47d60-6ebd-4f2f-b4d1-038b2fc76297
+      target function or activity:
+          - name: inVitals
+            ref_uuid: d4cfd234-360e-4282-9121-d8c41b2b2d7c
+      involving functional chains:
+        - name: Monitor Patient Vitals
+          ref_uuid : 29bea4bf-4be4-4386-898a-d0ce195f2adf
+    - name: inVentilator
+      type: FunctionInputPort
+      primary_uuid: 5b588f6f-4168-494e-bfc8-3dbb428e8327
+      description : 
+    - name: Ventilator
+      type: FunctionalExchange
+      primary_uuid: aa6f941c-387a-4169-a42b-06d25f407ea1
+      description : 
+      source function or activity:
+          - name: outVentilator
+            ref_uuid: d4930664-7af0-4c0e-9ae6-dab269e32228
+      target function or activity:
+          - name: inVentilator
+            ref_uuid: 5b588f6f-4168-494e-bfc8-3dbb428e8327
+    - name: inVentilator
+      type: FunctionInputPort
+      primary_uuid: 2609e49a-c7c7-412b-bf15-ba1340659d9c
+      description : 
+    - name: Ventilator
+      type: FunctionalExchange
+      primary_uuid: b92567c3-939b-402e-be18-7eb04cd0525e
+      description : 
+      source function or activity:
+          - name: outVentilator
+            ref_uuid: 2200b4dd-aef9-4c07-8209-3f8189ec9f03
+      target function or activity:
+          - name: inVentilator
+            ref_uuid: 2609e49a-c7c7-412b-bf15-ba1340659d9c
+    - name: outComponents and Manual
+      type: FunctionOutputPort
+      primary_uuid: e792c197-6e0d-435d-b4e3-4a8d2c0be711
+      description : 
+    - name: Components and Manual
+      type: FunctionalExchange
+      primary_uuid: 05922314-29ec-40f3-88f6-f650aa42bdef
+      description : 
+      source function or activity:
+          - name: outComponents and Manual
+            ref_uuid: e792c197-6e0d-435d-b4e3-4a8d2c0be711
+      target function or activity:
+          - name: inComponents and Manual
+            ref_uuid: b4b42af9-859a-47c8-ad01-62963b920ecd
+      involving functional chains:
+        - name: Faciltate Install
+          ref_uuid : 9cb062ad-a7fc-4a12-9ae8-bd15f8729c0a
+    - name: inInstructions
+      type: FunctionInputPort
+      primary_uuid: 4ecf1691-32af-43cb-bfb8-3415393e1a33
+      description : 
+    - name: Instructions
+      type: FunctionalExchange
+      primary_uuid: 21375e64-3fe8-4406-90ea-4085282e74fe
+      description : 
+      source function or activity:
+          - name: outInstructions
+            ref_uuid: 59cb266a-53fc-4d4a-acfd-f1acc789ffc6
+      target function or activity:
+          - name: inInstructions
+            ref_uuid: 4ecf1691-32af-43cb-bfb8-3415393e1a33
+      involving functional chains:
+        - name: Utilty Cart Install
+          ref_uuid : 293e221a-8719-477f-b0bc-df89401830d8
+    - name: inInstructions
+      type: FunctionInputPort
+      primary_uuid: b347b48f-14a7-421b-ac03-e047ebaef2c3
+      description : 
+    - name: Instructions
+      type: FunctionalExchange
+      primary_uuid: fab691b5-1be5-47a8-889e-afb7cbfef7b6
+      description : 
+      source function or activity:
+          - name: outInstructions
+            ref_uuid: 369a240c-6b4f-499c-a400-5b510477e4b0
+      target function or activity:
+          - name: inInstructions
+            ref_uuid: b347b48f-14a7-421b-ac03-e047ebaef2c3
+      involving functional chains:
+        - name: Utilty Cart Install
+          ref_uuid : 293e221a-8719-477f-b0bc-df89401830d8
+    - name: FIP 3
+      type: FunctionInputPort
+      primary_uuid: 43bb8a15-ebc2-4928-adbe-a5fe67163bf9
+      description : 
+    - name: Cart Install HW 
+      type: FunctionalExchange
+      primary_uuid: a1145807-f846-4c92-95e2-a1ef157a7d0e
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: b7bb4977-a84e-4f55-857e-d72b79657fcd
+      target function or activity:
+          - name: FIP 3
+            ref_uuid: 43bb8a15-ebc2-4928-adbe-a5fe67163bf9
+      involving functional chains:
+        - name: Utilty Cart Install
+          ref_uuid : 293e221a-8719-477f-b0bc-df89401830d8
+    - name: inComponents and Manual
+      type: FunctionInputPort
+      primary_uuid: b4b42af9-859a-47c8-ad01-62963b920ecd
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: cfcc738e-8042-437e-95e9-88a73ad2718f
+      description : 
+    - name: Manual
+      type: FunctionalExchange
+      primary_uuid: 0509c411-04e1-4bfb-b5eb-4ff7b2777205
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 0536bd9c-dfa3-49ab-bc31-b6cff997dab4
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: cfcc738e-8042-437e-95e9-88a73ad2718f
+      involving functional chains:
+        - name: Faciltate Install
+          ref_uuid : 9cb062ad-a7fc-4a12-9ae8-bd15f8729c0a
+    - name: outWeb Links
+      type: FunctionOutputPort
+      primary_uuid: d97b75fa-d6ec-4533-8fe4-492fdccb4e63
+      description : 
+    - name: Web Links
+      type: FunctionalExchange
+      primary_uuid: 97f6cfd6-2e4f-4b04-9970-1f6e4de9c86e
+      description : 
+      source function or activity:
+          - name: outWeb Links
+            ref_uuid: d97b75fa-d6ec-4533-8fe4-492fdccb4e63
+      target function or activity:
+          - name: inWeb Links
+            ref_uuid: 7b7eb115-9190-46ee-bfaa-02a3ba48daf2
+      involving functional chains:
+        - name: Faciltate Install
+          ref_uuid : 9cb062ad-a7fc-4a12-9ae8-bd15f8729c0a
+    - name: outInstructions
+      type: FunctionOutputPort
+      primary_uuid: 369a240c-6b4f-499c-a400-5b510477e4b0
+      description : 
+    - name: outInstructions
+      type: FunctionOutputPort
+      primary_uuid: 1cac51aa-dd83-410c-b0b7-8383ca5862e6
+      description : 
+    - name: Instructions
+      type: FunctionalExchange
+      primary_uuid: fbfb2153-93f0-48af-9741-83e01f1abdb6
+      description : 
+      source function or activity:
+          - name: outInstructions
+            ref_uuid: 1cac51aa-dd83-410c-b0b7-8383ca5862e6
+      target function or activity:
+          - name: inInstructions
+            ref_uuid: 1b58a8dd-1744-4491-b024-33349db4a19f
+      involving functional chains:
+        - name: Cart Install
+          ref_uuid : 3163f4ba-9ee9-4a5d-ac05-2325fc556448
+    - name: outInstructions
+      type: FunctionOutputPort
+      primary_uuid: 2718acd6-fae5-425f-9cbf-c54df64771ca
+      description : 
+    - name: Instructions
+      type: FunctionalExchange
+      primary_uuid: 0fd1d95c-b5ff-47b7-aca0-34b2a0da7d6c
+      description : 
+      source function or activity:
+          - name: outInstructions
+            ref_uuid: 2718acd6-fae5-425f-9cbf-c54df64771ca
+      target function or activity:
+          - name: inInstructions
+            ref_uuid: b76ab31b-f3e6-47f9-a564-5c30e64e0941
+      involving functional chains:
+        - name: Faciltate Install
+          ref_uuid : 9cb062ad-a7fc-4a12-9ae8-bd15f8729c0a
+    - name: outCircuit Info 
+      type: FunctionOutputPort
+      primary_uuid: 2d992b11-dfbe-4bae-b6b0-d5a5eed1d1cf
+      description : 
+    - name: Circuit Info 
+      type: FunctionalExchange
+      primary_uuid: d97ec16c-4e9b-4b15-8bec-f5bd0a242303
+      description : 
+      source function or activity:
+          - name: outCircuit Info 
+            ref_uuid: 2d992b11-dfbe-4bae-b6b0-d5a5eed1d1cf
+      target function or activity:
+          - name: inCircuit Info 
+            ref_uuid: 224c5fe1-1353-4c56-a34f-e79a3b7420a3
+      involving functional chains:
+        - name: Faciltate Patient Circuit Install
+          ref_uuid : f4f9455d-e8a0-4157-b171-c1fd9973dc9a
+    - name: inWeb Links
+      type: FunctionInputPort
+      primary_uuid: 7b7eb115-9190-46ee-bfaa-02a3ba48daf2
+      description : 
+    - name: FIP 2
+      type: FunctionInputPort
+      primary_uuid: ad54e784-6478-497c-9964-dbacc264b67b
+      description : 
+    - name: Web Resource
+      type: FunctionalExchange
+      primary_uuid: 3d7bde03-9e68-4c96-9c91-83f3ed8f566b
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 0586252a-7364-4cfc-960a-8be5950115d1
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: ad54e784-6478-497c-9964-dbacc264b67b
+      involving functional chains:
+        - name: Faciltate Install
+          ref_uuid : 9cb062ad-a7fc-4a12-9ae8-bd15f8729c0a
+    - name: outInstructions
+      type: FunctionOutputPort
+      primary_uuid: 59cb266a-53fc-4d4a-acfd-f1acc789ffc6
+      description : 
+    - name: outInstructions
+      type: FunctionOutputPort
+      primary_uuid: 613a9276-b8ef-4c53-b1a5-a8de4e70e06e
+      description : 
+    - name: Instructions
+      type: FunctionalExchange
+      primary_uuid: 8aea2162-ddbb-4132-8a81-943f192a3a8f
+      description : 
+      source function or activity:
+          - name: outInstructions
+            ref_uuid: 613a9276-b8ef-4c53-b1a5-a8de4e70e06e
+      target function or activity:
+          - name: inInstructions
+            ref_uuid: d3261c63-989e-4c53-b5d9-a1f87eb4611a
+      involving functional chains:
+        - name: Cart Install
+          ref_uuid : 3163f4ba-9ee9-4a5d-ac05-2325fc556448
+    - name: outCircuit Info
+      type: FunctionOutputPort
+      primary_uuid: ece61b5c-279f-478f-906f-33f155861b69
+      description : 
+    - name: Circuit Info
+      type: FunctionalExchange
+      primary_uuid: 13e1821e-263f-44ee-a7e5-edafda74ef79
+      description : 
+      source function or activity:
+          - name: outCircuit Info
+            ref_uuid: ece61b5c-279f-478f-906f-33f155861b69
+      target function or activity:
+          - name: inCircuit Info
+            ref_uuid: 211f784c-6da5-4963-a01a-3b8c6ec30bf7
+      involving functional chains:
+        - name: Faciltate Patient Circuit Install
+          ref_uuid : f4f9455d-e8a0-4157-b171-c1fd9973dc9a
+    - name: inInstructions
+      type: FunctionInputPort
+      primary_uuid: 1b58a8dd-1744-4491-b024-33349db4a19f
+      description : 
+    - name: inInstructions
+      type: FunctionInputPort
+      primary_uuid: d3261c63-989e-4c53-b5d9-a1f87eb4611a
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: f29b9bb3-13ce-4302-8531-cb1b03203369
+      description : 
+    - name: Wheel Chair Install HW
+      type: FunctionalExchange
+      primary_uuid: 9c532b69-e11d-4071-8ed2-105d2b820108
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: f29b9bb3-13ce-4302-8531-cb1b03203369
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: 64612aa8-8081-4c8c-90af-15cbf6035712
+      involving functional chains:
+        - name: Cart Install
+          ref_uuid : 3163f4ba-9ee9-4a5d-ac05-2325fc556448
+    - name: inInstructions
+      type: FunctionInputPort
+      primary_uuid: b76ab31b-f3e6-47f9-a564-5c30e64e0941
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: f40a07f3-0395-4504-957a-7112dfa72bc2
+      description : 
+    - name: Circuit Materials
+      type: FunctionalExchange
+      primary_uuid: aee13016-8620-46f0-b3d8-67b4f3e51914
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 1adcd19f-0f21-43dd-a244-e991a7a13379
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: f40a07f3-0395-4504-957a-7112dfa72bc2
+      involving functional chains:
+        - name: Faciltate Patient Circuit Install
+          ref_uuid : f4f9455d-e8a0-4157-b171-c1fd9973dc9a
+    - name: inCircuit
+      type: FunctionInputPort
+      primary_uuid: 7f9b3dd4-a574-4201-b0c6-5ed2a3e800b7
+      description : 
+    - name: Circuit
+      type: FunctionalExchange
+      primary_uuid: 2b6ae6b7-1187-4930-853e-ecbdffb1a184
+      description : 
+      source function or activity:
+          - name: outCircuit
+            ref_uuid: cd0544d6-785c-4479-8453-fec254e7349a
+      target function or activity:
+          - name: inCircuit
+            ref_uuid: 7f9b3dd4-a574-4201-b0c6-5ed2a3e800b7
+    - name: inCircuit
+      type: FunctionInputPort
+      primary_uuid: b31d23eb-eb6e-4a80-9770-78ba941ef8bb
+      description : 
+    - name: Circuit
+      type: FunctionalExchange
+      primary_uuid: 6446dfee-6e07-4c8b-b1f7-a71341ae53e9
+      description : 
+      source function or activity:
+          - name: outCircuit
+            ref_uuid: 0a263e68-2e64-4029-8020-15a12d229833
+      target function or activity:
+          - name: inCircuit
+            ref_uuid: b31d23eb-eb6e-4a80-9770-78ba941ef8bb
+    - name: outInteraction 11
+      type: FunctionOutputPort
+      primary_uuid: 0cab4501-dbbd-404e-9e1a-c6455a2f86e8
+      description : 
+    - name: Interaction 11
+      type: FunctionalExchange
+      primary_uuid: 7de04022-7957-4763-b11a-9d6278bfd0e7
+      description : 
+      source function or activity:
+          - name: outInteraction 11
+            ref_uuid: 0cab4501-dbbd-404e-9e1a-c6455a2f86e8
+      target function or activity:
+          - name: inInteraction 11
+            ref_uuid: 8b1230ac-a9ad-489f-8a98-ee4b3093055c
+      involving functional chains:
+        - name: Faciltate Patient Circuit Install
+          ref_uuid : f4f9455d-e8a0-4157-b171-c1fd9973dc9a
+    - name: inPatient Response
+      type: FunctionInputPort
+      primary_uuid: 1a44ace5-7d12-4ed2-a44a-64eb5fec4652
+      description : 
+    - name: outVentilator Status
+      type: FunctionOutputPort
+      primary_uuid: f0e2e0b1-3811-4e43-8e6b-1b75f5bd609f
+      description : 
+    - name: Ventilator Issues
+      type: FunctionalExchange
+      primary_uuid: d3bdce1a-7d67-4f3a-bc0d-fe02681a7d74
+      description : 
+      source function or activity:
+          - name: outVentilator Status
+            ref_uuid: f0e2e0b1-3811-4e43-8e6b-1b75f5bd609f
+      target function or activity:
+          - name: inVentilator Status
+            ref_uuid: 642c56c0-ecdd-4194-9ee7-8803c2fb3181
+      involving functional chains:
+        - name: Assess Ventilator State
+          ref_uuid : 5447abfd-0b12-4ab2-8f21-a4e85ecb3340
+    - name: inVentilator Status
+      type: FunctionInputPort
+      primary_uuid: 642c56c0-ecdd-4194-9ee7-8803c2fb3181
+      description : 
+    - name: outCircuit
+      type: FunctionOutputPort
+      primary_uuid: e6d8ef73-3799-4c13-8ff3-b634f70a99bb
+      description : 
+    - name: Circuit
+      type: FunctionalExchange
+      primary_uuid: 015f427f-3330-4738-856f-58b2bc5a7152
+      description : 
+      source function or activity:
+          - name: outCircuit
+            ref_uuid: e6d8ef73-3799-4c13-8ff3-b634f70a99bb
+      target function or activity:
+          - name: inCircuit
+            ref_uuid: a1248a03-26cf-4fc9-a181-4b9312b2a167
+      involving functional chains:
+        - name: Supply Circuit
+          ref_uuid : f1ceda27-3e18-43ee-8985-14d336406253
+    - name: outCircuit
+      type: FunctionOutputPort
+      primary_uuid: cd0544d6-785c-4479-8453-fec254e7349a
+      description : 
+    - name: outPurchase
+      type: FunctionOutputPort
+      primary_uuid: 53047d35-9cac-47f8-aabc-bd784e81712a
+      description : 
+    - name: Purchase
+      type: FunctionalExchange
+      primary_uuid: cb838204-8ade-4670-b8c1-ac0a4b6d7825
+      description : 
+      source function or activity:
+          - name: outPurchase
+            ref_uuid: 53047d35-9cac-47f8-aabc-bd784e81712a
+      target function or activity:
+          - name: inPurchase
+            ref_uuid: db4216e3-798b-4848-84b2-cc0dcaa37f4c
+      involving functional chains:
+        - name: Supply Ventilator
+          ref_uuid : 5d79a38b-1d54-407b-9f0b-7be9fbd7f26a
+    - name: outVentilator
+      type: FunctionOutputPort
+      primary_uuid: d4930664-7af0-4c0e-9ae6-dab269e32228
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 54a14dfb-3e2e-49c3-a643-dd483db164d4
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 2c873dae-a8b4-4122-999d-3f10383de47d
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 5d3f223b-260d-4917-856b-a7174f3f41b3
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 259040ed-62b7-4e4c-9c8b-98b4e733e968
+      description : 
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: 2fe982ee-38b8-4384-93b5-766c9288b764
+      description : 
+    - name: FOP 1
+      type: FunctionOutputPort
+      primary_uuid: 7fdef1f7-93a4-4cbe-b226-f269f735cae0
+      description : 
