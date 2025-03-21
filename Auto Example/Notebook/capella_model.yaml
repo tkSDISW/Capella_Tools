@@ -1,0 +1,213 @@
+# YAML file for Capella objects
+      # YAML file for system model relationships
+      schema:
+        primary_uuid: Unique identifier for the primary object
+        ref_uuid: Unique identifier for a referenced object
+      - name: Brake Master Cylinder
+        type: LogicalComponent
+        primary_uuid: a14015d2-eab4-488e-a7c0-da8b1d21edaa
+        description : <p>The brake master cylinder transform mechanical force to hydraulic pressure.</p>
+        is_human : False
+        components:
+        deployed components:
+        allocated functions:
+          - name: Converts mechanical to hydaulic
+            ref_uuid : b3f22b3a-d021-42d4-906e-b491abfbbfce
+          - name: Detect Level
+            ref_uuid : c050c86d-b51b-4e8b-aa9b-db57fd6727d8
+        ports:
+          - name: Mech Force In
+            description :  <p>Mechanical Force from the break pedal.</p>
+            ref_uuid : 537e6201-c0ef-467d-89ab-701af3de1b8e
+            exchanges:
+              - name: M
+                ref_uuid:  6a1d5524-8944-461b-8528-294c1d512b1c
+                description :  
+                source_component_name: Brake pedal
+                ref__uuid: 0b91855a-4cd9-4017-b9cb-cc58f8d8bcab
+                target_component_name: Brake Master Cylinder
+                ref_uuid: a14015d2-eab4-488e-a7c0-da8b1d21edaa
+          - name: Hydraulic Force Out
+            description :  <p>The mechanical force converted to hydraulic force.</p>
+            ref_uuid : 6a7538ec-6842-4bcf-bfc7-5ba1783ab07c
+            exchanges:
+              - name: H
+                ref_uuid:  e4ddbbac-bd66-43c3-932f-a41b8aa65ca2
+                description :  
+                source_component_name: Brake Master Cylinder
+                ref__uuid: a14015d2-eab4-488e-a7c0-da8b1d21edaa
+                target_component_name: Hydraulic Control Modulator
+                ref_uuid: 848c5b11-bef9-474d-b3b6-c84420b97d51
+          - name: Environment Forces
+            description :  <p>Flow of environmental impact to component.</p>
+            ref_uuid : 3870b55f-bc73-47b1-b4b5-cf2100f444c4
+            exchanges:
+              - name: D 1
+                ref_uuid:  d70f4ec6-756c-4632-a131-8d7c8b4a1836
+                description :  
+                source_component_name: Brake Vehicle Subsystem
+                ref__uuid: 417f6492-f267-4bd2-8919-a51824ed1f7e
+                target_component_name: Brake Master Cylinder
+                ref_uuid: a14015d2-eab4-488e-a7c0-da8b1d21edaa
+        applied property value groups:
+          - name: Bore Size
+            ref_uuid : 1f431556-36fc-4ea5-b132-f169ffb63ed9
+    - name: Mech Force In
+      type: ComponentPort
+      primary_uuid: 537e6201-c0ef-467d-89ab-701af3de1b8e
+      description : <p>Mechanical Force from the break pedal.</p>
+      - name: M
+        type: ComponentExchange
+        primary_uuid: 6a1d5524-8944-461b-8528-294c1d512b1c
+        description : 
+        source component:
+        - name: Brake pedal
+          ref_uuid: 0b91855a-4cd9-4017-b9cb-cc58f8d8bcab
+        target component:
+        - name: Brake Master Cylinder
+          ref_uuid: a14015d2-eab4-488e-a7c0-da8b1d21edaa
+          allocated functional exchanges:
+           - name: Brake force
+           ref_uuid : 1f954280-14ee-4c64-a4f8-6a722766dd58
+    - name: Hydraulic Force Out
+      type: ComponentPort
+      primary_uuid: 6a7538ec-6842-4bcf-bfc7-5ba1783ab07c
+      description : <p>The mechanical force converted to hydraulic force.</p>
+      - name: H
+        type: ComponentExchange
+        primary_uuid: e4ddbbac-bd66-43c3-932f-a41b8aa65ca2
+        description : 
+        source component:
+        - name: Brake Master Cylinder
+          ref_uuid: a14015d2-eab4-488e-a7c0-da8b1d21edaa
+        target component:
+        - name: Hydraulic Control Modulator
+          ref_uuid: 848c5b11-bef9-474d-b3b6-c84420b97d51
+          allocated functional exchanges:
+           - name: Low Pressure
+           ref_uuid : f93a5fd7-e3eb-4eda-8050-5aa5a3dbd0ee
+    - name: Environment Forces
+      type: ComponentPort
+      primary_uuid: 3870b55f-bc73-47b1-b4b5-cf2100f444c4
+      description : <p>Flow of environmental impact to component.</p>
+      - name: D 1
+        type: ComponentExchange
+        primary_uuid: d70f4ec6-756c-4632-a131-8d7c8b4a1836
+        description : 
+        source component:
+        - name: Brake Vehicle Subsystem
+          ref_uuid: 417f6492-f267-4bd2-8919-a51824ed1f7e
+        target component:
+        - name: Brake Master Cylinder
+          ref_uuid: a14015d2-eab4-488e-a7c0-da8b1d21edaa
+      - name: Converts mechanical to hydaulic
+        type: LogicalFunction
+        primary_uuid: b3f22b3a-d021-42d4-906e-b491abfbbfce
+        description : <p>Converts the force of pedal to force on hydraulic fluid.</p>
+        owner :
+          - name : Brake Master Cylinder
+            ref_uuid : a14015d2-eab4-488e-a7c0-da8b1d21edaa
+        child functions:
+        inputs:
+          - name: FIP 1
+            description :  
+            ref_uuid : ea157c15-a79a-4dd5-bb55-c4847b8c4033
+            exchanges:
+              - name: Brake force
+                ref_uuid:  1f954280-14ee-4c64-a4f8-6a722766dd58
+                description :  
+                source_function_name: Brake
+                ref_uuid: ccc239e4-d291-43f9-9ec2-fa5adad7aa67
+                target_function_name: Converts mechanical to hydaulic
+                ref_uuid: b3f22b3a-d021-42d4-906e-b491abfbbfce
+        outputs:
+          - name: Hydraulic Low Press
+            description :  
+            ref_uuid : 5a2eec17-b795-4854-8bb3-cc0cdc3c9cb1
+            exchanges:
+              - name: Low Pressure
+                ref_uuid:  f93a5fd7-e3eb-4eda-8050-5aa5a3dbd0ee
+                description :  
+                source_function_name: Converts mechanical to hydaulic
+                ref_uuid: b3f22b3a-d021-42d4-906e-b491abfbbfce
+                target_function_name: Amplify force
+                ref_uuid: 99828fa3-997e-49d4-a21a-8ed81a8506ba
+      - name: Detect Level
+        type: LogicalFunction
+        primary_uuid: c050c86d-b51b-4e8b-aa9b-db57fd6727d8
+        description : <p>Detect Fluid Levels</p>
+        owner :
+          - name : Brake Master Cylinder
+            ref_uuid : a14015d2-eab4-488e-a7c0-da8b1d21edaa
+        child functions:
+        inputs:
+        outputs:
+      - name: Bore Size
+        type: PropertyValueGroup
+        primary_uuid: 1f431556-36fc-4ea5-b132-f169ffb63ed9
+        description : 
+        property value groups:
+        property values:
+        - name: Units
+          ref_uuid: uuid : 158f7e55-4253-4aa8-acf0-d79a29856a65
+        - name: Max
+          ref_uuid: uuid : eac00f5f-5dac-41c8-a8af-6aa227a58fd8
+        - name: Min
+          ref_uuid: uuid : 427ec3b7-ca0b-4b99-b3db-dd601210f14b
+      - name: Units
+        type: StringPropertyValue
+        primary_uuid: 158f7e55-4253-4aa8-acf0-d79a29856a65
+        description : 
+        value :  Inches
+      - name: Max
+        type: FloatPropertyValue
+        primary_uuid: eac00f5f-5dac-41c8-a8af-6aa227a58fd8
+        description : 
+        value :  1.0
+      - name: Min
+        type: FloatPropertyValue
+        primary_uuid: 427ec3b7-ca0b-4b99-b3db-dd601210f14b
+        description : 
+        value :  0.625
+    - name: Brake Fluid Level Sensor
+      type: Traceability_Artifact Polarion Workitem Requirement
+      primary_uuid: ae6e1187-16cc-4b6b-9676-48c6f34e68f3
+      url : https://polarion.diswx.com/polarion/oslc/services/projects/drivepilot/workitems/DP-1322
+      identifier : DP-1322
+      linked model elements:
+        - name : satisfies
+          ref_uuid : c050c86d-b51b-4e8b-aa9b-db57fd6727d8
+    - name: Brake force
+      type: FunctionalExchange
+      primary_uuid: 1f954280-14ee-4c64-a4f8-6a722766dd58
+      description : 
+      source function or activity:
+          - name: FOP 1
+            ref_uuid: 0319ca8a-e034-4a99-90a9-3497518dbee7
+      target function or activity:
+          - name: FIP 1
+            ref_uuid: ea157c15-a79a-4dd5-bb55-c4847b8c4033
+      involving functional chains:
+        - name: Manual Braking
+          ref_uuid : 9d7b2746-68cb-47a1-b3e8-0b1a9debb31e
+    - name: Low Pressure
+      type: FunctionalExchange
+      primary_uuid: f93a5fd7-e3eb-4eda-8050-5aa5a3dbd0ee
+      description : 
+      source function or activity:
+          - name: Hydraulic Low Press
+            ref_uuid: 5a2eec17-b795-4854-8bb3-cc0cdc3c9cb1
+      target function or activity:
+          - name: FIP 2
+            ref_uuid: 99aede04-2811-4430-9a4e-e3ff5b50930b
+      involving functional chains:
+        - name: Manual Braking
+          ref_uuid : 9d7b2746-68cb-47a1-b3e8-0b1a9debb31e
+    - name: FIP 1
+      type: FunctionInputPort
+      primary_uuid: ea157c15-a79a-4dd5-bb55-c4847b8c4033
+      description : 
+    - name: Hydraulic Low Press
+      type: FunctionOutputPort
+      primary_uuid: 5a2eec17-b795-4854-8bb3-cc0cdc3c9cb1
+      description : 

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="ASCII"?>
+<traceability:Traceability xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:traceability="http://www.obeo.fr/dsl/traceability" id="7f5c30c6-1d33-4991-a451-2048e3b2ba9d" modelUri="https://p4capella.diswx.com/projects/2d624070-b664-4446-8339-620fb9be5fe8/edit/1">
+  <domains id="0f500c32-3b33-4c61-b9c7-bff5b7e89ae9" name="Requirements Management" uri="http://open-services.net/ns/rm#" prefix="oslc_rm">
+    <ownedArtifactTypes id="90c91da3-9763-449d-9607-d669fe11a1d6" name="Requirement"/>
+    <ownedArtifactTypes id="3e0a8c5a-bd27-4581-9e3b-658fa965cda8" name="RequirementCollection"/>
+    <ownedLinkTypes id="133a59b8-ef40-4718-aa3f-9e680e61ca95" name="affectedBy" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="cfb32706-212e-4987-b09b-da14c61e033b" name="constrainedBy" inverse="476f847e-718b-49cf-bc01-1a7299695cd4" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="476f847e-718b-49cf-bc01-1a7299695cd4" name="constrains" inverse="cfb32706-212e-4987-b09b-da14c61e033b" impact="FOLLOWS_LINK"/>
+    <ownedLinkTypes id="0e1cf10a-1468-4b03-94ad-dce179f1b96f" name="decomposedBy" inverse="55a9cb8b-40b2-4e74-b634-becceb945b56" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="55a9cb8b-40b2-4e74-b634-becceb945b56" name="decomposes" inverse="0e1cf10a-1468-4b03-94ad-dce179f1b96f" impact="FOLLOWS_LINK"/>
+    <ownedLinkTypes id="10af11d7-2071-4e97-a655-b23684bcad14" name="elaboratedBy" inverse="5f2fc4cd-4c56-410e-8d6d-4486371f0cff" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="5f2fc4cd-4c56-410e-8d6d-4486371f0cff" name="elaborates" inverse="10af11d7-2071-4e97-a655-b23684bcad14" impact="FOLLOWS_LINK"/>
+    <ownedLinkTypes id="d05d1a2c-8c44-4672-959e-0c2c5da97257" name="satisfiedBy" inverse="85fceac2-4b2e-4058-a76f-acdd60c5355f" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="85fceac2-4b2e-4058-a76f-acdd60c5355f" name="satisfies" inverse="d05d1a2c-8c44-4672-959e-0c2c5da97257" impact="FOLLOWS_LINK"/>
+    <ownedLinkTypes id="a16b3d2f-ef70-488d-acdf-a985b7907ae5" name="implementedBy" impact="SYMMETRIC_IMPACT"/>
+    <ownedLinkTypes id="92ee86f9-8dd9-41b5-95fb-dc0074d3ce16" name="specifiedBy" inverse="ae60f9a7-e68e-47eb-87c1-22358dfa41dd" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="ae60f9a7-e68e-47eb-87c1-22358dfa41dd" name="specifies" inverse="92ee86f9-8dd9-41b5-95fb-dc0074d3ce16" impact="FOLLOWS_LINK"/>
+    <ownedLinkTypes id="4fa8941b-acd9-4b4b-8b8c-338c0c7cb81b" name="trackedBy" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="7bce6e30-69ee-4c88-a690-987951019fa7" name="uses" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="127f140b-5be9-409c-b3dd-5ecaeed92e66" name="validatedBy" impact="SYMMETRIC_IMPACT"/>
+  </domains>
+  <domains id="65c92f51-4d70-4fba-95b3-a8cec41385a7" name="Change Management" uri="http://open-services.net/ns/cm#" prefix="oslc_cm">
+    <ownedArtifactTypes id="1ecbda03-82f7-4b18-9dd4-233b57b16b91" name="ChangeNotice"/>
+    <ownedArtifactTypes id="aef5a33f-5e6f-4948-b33d-d552d28fd7fe" name="ChangeRequest"/>
+    <ownedArtifactTypes id="2c18f88b-1a43-4285-9cf1-4bab6a4eee09" name="Defect"/>
+    <ownedArtifactTypes id="ada4109a-cfbe-4bec-936a-9b10e2993355" name="Enhancement"/>
+    <ownedArtifactTypes id="241f436a-cd4f-4208-ad65-76f96be07e08" name="ReviewTask"/>
+    <ownedArtifactTypes id="9d1b8c6d-a69b-405f-8e83-eb902254fce1" name="Task"/>
+    <ownedLinkTypes id="adcb8bf1-a7c1-4251-ab91-825d0a4b951c" name="affectedByDefect" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="5fb1b8fb-1282-4aff-9d0d-dbab05040a5c" name="affectsPlanItem"/>
+    <ownedLinkTypes id="323549bb-12c0-4efc-b102-5f53edf61ebb" name="affectsRequirement"/>
+    <ownedLinkTypes id="e6b67701-f6c2-4270-ad2f-789e75740d92" name="implementsRequirement"/>
+    <ownedLinkTypes id="62e9f685-ea2e-4a78-b726-e29b12acd66b" name="parent"/>
+    <ownedLinkTypes id="c5da1239-d203-4c51-8cd3-efec1dfe3adf" name="relatedChangeRequest"/>
+    <ownedLinkTypes id="43327de0-cfc2-40b5-a60f-847de16c68de" name="tracksRequirement"/>
+  </domains>
+  <domains id="b6c523a2-400c-4b26-96fa-d287c57cabf6" name="Quality Management" uri="http://open-services.net/ns/qm#" prefix="oslc_qm">
+    <ownedArtifactTypes id="ad6a7685-9e00-471a-8f6b-5ee5b5c28686" name="TestPlan"/>
+    <ownedArtifactTypes id="a36c8aa8-d110-478c-bd2f-e36e4e722fa2" name="TestCase"/>
+    <ownedArtifactTypes id="3c1beecb-664b-463d-a090-fec47a30e387" name="TestScript"/>
+    <ownedArtifactTypes id="3b878996-c959-4441-b387-cf0bc6b9f01f" name="TestExecutionRecord"/>
+    <ownedArtifactTypes id="b3ef5df4-a250-4777-a270-dd25b1ce79f7" name="TestResult"/>
+    <ownedLinkTypes id="1900930d-c985-4628-affe-78ff355917d2" name="affectedByChangeRequest" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="17de1f42-5463-480a-bfb8-71e24e746b29" name="blockedByChangeRequest" impact="OPPOSITE_LINK"/>
+    <ownedLinkTypes id="82d3d665-d8d5-481c-aa37-49b1c5c4f14d" name="executesTestScript"/>
+    <ownedLinkTypes id="1bf79970-1525-4a48-816a-cc59cf001255" name="producedByTestExecutionRecord"/>
+    <ownedLinkTypes id="c04867c9-61f8-489b-a0a9-5871b8e7f2d9" name="relatedChangeRequest"/>
+    <ownedLinkTypes id="fc1ee098-d713-4123-802b-88ba583be4e2" name="reportsOnTestCase"/>
+    <ownedLinkTypes id="67b2fbed-c8c5-43e0-a159-07ef2fd1e464" name="reportsOnTestPlan" impact="FOLLOWS_LINK"/>
+    <ownedLinkTypes id="d4c2fe48-4d5b-446b-bec2-14519cc1970b" name="runsTestCase"/>
+    <ownedLinkTypes id="cb2b3c73-c177-4b09-a5cb-20339f92c333" name="testsChangeRequest"/>
+    <ownedLinkTypes id="54e3a138-2b37-46b2-801c-5dd0d80db7e0" name="usesTestCase"/>
+    <ownedLinkTypes id="407b63b3-c2a3-4cf0-bfed-d3a5561ae3d3" name="usesTestScript"/>
+    <ownedLinkTypes id="5a93ff91-7e50-4624-b416-6a0500f224f5" name="validatesRequirement"/>
+    <ownedLinkTypes id="c86617c3-c01d-462a-84b3-fe7806943ed6" name="validatesRequirementCollection"/>
+  </domains>
+  <repositories id="d0c63a1e-d571-40d8-92a2-2230847bac55" name="Polarion" url="https://polarion.diswx.com/polarion/oslc/rootservices">
+    <linkRanges id="2ba4dd8d-c1dc-46c5-9291-c016f7b09610" name="Any to satisfies requirement" linkType="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifactRange="90c91da3-9763-449d-9607-d669fe11a1d6" directionConstraint="MODEL_TO_ARTIFACT">
+      <localRange>CapellaElement</localRange>
+    </linkRanges>
+    <store id="3a9a6047-2691-4331-b321-7952825e3b82">
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Operation Modes" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1518" identifier="VS-1518" id="3d9e5944-99d4-41cf-9fc1-0a9714e410ad">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="3d9e5944-99d4-41cf-9fc1-0a9714e410ad" id="99cbe3a2-ea56-4f15-9137-2a21187c7de6">
+          <modelObject href="CR_Ventilator.capella#a48f19e8-119e-4d2b-a0a5-56759c836bb3"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Utility Cart Install" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1514" identifier="VS-1514" id="f2af1fb9-edb7-4d0b-83b7-28655aec13a6">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="f2af1fb9-edb7-4d0b-83b7-28655aec13a6" id="3a3e8c97-c6a5-4833-9bc2-253472d135dd">
+          <modelObject href="CR_Ventilator.capella#74c8f064-8760-40b5-9901-ff486f2209d6"/>
+        </ownedLinks>
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="f2af1fb9-edb7-4d0b-83b7-28655aec13a6" id="2bb5da73-353a-4a9a-a86c-ffb341e8bb19">
+          <modelObject href="CR_Ventilator.capella#4da0c1f3-c2ec-45e4-8765-671b0a6d184d"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Wheel Chair Install" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1513" identifier="VS-1513" id="b4a8e534-7ee4-4793-b135-facd87ed6969">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="b4a8e534-7ee4-4793-b135-facd87ed6969" id="f8913d83-cfd4-4f44-8b5a-60a89023b8b6">
+          <modelObject href="CR_Ventilator.capella#e12d4feb-5c1a-445a-a82b-6f8769f227b9"/>
+        </ownedLinks>
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="b4a8e534-7ee4-4793-b135-facd87ed6969" id="4db7fa21-7dbc-4132-aa74-ab9b417ce354">
+          <modelObject href="CR_Ventilator.capella#db3a9e1c-b26f-4bda-ae6b-cfa486b07683"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Call System Compatibility" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1521" identifier="VS-1521" id="ee2076b2-8c79-4d06-be83-2262377dee1c">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="ee2076b2-8c79-4d06-be83-2262377dee1c" id="bbe2f7c2-ff1b-4683-a865-22374db0399d">
+          <modelObject href="CR_Ventilator.capella#4a62af52-2939-43bb-8fd5-4c8443b186ba"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Remote Operation" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1529" identifier="VS-1529" id="41bec35b-9e2d-4df4-bf0d-2b13652c1f3b">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="41bec35b-9e2d-4df4-bf0d-2b13652c1f3b" id="cced152f-855a-4eb9-addc-4bf11e938279">
+          <modelObject href="CR_Ventilator.capella#9470fdd8-e8de-4b9b-acdc-53d64df1e296"/>
+        </ownedLinks>
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="41bec35b-9e2d-4df4-bf0d-2b13652c1f3b" id="da04c4e4-3b27-4d8c-8b6e-fb1836873551">
+          <modelObject href="CR_Ventilator.capella#aacea39c-3c44-48d1-b905-1178c4159493"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Secure Remote Operation" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1530" identifier="VS-1530" id="6f06b656-898b-4df2-8e88-6ee57c57bb08">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="6f06b656-898b-4df2-8e88-6ee57c57bb08" id="6d4c2672-fb7f-434f-8165-746c1c2c00b6">
+          <modelObject href="CR_Ventilator.capella#9470fdd8-e8de-4b9b-acdc-53d64df1e296"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Deliver Ventilation" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1520" identifier="VS-1520" id="2b3784cd-65b5-462f-a30c-5cd53038c134">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="2b3784cd-65b5-462f-a30c-5cd53038c134" id="c6ba65a3-52ab-412c-94d8-da715c45d9e5">
+          <modelObject href="CR_Ventilator.capella#0e058125-99e4-4006-a8a3-c3d13430bbe2"/>
+        </ownedLinks>
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="2b3784cd-65b5-462f-a30c-5cd53038c134" id="38484991-75c5-4ce2-8b92-37959f7c8096">
+          <modelObject href="CR_Ventilator.capella#0737802b-988c-4e77-aaed-c8ee83755e9d"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="Patient Connect" url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1517" identifier="VS-1517" id="cf5b61dd-826a-4ff6-9229-691a40e024de">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="cf5b61dd-826a-4ff6-9229-691a40e024de" id="540a6dfd-1bc6-40fb-a753-37cb680d86bc">
+          <modelObject href="CR_Ventilator.capella#4e5412d6-dc84-4534-9cf6-7817588ce21c"/>
+        </ownedLinks>
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="cf5b61dd-826a-4ff6-9229-691a40e024de" id="e217fe2a-ce04-4204-8709-f628ffee0320">
+          <modelObject href="CR_Ventilator.capella#bebee4a0-2299-46c2-a3da-f00a8dae82aa"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="The ventilator shall provide an O2 intake port and connector which shall allow c..." url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-653" identifier="VS-653" id="a46b976f-4839-47c9-986b-ae8a91f0fcd8">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="a46b976f-4839-47c9-986b-ae8a91f0fcd8" id="359040e2-4337-4719-be1c-769592ae9deb">
+          <modelObject href="CR_Ventilator.capella#4ee31a8f-432b-4cfd-bc9b-6f842d7863bc"/>
+        </ownedLinks>
+      </ownedArtifacts>
+      <ownedArtifacts xsi:type="traceability:Artifact" types="90c91da3-9763-449d-9607-d669fe11a1d6" title="The ventilator shall provide an exhalation valve control fitting that is compati..." url="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-655" identifier="VS-655" id="e0d9bbfb-6d90-4af9-bc79-ac3ff422b12b">
+        <ownedLinks xsi:type="traceability:Link" type="85fceac2-4b2e-4058-a76f-acdd60c5355f" artifact="e0d9bbfb-6d90-4af9-bc79-ac3ff422b12b" id="18b85d53-2275-45e2-a87e-852ce1b85a20">
+          <modelObject href="CR_Ventilator.capella#9d640652-3dfd-46c0-b4e7-46a714cab6e7"/>
+        </ownedLinks>
+      </ownedArtifacts>
+    </store>
+    <snapshots>
+      <linksByModelObjectId key="a48f19e8-119e-4d2b-a0a5-56759c836bb3">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1518" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="74c8f064-8760-40b5-9901-ff486f2209d6">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1514" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="4da0c1f3-c2ec-45e4-8765-671b0a6d184d">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1514" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="e12d4feb-5c1a-445a-a82b-6f8769f227b9">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1513" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="db3a9e1c-b26f-4bda-ae6b-cfa486b07683">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1513" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="4a62af52-2939-43bb-8fd5-4c8443b186ba">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1521" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="9470fdd8-e8de-4b9b-acdc-53d64df1e296">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1529" typeName="oslc_rm:satisfies"/>
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1530" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="aacea39c-3c44-48d1-b905-1178c4159493">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1529" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="0e058125-99e4-4006-a8a3-c3d13430bbe2">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1520" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="0737802b-988c-4e77-aaed-c8ee83755e9d">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1520" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="4e5412d6-dc84-4534-9cf6-7817588ce21c">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1517" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="bebee4a0-2299-46c2-a3da-f00a8dae82aa">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-1517" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="4ee31a8f-432b-4cfd-bc9b-6f842d7863bc">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-653" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <linksByModelObjectId key="9d640652-3dfd-46c0-b4e7-46a714cab6e7">
+        <value artifactURL="https://polarion.diswx.com/polarion/oslc/services/projects/VentilatorSystem/workitems/VS-655" typeName="oslc_rm:satisfies"/>
+      </linksByModelObjectId>
+      <uriPrefixes key="oslc_rm" value="http://open-services.net/ns/rm#"/>
+    </snapshots>
+  </repositories>
+</traceability:Traceability>
