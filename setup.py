@@ -9,6 +9,7 @@ setup(
         "cairosvg",
         "polarion",
         "openai",
-        "ipywidgets"
+        "ipywidgets",
+        "jupyter_ui_poll"
     ],
 )
