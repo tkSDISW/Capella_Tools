@@ -473,6 +473,35 @@ class CapellaYAMLHandler:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
         if obj.__class__.__name__ ==  "PhysicalLink" :
+            #print(obj)
+            for obj in obj.exchanges:
+                if obj not in self.referenced_objects:
+                    self.referenced_objects.append(obj)
+             # Only attempt to access `physical_paths` if the object has that attribute
+            if hasattr(obj, "physical_paths"):
+                for ppath in obj.physical_paths:
+                    if ppath not in self.referenced_objects:
+                        self.referenced_objects.append(ppath)          
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
+            for apv in obj.applied_property_values:
+                if apv not in self.referenced_objects:
+                    self.referenced_objects.append(apv)
+            for con in obj.constraints:
+                if con not in self.referenced_objects:
+                    self.referenced_objects.append(con) 
+            for pvg in obj.property_value_groups:
+                if pvg not in self.referenced_objects:
+                    self.referenced_objects.append(pvg)
+            for pv in obj.property_values:
+                if pv not in self.referenced_objects:
+                    self.referenced_objects.append(pv)
+
+        if obj.__class__.__name__ ==  "PhysicalPath" :
+            for inv in obj.involved_items:
+                if inv not in self.referenced_objects:
+                    self.referenced_objects.append(inv)
             for obj in obj.exchanges:
                 if obj not in self.referenced_objects:
                     self.referenced_objects.append(obj)
@@ -491,7 +520,7 @@ class CapellaYAMLHandler:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
-                
+                        
                
         if obj.__class__.__name__ ==  "ComponentExchange" :
             for ei in obj.exchange_items:
@@ -558,6 +587,10 @@ class CapellaYAMLHandler:
             for node in obj.nodes:
                 if node not in self.referenced_objects:
                     self.referenced_objects.append(node)
+        if obj.__class__.__name__ ==  "Part" :
+            if obj.type not in self.referenced_objects:
+                self.referenced_objects.append(obj.type)
+    
     
     def generate_yaml(self, obj):
 
@@ -573,6 +606,15 @@ class CapellaYAMLHandler:
         - name: {{ n.name }}
           ref_uuid : {{ n.uuid }}
         {% endfor %}
+"""   
+        part = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      reference object  :
+        - name: {{ type_name }}
+        ref_uuid : {{ type_uuid }}
 """   
 
         
@@ -679,24 +721,24 @@ class CapellaYAMLHandler:
       {% endif %}
 """     
         state_machine_template = """
-      - name: {{ name }}
-        type:{{type}} 
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        regions:
-        {% for region in regions %}
-        - name: "{{ region.name }}"
-          states:
-          {% for state in region.states %}
-            - name: "{{ state.name }}"
-              ref_uuid : {{ state.uuid }}
-          {% endfor %}
-          transitions:
-          {% for transition in region.transitions %}
-            - name: "{{ transition.name }}"
-              ref_uuid : {{ transition.uuid }}
-          {% endfor %}
+    - name: {{ name }}
+      type:{{type}} 
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      regions:
+      {% for region in regions %}
+      - name: "{{ region.name }}"
+        states:
+        {% for state in region.states %}
+         - name: "{{ state.name }}"
+           ref_uuid : {{ state.uuid }}
         {% endfor %}
+        transitions:
+        {% for transition in region.transitions %}
+         - name: "{{ transition.name }}"
+           ref_uuid : {{ transition.uuid }}
+        {% endfor %}
+      {% endfor %}
 """     
         state_template = """
     - name: {{ name }}
@@ -916,45 +958,51 @@ class CapellaYAMLHandler:
         {% endif %}
 """
         physical_link_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        source component:
-        - name: {{ source_component }}
-          ref_uuid: {{ source_component_uuid }}
-        target component:
-        - name: {{ target_component }}
-          ref_uuid: {{ target_component_uuid  }}
-          {% if applied_property_value_groups %}applied property value groups:
-          {% for apvg in applied_property_value_groups %}
-              - name: {{ apvg.name }}
-                ref_uuid : {{ apvg.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if allocated_component_exchanges %}allocated component exchanges:
-          {% for ce in allocated_component_exchanges  %}
-           - name: {{  ce.name }}
-           ref_uuid : {{ ce.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if applied_property_values %}applied property values:
-          {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if constraints %}constraints:
-          {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if exchanges %}exchanges:
-          {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-          {% endfor %}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      {% if physical_paths %}involving physical_paths:
+      {% for pp in physical_paths %}
+       - name: {{ pp.name }}
+         ref_uuid : {{ pp.uuid }}
+      {% endfor %}
+      {% endif %}
+      source component:
+      - name: {{ source_component }}
+        ref_uuid: {{ source_component_uuid }}
+      target component:
+      - name: {{ target_component }}
+        ref_uuid: {{ target_component_uuid  }}
+        {% if applied_property_value_groups %}applied property value groups:
+        {% for apvg in applied_property_value_groups %}
+        - name: {{ apvg.name }}
+          ref_uuid : {{ apvg.uuid }}
+        {% endfor %}
+        {% endif %}
+        {% if allocated_component_exchanges  %}allocated component exchanges:
+        {% for ce in allocated_component_exchanges  %}
+        - name: {{  ce.name }}
+          ref_uuid : {{ ce.uuid }}
+        {% endfor %}
+        {% endif %}
+        {% if applied_property_values %}applied property values:
+        {% for apv in applied_property_values %}
+        - name: {{ apv.name }}
+          ref_uuid : {{ apv.uuid }}
+        {% endfor %}
+        {% endif %}
+        {% if constraints %}constraints:
+        {% for cons in constraints %}
+        - name: {{ cons.name }}
+          ref_uuid : {{ cons.uuid }}
+        {% endfor %}
+        {% endif %}
+        {% if exchanges %}exchanges:
+        {% for excs in exchanges %}
+         - name: {{  e.name }}
+           ref_uuid : {{ e.uuid }}
+        {% endfor %}
         {% endif %}
 """
 
@@ -993,6 +1041,42 @@ class CapellaYAMLHandler:
             ref_uuid : {{ e.uuid }}
         {% endfor %}
         {% endif %}
+""" 
+        physicalpath_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      involved:
+      {% for inv in involved_items %}
+      - name: {{  inv.name }}
+        ref_uuid: uuid : {{ inv.uuid }}
+      {% endfor %}
+      {% if allocated_component_exchanges  %}allocated component exchanges:
+      {% for excs in allocated_component_exchanges %}
+      - name: {{  excs.name }}
+        ref_uuid : {{ excs.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %} 
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+
 """ 
         property_value_template = """
       - name: {{ name }}
@@ -1496,6 +1580,7 @@ class CapellaYAMLHandler:
             self.yaml_content = self.yaml_content + template.render(data)
 
 
+
 # Build the data for the YAML generation
         
        
@@ -1676,6 +1761,7 @@ class CapellaYAMLHandler:
             self.yaml_content = self.yaml_content + template.render(data)
 
         elif obj.__class__.__name__ ==  "PhysicalLink" : 
+            #print(obj)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
@@ -1686,6 +1772,7 @@ class CapellaYAMLHandler:
                 "target_component": obj.target.owner.name, 
                 "target_component_uuid": obj.target.owner.uuid ,
                 "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in obj.exchanges],
+                "physical_paths": [{"name": pp.name, "uuid": pp.uuid} for pp in obj.physical_paths],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
@@ -1696,6 +1783,29 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(physical_link_template)
+
+ 
+            self.yaml_content = self.yaml_content + template.render(data)
+
+        elif obj.__class__.__name__ ==  "PhysicalPath" : 
+            #print(obj)
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid" : obj.uuid,
+                "description" :obj.description,
+                "involved_items": [{"name": inv.name , "uuid": inv.uuid} for inv in obj.involved_items],
+                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in obj.exchanges],
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+            }
+    
+            # Add referenced objects for expansion
+            self._track_referenced_objects(obj)
+    
+            # Render the template
+            template = Template(physicalpath_template)
 
  
             self.yaml_content = self.yaml_content + template.render(data)
@@ -1941,7 +2051,7 @@ class CapellaYAMLHandler:
             self.yaml_content = self.yaml_content + template.render(data)           
 
         elif obj.__class__.__name__ ==  "ExchangeItemElement" :   
-            #print(obj)
+            
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
@@ -1989,11 +2099,29 @@ class CapellaYAMLHandler:
             # Render the template
             self._track_referenced_objects(obj)
             template = Template(diagram)
+            self.yaml_content = self.yaml_content + template.render(data)     
+
+        elif obj.__class__.__name__ ==  "Part" : 
+            #print("printing Part:",obj)
+            #print("printing Part type:",obj.type)
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "description" :obj.description,
+                "uuid":obj.uuid,
+                "type_name":obj.type.name,
+                "type_uuid":obj.type.uuid,
+                
+            }
+            # Render the template
+            self._track_referenced_objects(obj)
+            template = Template(part)
             self.yaml_content = self.yaml_content + template.render(data)                     
+
 
         else :
             #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processiong.")
-           
+            #print(obj)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": getattr(obj, "name", None), # Safe access to name
