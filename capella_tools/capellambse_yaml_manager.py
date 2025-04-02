@@ -1675,7 +1675,7 @@ class CapellaYAMLHandler:
  
             self.yaml_content = self.yaml_content + template.render(data)
 
-         elif obj.__class__.__name__ ==  "PhysicalLink" : 
+        elif obj.__class__.__name__ ==  "PhysicalLink" : 
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
