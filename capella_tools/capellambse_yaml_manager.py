@@ -472,7 +472,27 @@ class CapellaYAMLHandler:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
-        
+         if obj.__class__.__name__ ==  "PhysicalLink" :
+            for obj in obj.allocated_component_exchanges:
+                if obj not in self.referenced_objects:
+                    self.referenced_objects.append(obj)
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
+            for apv in obj.applied_property_values:
+                if apv not in self.referenced_objects:
+                    self.referenced_objects.append(apv)
+            for con in obj.constraints:
+                if con not in self.referenced_objects:
+                    self.referenced_objects.append(con) 
+            for pvg in obj.property_value_groups:
+                if pvg not in self.referenced_objects:
+                    self.referenced_objects.append(pvg)
+            for pv in obj.property_values:
+                if pv not in self.referenced_objects:
+                    self.referenced_objects.append(pv)
+                
+               
         if obj.__class__.__name__ ==  "ComponentExchange" :
             for ei in obj.exchange_items:
                 if ei not in self.referenced_objects:
@@ -895,6 +915,50 @@ class CapellaYAMLHandler:
           {% endfor %}
         {% endif %}
 """
+        physical_link_template = """
+      - name: {{ name }}
+        type: {{type}}
+        primary_uuid: {{ uuid }}
+        description : {{ description }}
+        source component:
+        - name: {{ source_component }}
+          ref_uuid: {{ source_component_uuid }}
+        target component:
+        - name: {{ target_component }}
+          ref_uuid: {{ target_component_uuid  }}
+          {% if applied_property_value_groups %}applied property value groups:
+          {% for apvg in applied_property_value_groups %}
+              - name: {{ apvg.name }}
+                ref_uuid : {{ apvg.uuid }}
+          {% endfor %}
+          {% endif %}
+          {% if allocated_component_exchanges %}allocated component exchanges:
+          {% for ce in allocated_component_exchanges  %}
+           - name: {{  ce.name }}
+           ref_uuid : {{ ce.uuid }}
+          {% endfor %}
+          {% endif %}
+          {% if applied_property_values %}applied property values:
+          {% for apv in applied_property_values %}
+          - name: {{ apv.name }}
+            ref_uuid : {{ apv.uuid }}
+          {% endfor %}
+          {% endif %}
+          {% if constraints %}constraints:
+          {% for cons in constraints %}
+          - name: {{ cons.name }}
+            ref_uuid : {{ cons.uuid }}
+          {% endfor %}
+          {% endif %}
+          {% if exchanges %}exchanges:
+          {% for excs in exchanges %}
+          - name: {{  e.name }}
+            ref_uuid : {{ e.uuid }}
+          {% endfor %}
+        {% endif %}
+"""
+
+        
         functional_chain_template = """
       - name: {{ name }}
         type: {{type}}
@@ -1092,7 +1156,7 @@ class CapellaYAMLHandler:
 """
         node_component_template = """
       - name: {{ name }}
-        type: {{type}}
+        type: {{type}} Node 
         primary_uuid: {{ uuid }}
         description : {{ description }}
         is_human : {{ is_human }}
@@ -1611,7 +1675,32 @@ class CapellaYAMLHandler:
  
             self.yaml_content = self.yaml_content + template.render(data)
 
-        
+         elif obj.__class__.__name__ ==  "PhysicalLink" : 
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid" : obj.uuid,
+                "description" :obj.description,
+                "source_component": obj.source.owner.name,
+                "source_component_uuid": obj.source.owner.uuid,
+                "target_component": obj.target.owner.name, 
+                "target_component_uuid": obj.target.owner.uuid ,
+                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in obj.allocated_component_exchanges],
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+            }
+    
+            # Add referenced objects for expansion
+            self._track_referenced_objects(obj)
+    
+            # Render the template
+            template = Template(physical_link_template_template)
+
+ 
+            self.yaml_content = self.yaml_content + template.render(data)
+
+             
         elif obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "NODE":  
                 data = {
                     "type" : obj.__class__.__name__,
