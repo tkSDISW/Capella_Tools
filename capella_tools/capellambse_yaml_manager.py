@@ -473,7 +473,7 @@ class CapellaYAMLHandler:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
         if obj.__class__.__name__ ==  "PhysicalLink" :
-            for obj in obj.allocated_component_exchanges:
+            for obj in obj.exchanges:
                 if obj not in self.referenced_objects:
                     self.referenced_objects.append(obj)
             for apvg in obj.applied_property_value_groups:
@@ -1676,7 +1676,6 @@ class CapellaYAMLHandler:
             self.yaml_content = self.yaml_content + template.render(data)
 
         elif obj.__class__.__name__ ==  "PhysicalLink" : 
-            print(obj)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
