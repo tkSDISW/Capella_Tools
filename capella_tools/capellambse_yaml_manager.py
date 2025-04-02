@@ -1686,7 +1686,7 @@ class CapellaYAMLHandler:
                 "source_component_uuid": obj.source.owner.uuid,
                 "target_component": obj.target.owner.name, 
                 "target_component_uuid": obj.target.owner.uuid ,
-                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in obj.allocated_component_exchanges],
+                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in obj.exchanges],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
