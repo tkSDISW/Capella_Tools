@@ -472,7 +472,7 @@ class CapellaYAMLHandler:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
-         if obj.__class__.__name__ ==  "PhysicalLink" :
+        if obj.__class__.__name__ ==  "PhysicalLink" :
             for obj in obj.allocated_component_exchanges:
                 if obj not in self.referenced_objects:
                     self.referenced_objects.append(obj)
