@@ -1695,7 +1695,7 @@ class CapellaYAMLHandler:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(physical_link_template_template)
+            template = Template(physical_link_template)
 
  
             self.yaml_content = self.yaml_content + template.render(data)
