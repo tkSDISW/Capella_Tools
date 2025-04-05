@@ -1540,6 +1540,7 @@ class CapellaYAMLHandler:
                 "is_human":obj.is_human,
                 "is_actor":obj.is_actor,
                 "description" :obj.description,
+                "entities": [{"name": ent.name , "uuid": ent.uuid} for ent in obj.entities],
                 "allocated_activities": [{"name": a.name , "uuid": a.uuid} for a in obj.activities],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
