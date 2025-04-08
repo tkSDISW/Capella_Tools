@@ -452,4 +452,26 @@ class EmbeddingManager :
                 # Handle invalid input
                 print("\nInvalid input. Please enter valid indices or retry.")
 
+    def query_and_select_top_objects(self, prompt, top_n=20):
+        """
+        Query and return top N ranked objects based on similarity.
+    
+        :param prompt: The query string describing what to look for.
+        :param top_n: Number of top ranked objects to return.
+        :return: List of top N selected objects.
+        """
+        # Step 1: Rank objects based on the query
+        ranked_objects = self.find_similar_objects(prompt)
+    
+        # Step 2: Display ranked objects
+        print("\nThis is a list of ranked Objects Based on Query:")
+        for i, (obj, similarity) in enumerate(ranked_objects[:top_n]):
+            print(f"Index: {i}, Name: {obj['name']}, Similarity: {similarity:.2f}, "
+                  f"Type: {obj['type']}, Phase: {obj['phase']}, "
+                  f"Source: {obj.get('source_component', 'N/A')}, "
+                  f"Target: {obj.get('target_component', 'N/A')}")
+    
+        # Step 3: Return the top N objects
+        selected_objects = [obj for obj, _ in ranked_objects[:top_n]]
+        return selected_objects
 
