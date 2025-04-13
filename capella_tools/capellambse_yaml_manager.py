@@ -1963,7 +1963,7 @@ class CapellaYAMLHandler:
                 "description" :obj.description,
                 "outgoing_transitions": [{"name": og.name, "uuid": og.uuid} for og in obj.outgoing_transitions],
                 "incoming_transitions": [{"name": inc.name, "uuid": inc.uuid} for inc in obj.incoming_transitions],
-                "do activites": [{"name": da.name, "uuid": da.uuid} for da in obj.do_activity],
+                "do_activites": [{"name": da.name, "uuid": da.uuid} for da in obj.do_activity],
                 "exits": [{"name": ex.name, "uuid": ex.uuid} for ex in obj.exits],
                 "entries": [{"name": en.name, "uuid": en.uuid} for en in obj.entries],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
