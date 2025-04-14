@@ -33,9 +33,7 @@ class CapellaYAMLHandler:
         print(self.yaml_content)
 
     def get_entire_model(self, model):
-  
-
-        
+     
         def add_unique_object(obj_list, new_obj):
             """
             Adds a new object to the list if not already present.
@@ -132,11 +130,6 @@ class CapellaYAMLHandler:
         print("Number of model objects:", num_elements)
         return object_data    
          
-          
-
-
-
-    
     def generate_yaml_referenced_objects(self):
         """generate YAML content of referenced objects."""
         for ref_obj in self.referenced_objects:
@@ -156,11 +149,7 @@ class CapellaYAMLHandler:
                  if model_element in self.referenced_objects or  model_element in self.primary_objects :
                     #print("Adding Artifact",artifact.name,artifact.uuid)
                     self.referenced_objects.append(artifact)
-
-                
-
-               
-            
+      
     def _track_referenced_objects(self, obj):
         """Track referenced objects to allow further expansion as primary objects."""
         if obj.__class__.__name__ ==  "LogicalComponent" or obj.__class__.__name__ ==  "SystemComponent"  :  
@@ -256,7 +245,7 @@ class CapellaYAMLHandler:
                 for con in obj.constraints:
                     if con not in self.referenced_objects:
                         self.referenced_objects.append(con)
-        if obj.__class__.__name__ ==  "LogicalFunction" or obj.__class__.__name__ ==  "SystemFunction" or obj.__class__.__name__ ==  "PhysicalFunction":  
+        if obj.__class__.__name__ ==  "LogicalFunction" or obj.__class__.__name__ ==  "SystemFunction" or obj.__class__.__name__ ==  "PhysicalFunction":
             if obj.owner not in self.referenced_objects:
                     self.referenced_objects.append(obj.owner)
             for port in obj.inputs:
@@ -754,11 +743,6 @@ class CapellaYAMLHandler:
         {% for inc in incoming_transitions %}
         - name: {{ inc.name }}
           ref_uuid : {{ inc.uuid }}
-        {% endfor %}
-      functions:
-        {% for func in functions %}
-        - name: {{ func.name }}
-          ref_uuid : {{ func.uuid }}
         {% endfor %}
       do functions:
         {% for da in do_activity %}
@@ -1585,7 +1569,7 @@ class CapellaYAMLHandler:
 # Build the data for the YAML generation
         
        
-        elif obj.__class__.__name__ ==  "SystemFuntion" or obj.__class__.__name__ ==  "LogicalFunction" or obj.__class__.__name__ ==  "PhysicalFunction":    
+        elif obj.__class__.__name__ ==  "SystemFunction" or obj.__class__.__name__ ==  "LogicalFunction" or obj.__class__.__name__ ==  "PhysicalFunction":    
 
             data = {
                 "type" : obj.__class__.__name__,
@@ -1963,7 +1947,7 @@ class CapellaYAMLHandler:
                 "description" :obj.description,
                 "outgoing_transitions": [{"name": og.name, "uuid": og.uuid} for og in obj.outgoing_transitions],
                 "incoming_transitions": [{"name": inc.name, "uuid": inc.uuid} for inc in obj.incoming_transitions],
-                "do_activites": [{"name": da.name, "uuid": da.uuid} for da in obj.do_activity],
+                "do_activity": [{"name": da.name, "uuid": da.uuid} for da in obj.do_activity],
                 "exits": [{"name": ex.name, "uuid": ex.uuid} for ex in obj.exits],
                 "entries": [{"name": en.name, "uuid": en.uuid} for en in obj.entries],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
