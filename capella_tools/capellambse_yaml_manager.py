@@ -208,6 +208,9 @@ class CapellaYAMLHandler:
                 if hasattr(dc, "name") and hasattr(dc, "uuid"):  # Avoid AttributeError
                     if dc not in self.referenced_objects:
                         self.referenced_objects.append(dc)
+            for comp in obj.components:
+                if comp not in self.referenced_objects:
+                    self.referenced_objects.append(comp)
             for physical_port in obj.physical_ports:
                 if physical_port not in self.referenced_objects:
                     self.referenced_objects.append(physical_port)
@@ -227,6 +230,9 @@ class CapellaYAMLHandler:
             for dc in obj.deployed_components:
                     if dc not in self.referenced_objects:
                         self.referenced_objects.append(dc)
+            for comp in obj.components:
+                if comp not in self.referenced_objects:
+                    self.referenced_objects.append(comp)
             for port in obj.ports:
                 if port not in self.referenced_objects:
                     self.referenced_objects.append(port)
@@ -1228,6 +1234,11 @@ class CapellaYAMLHandler:
         primary_uuid: {{ uuid }}
         description : {{ description }}
         is_human : {{ is_human }}
+        components:
+        {% for comp in components %}
+          - component {{ comp.name }}
+            ref_uuid : {{ comp.uuid }}
+        {% endfor %}
         deployed_components:
         {% for dc in deployed_components %}
           - deployed_behavior_component {{ dc.name }}
@@ -1804,6 +1815,7 @@ class CapellaYAMLHandler:
                     "uuid" : obj.uuid,
                     "is_human":obj.is_human,
                     "description" :obj.description,
+                    "components" : [{"name": c.name , "uuid": c.uuid} for c in obj.components],
                     "deployed_components": [
                         {"name": getattr(dc, "name", None), "uuid": getattr(dc, "uuid", None)}
                         for dc in getattr(obj, "deployed_components", [])  # Ensure it's iterable
@@ -1835,6 +1847,7 @@ class CapellaYAMLHandler:
                 "uuid" : obj.uuid,
                 "is_human":obj.is_human,
                 "description" :obj.description,
+                "components" : [{"name": c.name , "uuid": c.uuid} for c in obj.components],
                 "deployed_components": [{"name": dc.name , "uuid": dc.uuid} for dc in obj.deployed_components],
                 "allocated_functions": [{"name": f.name , "uuid": f.uuid} for f in obj.allocated_functions],
                 "ports": [{
