@@ -1005,6 +1005,7 @@ class CapellaYAMLHandler:
         involved:
         {% for inv in involved %}
           - name: {{  inv.name }}
+            type: {{ inv.type}}
             ref_uuid: uuid : {{ inv.uuid }}
         {% endfor %}
         {% if applied_property_value_groups %}applied property value groups:
@@ -1560,7 +1561,7 @@ class CapellaYAMLHandler:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "description" :obj.description,
-                "involved": [{"name": inv.name , "uuid": inv.uuid} for inv in obj.involved],
+                "involved": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
