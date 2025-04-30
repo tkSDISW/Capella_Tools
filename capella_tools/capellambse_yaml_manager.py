@@ -597,10 +597,10 @@ class CapellaYAMLHandler:
       primary_uuid: {{ uuid }}
       description : {{ description }}
       nodes or element :
-        {% for n in nodes %}
-        - name: {{ n.name }}
-          ref_uuid : {{ n.uuid }}
-        {% endfor %}
+      {% for n in nodes %}
+      - name: {{ n.name }}
+        ref_uuid : {{ n.uuid }}
+      {% endfor %}
 """   
         part = """
     - name: {{ name }}
@@ -608,7 +608,7 @@ class CapellaYAMLHandler:
       primary_uuid: {{ uuid }}
       description : {{ description }}
       reference object  :
-        - name: {{ type_name }}
+      - name: {{ type_name }}
         ref_uuid : {{ type_uuid }}
 """   
 
@@ -619,16 +619,16 @@ class CapellaYAMLHandler:
       primary_uuid: {{ uuid }}
       description : {{ description }}
       {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-        - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-        - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
-        {% endfor %}
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid : {{ apv.uuid }}
+       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
@@ -638,8 +638,8 @@ class CapellaYAMLHandler:
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
-        - name: {{  e.name }}
-          ref_uuid : {{ e.uuid }}
+      - name: {{  e.name }}
+        ref_uuid : {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -648,44 +648,44 @@ class CapellaYAMLHandler:
       type: {{type}}
       primary_uuid: {{ uuid }}
       description : {{ description }}
-      abstract type: 
-        - name {{ abstract_type_name }}
+      abstract type of: 
+      - name {{ abstract_type_name }}
         ref_uuid : {{ abstract_type_uuid }}
-        {% if applied_property_value_groups %}applied property value groups:
-            {% for apvg in applied_property_value_groups %}
-            - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-            {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-            {% for apv in applied_property_values %}
-                - name: {{ apv.name }}
-                ref_uuid : {{ apv.uuid }}
-            {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-            {% for cons in constraints %}
-                - name: {{ cons.name }}
-                ref_uuid : {{ cons.uuid }}
-            {% endfor %}
-        {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+      - name: {{ apvg.name }}
+        ref_uuid : {{ apvg.uuid }
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+      - name: {{ apv.name }}
+        ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
 """
         exchangeitem_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
       description : {{ description }}
-      {% if elements %}elements:
-        {% for e in elements %}
-        - name: {{ e.name }}
-          ref_uuid : {{ e.uuid }}
-        {% endfor %}
+      {% if elements %}elements of:
+      {% for e in elements %}
+      - name: {{ e.name }}
+        ref_uuid : {{ e.uuid }}
+      {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-        - name: {{ apvg.name }}
-          ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
+      {% for apvg in applied_property_value_groups %}
+      - name: {{ apvg.name }}
+        ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
         {% for apv in applied_property_values %}
@@ -694,10 +694,10 @@ class CapellaYAMLHandler:
         {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
-        {% for cons in constraints %}
-        - name: {{ cons.name }}
-          ref_uuid : {{ cons.uuid }}
-        {% endfor %}
+      {% for cons in constraints %}
+       - name: {{ cons.name }} 
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
       {% endif %}
 
 """
@@ -710,8 +710,8 @@ class CapellaYAMLHandler:
       identifier : {{ identifier }}
       {% if artifact_links %}linked model elements:
       {% for link in artifact_links %}
-        - name : {{ link.name}}
-          ref_uuid : {{ link.model_element_uuid}}
+       - name : {{ link.name}}
+         ref_uuid : {{ link.model_element_uuid}}
       {% endfor %}
       {% endif %}
 """     
@@ -812,10 +812,10 @@ class CapellaYAMLHandler:
       target activity:
           - name: {{ target_activity }}
             ref_uuid: {{ target_activity_uuid }}
-      {% if involving_ops %}involving operational processes:
-        {% for op in involving_ops %}
-        - name: {{ op.name }}
-          ref_uuid : {{ op.uuid }}
+      {% if involving_ops %}involved operational processes:
+      {% for op in involving_ops %}
+      - name: {{ op.name }}
+        ref_uuid : {{ op.uuid }}
         {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
@@ -824,29 +824,29 @@ class CapellaYAMLHandler:
           ref_uuid : {{ apvg.uuid }}
         {% endfor %}
       {% endif %}
-      {% if exchanges_items %}exchanges items:
-            {% for ei in exchange_items %}
-            - name: {{  ei.name }}
-              ref_uuid : {{ ei.uuid }}
-            {% endfor %}
+      {% if exchanges_items %}allocated exchanges items:
+      {% for ei in exchange_items %}
+       - name: {{  ei.name }}
+         ref_uuid : {{ ei.uuid }}
+      {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-        - name: {{ apv.name }}
-          ref_uuid : {{ apv.uuid }}
-        {% endfor %}
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid : {{ apv.uuid }}
+      {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
-            {% for cons in constraints %}
-            - name: {{ cons.name }}
-              ref_uuid : {{ cons.uuid }}
-            {% endfor %}
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
-            {% for excs in exchanges %}
-            - name: {{  e.name }}
-              ref_uuid : {{ e.uuid }}
-            {% endfor %}
+      {% for excs in exchanges %}
+       - name: {{  e.name }}
+         ref_uuid : {{ e.uuid }}
+       {% endfor %}
       {% endif %}
 """       
         function_exchange_template = """
@@ -855,97 +855,97 @@ class CapellaYAMLHandler:
       primary_uuid: {{ uuid }}
       description : {{ description }}
       source function or activity:
-          - name: {{ source_function }}
-            ref_uuid: {{ source_function_uuid }}
+      - name: {{ source_function }}
+        ref_uuid: {{ source_function_uuid }}
       target function or activity:
-          - name: {{ target_function }}
-            ref_uuid: {{ target_function_uuid }}
-      {% if involving_fcs %}involving functional chains:
-        {% for fc in involving_fcs %}
-        - name: {{ fc.name }}
-          ref_uuid : {{ fc.uuid }}
-        {% endfor %}
+      - name: {{ target_function }}
+        ref_uuid: {{ target_function_uuid }}
+      {% if involving_fcs %}involving functional chain:
+      {% for fc in involving_fcs %}
+       - name: {{ fc.name }}
+         ref_uuid : {{ fc.uuid }}
+      {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-        - name: {{ apvg.name }}
-          ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
       {% endif %}
-      {% if exchanges_items %}exchanges items:
-            {% for ei in exchange_items %}
-            - name: {{  ei.name }}
-              ref_uuid : {{ ei.uuid }}
-            {% endfor %}
+      {% if exchanges_items %}allocated exchanges items:
+      {% for ei in exchange_items %}
+      - name: {{  ei.name }}
+        ref_uuid : {{ ei.uuid }}
+      {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-        - name: {{ apv.name }}
-          ref_uuid : {{ apv.uuid }}
-        {% endfor %}
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid : {{ apv.uuid }}
+      {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
-            {% for cons in constraints %}
-            - name: {{ cons.name }}
-              ref_uuid : {{ cons.uuid }}
-            {% endfor %}
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid : {{ cons.uuid }}
+      {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
-            {% for excs in exchanges %}
-            - name: {{  e.name }}
-              ref_uuid : {{ e.uuid }}
-            {% endfor %}
+      {% for excs in exchanges %}
+       - name: {{  e.name }}
+         ref_uuid : {{ e.uuid }}
+      {% endfor %}
       {% endif %}
 """
 
         
         component_exchange_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        source component:
-        - name: {{ source_component }}
-          ref_uuid: {{ source_component_uuid }}
-        target component:
-        - name: {{ target_component }}
-          ref_uuid: {{ target_component_uuid  }}
-          {% if applied_property_value_groups %}applied property value groups:
-          {% for apvg in applied_property_value_groups %}
-              - name: {{ apvg.name }}
-                ref_uuid : {{ apvg.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if exchanges_items %}exchanges items:
-          {% for ei in exchange_items %}
-          - name: {{  ei.name }}
-            ref_uuid : {{ ei.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if allocated_functional_exchanges %}allocated functional exchanges:
-          {% for fe in allocated_functional_exchanges  %}
-           - name: {{  fe.name }}
-           ref_uuid : {{ fe.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if applied_property_values %}applied property values:
-          {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if constraints %}constraints:
-          {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-          {% endfor %}
-          {% endif %}
-          {% if exchanges %}exchanges:
-          {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-          {% endfor %}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      source component:
+      - name: {{ source_component }}
+        ref_uuid: {{ source_component_uuid }}
+      target component:
+      - name: {{ target_component }}
+        ref_uuid: {{ target_component_uuid  }}
+        {% if applied_property_value_groups %}applied property value groups:
+        {% for apvg in applied_property_value_groups %}
+          - name: {{ apvg.name }}
+            ref_uuid : {{ apvg.uuid }}
+        {% endfor %}
         {% endif %}
+      {% if exchanges_items %} allocated exchanges items:
+      {% for ei in exchange_items %}
+      - name: {{  ei.name }}
+        ref_uuid : {{ ei.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if allocated_functional_exchanges %}allocated functional exchanges:
+      {% for fe in allocated_functional_exchanges  %}
+       - name: {{  fe.name }}
+         ref_uuid : {{ fe.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+          ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+      - name: {{  e.name }}
+        ref_uuid : {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
 """
         physical_link_template = """
     - name: {{ name }}
@@ -964,81 +964,81 @@ class CapellaYAMLHandler:
       target component:
       - name: {{ target_component }}
         ref_uuid: {{ target_component_uuid  }}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-        - name: {{ apvg.name }}
-          ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if allocated_component_exchanges  %}allocated component exchanges:
-        {% for ce in allocated_component_exchanges  %}
-        - name: {{  ce.name }}
-          ref_uuid : {{ ce.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-        - name: {{ apv.name }}
-          ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-        - name: {{ cons.name }}
-          ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-         - name: {{  e.name }}
-           ref_uuid : {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+      - name: {{ apvg.name }}
+        ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if allocated_component_exchanges  %}allocated component exchanges:
+      {% for ce in allocated_component_exchanges  %}
+      - name: {{  ce.name }}
+        ref_uuid : {{ ce.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+      - name: {{ apv.name }}
+        ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+      - name: {{  e.name }}
+        ref_uuid : {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         
         functional_chain_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        involved:
-        {% for inv in involved %}
-          - name: {{  inv.name }}
-            type: {{ inv.type}}
-            ref_uuid: uuid : {{ inv.uuid }}
-        {% endfor %}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-            {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      involve:
+      {% for inv in involved %}
+      - name: {{  inv.name }}
+        type: {{ inv.type}}
+        ref_uuid: uuid : {{ inv.uuid }}
+      {% endfor %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+      - name: {{ apv.name }}
+        ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+      - name: {{  e.name }}
+        ref_uuid : {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
 """ 
         physicalpath_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
       description : {{ description }}
-      involved:
+      involve:
       {% for inv in involved_items %}
       - name: {{  inv.name }}
         ref_uuid: uuid : {{ inv.uuid }}
@@ -1070,417 +1070,411 @@ class CapellaYAMLHandler:
 
 """ 
         property_value_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        value :  {{ value }}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      value :  {{ value }}
 """
         property_value_group_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        property value groups:
-        {% for pvg in property_value_groups %}
-        - name: {{  pvg.name }}
-          ref_uuid: uuid : {{ pvg.uuid }}
-        {% endfor %}
-        property values:
-        {% for pv in property_values %}
-        - name: {{  pv.name }}
-          ref_uuid: uuid : {{ pv.uuid }}
-        {% endfor %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+      - name: {{ apvg.name }}
+        ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+      - name: {{ apv.name }}
+        ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      property value groups:
+      {% for pvg in property_value_groups %}
+      - name: {{  pvg.name }}
+        ref_uuid: uuid : {{ pvg.uuid }}
+      {% endfor %}
+      property values:
+      {% for pv in property_values %}
+      - name: {{  pv.name }}
+        ref_uuid: uuid : {{ pv.uuid }}
+      {% endfor %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
         
 """ 
         logical_component_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        is_human : {{ is_human }}
-        components:
-        {% for comp in components %}
-          - component {{ comp.name }}
-            ref_uuid : {{ comp.uuid }}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      is_human : {{ is_human }}
+      components:
+      {% for comp in components %}
+       - component {{ comp.name }}
+         ref_uuid : {{ comp.uuid }}
+      {% endfor %}
+      functions allocated to:
+      {% for func in allocated_functions %}
+       - name: {{ func.name }}
+         ref_uuid : {{ func.uuid }}
+      {% endfor %}
+      ports:
+      {% for port in ports %}
+       - name: {{ port.name }}
+         description :  {{ port.description }}
+         ref_uuid : {{ port.uuid }}
+         exchanges:
+         {% for exchange in port.exchanges %}
+          - name: {{ exchange.name }}
+            ref_uuid:  {{ exchange.uuid }}
+            description :  {{ exchange.description }}
+            source_component_name: {{ exchange.source_component }}
+            ref__uuid: {{ exchange.source_component_uuid }}
+            target_component_name: {{ exchange.target_component }}
+            ref_uuid: {{ exchange.target_component_uuid }}
         {% endfor %}
-        deployed components:
-        {% for dc in deployed_components %}
-          - deployed_behavior_component {{ dc.name }}
-            ref_uuid : {{ dc.uuid }}
-        {% endfor %}
-        allocated functions:
-        {% for func in allocated_functions %}
-          - name: {{ func.name }}
-            ref_uuid : {{ func.uuid }}
-        {% endfor %}
-        ports:
-        {% for port in ports %}
-          - name: {{ port.name }}
-            description :  {{ port.description }}
-            ref_uuid : {{ port.uuid }}
-            exchanges:
-            {% for exchange in port.exchanges %}
-              - name: {{ exchange.name }}
-                ref_uuid:  {{ exchange.uuid }}
-                description :  {{ exchange.description }}
-                source_component_name: {{ exchange.source_component }}
-                ref__uuid: {{ exchange.source_component_uuid }}
-                target_component_name: {{ exchange.target_component }}
-                ref_uuid: {{ exchange.target_component_uuid }}
-            {% endfor %}
-        {% endfor %}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if state_machines %}state machines:
-        {% for sm in state_machines %}
-          - name: {{  sm.name }}
-            ref_uuid : {{ sm.uuid }}
-        {% endfor %}
-        {% endif %}
+      {% endfor %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+      - name: {{ apvg.name }}
+        ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+      - name: {{ apv.name }}
+        ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+       - name: {{  e.name }}
+         ref_uuid : {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if state_machines %}state machines:
+      {% for sm in state_machines %}
+       - name: {{  sm.name }}
+         ref_uuid : {{ sm.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         entity_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        is_human : {{ is_human }}
-        is_actor : {{ is_actor }}
-        entities:
-        {% for ent in entities %}
-          - component {{ ent.name }}
-            ref_uuid : {{ ent.uuid }}
-        {% endfor %}
-        deployed components:
-        allocated activities:
-        {% for act in allocated_activities %}
-          - name: {{ act.name }}
-            ref_uuid : {{ act.uuid }}
-        {% endfor %}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if state_machines %}state machines:
-        {% for sm in state_machines %}
-          - name: {{  sm.name }}
-            ref_uuid : {{ sm.uuid }}
-        {% endfor %}
-        {% endif %}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      is_human : {{ is_human }}
+      is_actor : {{ is_actor }}
+      entities:
+      {% for ent in entities %}
+       - component {{ ent.name }}
+         ref_uuid : {{ ent.uuid }}
+      {% endfor %}
+      allocated activities:
+      {% for act in allocated_activities %}
+       - name: {{ act.name }}
+         ref_uuid : {{ act.uuid }}
+      {% endfor %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+      - name: {{ apv.name }}
+        ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }} 
+        ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+       - name: {{  e.name }} 
+         ref_uuid : {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if state_machines %}state machines:
+      {% for sm in state_machines %}
+       - name: {{  sm.name }}
+         ref_uuid : {{ sm.uuid }}
+      {% endfor %}
+      {% endif %}
 """
         node_component_template = """
-      - name: {{ name }}
-        type: {{type}} Node 
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        is_human : {{ is_human }}
-        components:
-        {% for comp in components %}
-          - component {{ comp.name }}
-            ref_uuid : {{ comp.uuid }}
+    - name: {{ name }}
+      type: {{type}} Node 
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      is_human : {{ is_human }}
+      components owned:
+      {% for comp in components %}
+      - component {{ comp.name }}
+        ref_uuid : {{ comp.uuid }}
+      {% endfor %}
+      behavior components deployed to:
+      {% for dc in deployed_components %}
+      - deployed_behavior_component {{ dc.name }}
+        ref_uuid : {{ dc.uuid }}
+      {% endfor %}
+      physical ports:
+      {% for physical_port in physical_ports %}
+       - name: {{ physical_port.name }}
+         description :  {{ physical_port.description }}
+         ref_uuid : {{ physical_port.uuid }}
+         links:
+         {% for link in physical_port.links %}
+          - name: {{ link.name }}
+            ref_uuid:  {{ link.uuid }}
+            description :  {{ link.description }}
+            source_component_name: {{ link.source_component }}
+            ref__uuid: {{ link.source_component_uuid }}
+            target_component_name: {{ link.target_component }}
+            ref__uuid: {{ link.target_component_uuid }}
+          {% endfor %}
         {% endfor %}
-        deployed_components:
-        {% for dc in deployed_components %}
-          - deployed_behavior_component {{ dc.name }}
-            ref_uuid : {{ dc.uuid }}
-        {% endfor %}
-        physical ports:
-        {% for physical_port in physical_ports %}
-          - name: {{ physical_port.name }}
-            description :  {{ physical_port.description }}
-            ref_uuid : {{ physical_port.uuid }}
-            links:
-            {% for link in physical_port.links %}
-              - name: {{ link.name }}
-                ref_uuid:  {{ link.uuid }}
-                description :  {{ link.description }}
-                source_component_name: {{ link.source_component }}
-                ref__uuid: {{ link.source_component_uuid }}
-                target_component_name: {{ link.target_component }}
-                ref__uuid: {{ link.target_component_uuid }}
-            {% endfor %}
-        {% endfor %}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+      - name: {{ apvg.name }}
+        ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+      - name: {{  e.name }}
+        ref_uuid : {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         function_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        owner :
-          - name : {{owner_name}}
-            ref_uuid : {{owner_uuid}}
-        child functions:
-        {% for func in child_functions %}
-          - name: {{ func.name }}
-            ref_uuid : {{ func.uuid }}
-        {% endfor %}  
-        inputs:
-        {% for port in inputs %}
-          - name: {{ port.name }}
-            description :  {{ port.description }}
-            ref_uuid : {{ port.uuid }}
-            exchanges:
-            {% for exchange in port.exchanges %}
-              - name: {{ exchange.name }}
-                ref_uuid:  {{ exchange.uuid }}
-                description :  {{ exchange.description }}
-                source_function_name: {{ exchange.source_component }}
-                ref_uuid: {{ exchange.source_component_uuid }}
-                target_function_name: {{ exchange.target_component }}
-                ref_uuid: {{ exchange.target_component_uuid }}
-            {% endfor %}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      allocated from :
+      - name : {{owner_name}}
+        ref_uuid : {{owner_uuid}}
+      functions owned:
+      {% for func in child_functions %}
+       - name: {{ func.name }}
+         ref_uuid : {{ func.uuid }}
+      {% endfor %}  
+      inputs:
+      {% for port in inputs %}
+       - name: {{ port.name }}
+         description :  {{ port.description }}
+         ref_uuid : {{ port.uuid }}
+         exchanges:
+         {% for exchange in port.exchanges %}
+          - name: {{ exchange.name }}
+            ref_uuid:  {{ exchange.uuid }}
+            description :  {{ exchange.description }} 
+            source_function_name: {{ exchange.source_component }}
+            ref_uuid: {{ exchange.source_component_uuid }}
+            target_function_name: {{ exchange.target_component }}
+            ref_uuid: {{ exchange.target_component_uuid }}
+          {% endfor %}
         {% endfor %}
-        outputs:
-        {% for port in outputs %}
-          - name: {{ port.name }}
-            description :  {{ port.description }}
-            ref_uuid : {{ port.uuid }}
-            exchanges:
-            {% for exchange in port.exchanges %}
-              - name: {{ exchange.name }}
-                ref_uuid:  {{ exchange.uuid }}
-                description :  {{ exchange.description }}
-                source_function_name: {{ exchange.source_component }}
-                ref_uuid: {{ exchange.source_component_uuid }}
-                target_function_name: {{ exchange.target_component }}
-                ref_uuid: {{ exchange.target_component_uuid }}
-            {% endfor %}
+      outputs:
+      {% for port in outputs %}
+      - name: {{ port.name }}
+        description :  {{ port.description }}
+        ref_uuid : {{ port.uuid }}
+        exchanges:
+        {% for exchange in port.exchanges %}
+         - name: {{ exchange.name }}
+           ref_uuid:  {{ exchange.uuid }}
+           description :  {{ exchange.description }}
+           source_function_name: {{ exchange.source_component }}
+           ref_uuid: {{ exchange.source_component_uuid }}
+           target_function_name: {{ exchange.target_component }}
+           ref_uuid: {{ exchange.target_component_uuid }}
         {% endfor %}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
+      {% endfor %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+        ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+       - name: {{  e.name }}         
+         ref_uuid : {{ e.uuid }}
+       {% endfor %}
+       {% endif %}
 """
 
         activity_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        owner :
-          - name : {{owner_name}}
-            ref_uuid : {{owner_uuid}}
-        child activities:
-        {% for act in child_activities %}
-          - name: {{ act.name }}
-            ref_uuid : {{ act.uuid }}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      owner :
+      - name : {{owner_name}}
+        ref_uuid : {{owner_uuid}}
+      activities owned:
+      {% for act in child_activities %}
+       - name: {{ act.name }}
+         ref_uuid : {{ act.uuid }}
+      {% endfor %}
+      inputs to:
+      {% for port in inputs %}
+       - name: {{ port.name }}
+         description :  {{ port.description }}
+         ref_uuid : {{ port.uuid }}
+         exchanges:
+         {% for exchange in port.exchanges %}
+          - name: {{ exchange.name }}
+            ref_uuid:  {{ exchange.uuid }}
+            description :  {{ exchange.description }}
+            source_function_name: {{ exchange.source_component }}
+            ref_uuid: {{ exchange.source_component_uuid }}
+            target_function_name: {{ exchange.target_component }}
+            ref_uuid: {{ exchange.target_component_uuid }}
+         {% endfor %}
+         {% endfor %}
+      outputs from:
+      {% for port in outputs %}
+       - name: {{ port.name }}
+         description :  {{ port.description }}
+         ref_uuid : {{ port.uuid }}
+         exchanges:
+         {% for exchange in port.exchanges %}
+          - name: {{ exchange.name }}
+            ref_uuid:  {{ exchange.uuid }}
+            description :  {{ exchange.description }}
+            source_function_name: {{ exchange.source_component }}
+            ref_uuid: {{ exchange.source_component_uuid }}
+            target_function_name: {{ exchange.target_component }}
+            ref_uuid: {{ exchange.target_component_uuid }}
+          {% endfor %}
         {% endfor %}
-        inputs:
-        {% for port in inputs %}
-          - name: {{ port.name }}
-            description :  {{ port.description }}
-            ref_uuid : {{ port.uuid }}
-            exchanges:
-            {% for exchange in port.exchanges %}
-              - name: {{ exchange.name }}
-                ref_uuid:  {{ exchange.uuid }}
-                description :  {{ exchange.description }}
-                source_function_name: {{ exchange.source_component }}
-                ref_uuid: {{ exchange.source_component_uuid }}
-                target_function_name: {{ exchange.target_component }}
-                ref_uuid: {{ exchange.target_component_uuid }}
-            {% endfor %}
-        {% endfor %}
-        outputs:
-        {% for port in outputs %}
-          - name: {{ port.name }}
-            description :  {{ port.description }}
-            ref_uuid : {{ port.uuid }}
-            exchanges:
-            {% for exchange in port.exchanges %}
-              - name: {{ exchange.name }}
-                ref_uuid:  {{ exchange.uuid }}
-                description :  {{ exchange.description }}
-                source_function_name: {{ exchange.source_component }}
-                ref_uuid: {{ exchange.source_component_uuid }}
-                target_function_name: {{ exchange.target_component }}
-                ref_uuid: {{ exchange.target_component_uuid }}
-            {% endfor %}
-        {% endfor %}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+       - name: {{  e.name }}
+         ref_uuid : {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         oc_template = """
-      - name: {{ name }}
-        type: {{type}}
-        primary_uuid: {{ uuid }}
-        description : {{ description }}
-        {% if includes_capabilities %}included capability:
-        {% for obj in includes_capabilities %}
-          - name: {{ obj.name }}
-            ref_uuid : {{ obj.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if extended_capabilities %}extended capability:
-        {% for obj in extended_capabilities %}
-          - name: {{ obj.name }}
-            ref_uuid : {{ obj.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if involved_activities %}involved activity:
-        {% for obj in involved_activities %}
-          - name: {{ obj.name }}
-            ref_uuid : {{ obj.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if involved_entities %}involved entity or actor:
-        {% for obj in  involved_entities %}
-          - name: {{ obj.name }}
-            ref_uuid : {{ obj.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if involved_operational_processes %}involved operational process:
-        {% for obj in involved_operational_processes %}
-          - name: {{ obj.name }}
-            ref_uuid : {{ obj.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_value_groups %}applied property value groups:
-        {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-          - name: {{ apv.name }}
-            ref_uuid : {{ apv.uuid }}
-        {% endfor %}
-        {% endif %}
-        {% if constraints %}constraints:
-        {% for cons in constraints %}
-          - name: {{ cons.name }}
-            ref_uuid : {{ cons.uuid }}
-        {% endfor %}
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description : {{ description }}
+      {% if includes_capabilities %}included capability:
+      {% for obj in includes_capabilities %}
+       - name: {{ obj.name }}
+         ref_uuid : {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if extended_capabilities %}extended capability:
+      {% for obj in extended_capabilities %}
+       - name: {{ obj.name }}
+         ref_uuid : {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if involved_activities %}involved activity:
+      {% for obj in involved_activities %}
+       - name: {{ obj.name }}
+         ref_uuid : {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if involved_entities %}involved entity or actor:
+      {% for obj in  involved_entities %}
+       - name: {{ obj.name }}
+         ref_uuid : {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if involved_operational_processes %}involved operational process:
+      {% for obj in involved_operational_processes %}
+       - name: {{ obj.name }}
+         ref_uuid : {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid : {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid : {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid : {{ cons.uuid }}
+      {% endfor %}
         {% endif %}
         {% if exchanges %}exchanges:
         {% for excs in exchanges %}
@@ -1849,7 +1843,6 @@ class CapellaYAMLHandler:
                 "is_human":obj.is_human,
                 "description" :obj.description,
                 "components" : [{"name": c.name , "uuid": c.uuid} for c in obj.components],
-                "deployed_components": [{"name": dc.name , "uuid": dc.uuid} for dc in obj.deployed_components],
                 "allocated_functions": [{"name": f.name , "uuid": f.uuid} for f in obj.allocated_functions],
                 "ports": [{
                     "name": p.name,

@@ -15,6 +15,12 @@ from IPython.display import display
 from IPython.core.display import Javascript
 from jupyter_ui_poll import ui_events
 import time
+import ast
+import re
+import networkx as nx
+import plotly.graph_objects as go
+from pyvis.network import Network
+Network(notebook=True)
 
 def get_api_key():
     """Retrieve the OpenAI API key from a hidden file."""
@@ -157,4 +163,88 @@ Please format the response in .html format.
                 time.sleep(1)  # ✅ Non-blocking pause before rechecking
 
         print("Chat session ended. Moving to the next cell.")
+
+
+
+
+    def generate_pyvis_graph_from_relations(self, relations, output_file="graph.html"):
+        """
+        Generate a draggable, labeled, arrowed graph using PyVis with tighter spacing.
+        """
+        net = Network(height="750px", width="100%", directed=True, notebook=True, cdn_resources="in_line")
+
+        
+        # Optional tighter layout (or skip for default)
+        net.set_options("""
+        var options = {
+          "physics": {
+            "barnesHut": {
+              "springLength": 90
+            }
+          },
+          "edges": {
+            "arrows": {"to": {"enabled": true}},
+            "font": {"size": 14, "align": "middle"},
+            "color": {"color": "gray"}
+          }
+        }
+        """)
+    
+        added_nodes = set()
+        for src, tgt, lbl in relations:
+            for node in (src, tgt):
+                if node not in added_nodes:
+                    net.add_node(node, label=node, shape="ellipse")
+                    added_nodes.add(node)
+            net.add_edge(src, tgt, label=lbl)
+        net.show(output_file)
+
+
+    def analyze_and_generate_graph(self):
+        """
+        Analyze YAML content, extract relations, and generate a graph.
+        If extraction fails, fallback to text summary display.
+        """
+        special_prompt = """
+Analyze the YAML content and extract relationships suitable for a graph.
+
+- Each relationship should be a tuple: (source, target, label).
+- Use simple labels like 'abstract type of','property value group','property value','constrains','linked model element',"region','states','transitions','outgoing transition','incoming transtion','do function','entry function','exits function','triggers','source state','destination state','after function','source','target','involves','exchange items','exchanges','allocated to', 'involving','components','deployed to','port','state machine','entities', 'elements of'.
+- Use ref_id to navigate primary_id but do not list them in tuples.
+- Output ONLY a Python list of these tuples.
+- No explanation, no extra text, just the list in Python syntax.
+"""
+
+        print("Sending prompt to extract graphable relations...")
+        self.initial_prompt(special_prompt)
+
+        relations_text = self.get_response()
+
+        try:
+            print("Relations Text:",relations_text)
+            cleaned_text = re.sub(r"^```[a-zA-Z]*\n", "", relations_text.strip())
+            cleaned_text = cleaned_text.replace("```", "").strip()
+            relations = ast.literal_eval(cleaned_text)
+            #print("Relations:",relations)
+            if isinstance(relations, list) and all(isinstance(r, tuple) for r in relations):
+                #print("Relations extracted successfully. Drawing graph...")
+                #self.generate_interactive_graph_from_relation(relations)
+                self.generate_pyvis_graph_from_relations(relations)
+            else:
+                print("Relations:",relations_text)
+                raise ValueError("Extracted data is not a valid list of tuples.")
+        except Exception as e:
+            print(f"Failed to parse structured relations ({e}). Falling back to text summary.")
+
+            # Fallback: Ask for a textual summary instead
+            fallback_prompt = """
+Please summarize the key conclusions from the YAML content in a short bullet list.
+Format it nicely for .html display.
+"""
+            self.initial_prompt(fallback_prompt)
+            fallback_response = self.get_response()
+
+            # Display the fallback Markdown
+            display(HTML(f"Fallback Summary:**\n\n{fallback_response}"))
+            
 
