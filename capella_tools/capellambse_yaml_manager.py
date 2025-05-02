@@ -651,19 +651,19 @@ class CapellaYAMLHandler:
       abstract type of: 
       - name {{ abstract_type_name }}
         ref_uuid : {{ abstract_type_uuid }}
-      {% if applied_property_value_groups %}applied property value groups:
+      {% if applied_property_value_groups %} applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }
+        ref_uuid : {{ apvg.uuid })
       {% endfor %}
       {% endif %}
-      {% if applied_property_values %}applied property values:
+      {% if applied_property_values %} applied property values:
       {% for apv in applied_property_values %}
       - name: {{ apv.name }}
         ref_uuid : {{ apv.uuid }}
       {% endfor %}
       {% endif %}
-      {% if constraints %}constraints:
+      {% if constraints %} constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
          ref_uuid : {{ cons.uuid }}
