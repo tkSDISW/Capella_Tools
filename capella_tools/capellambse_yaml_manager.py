@@ -654,7 +654,7 @@ class CapellaYAMLHandler:
       {% if applied_property_value_groups %} applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid })
+        ref_uuid : {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %} applied property values:
