@@ -114,8 +114,8 @@ class EmbeddingManager :
                     "name": object.name,
                     "type": type(object).__name__,
                     "phase" : phase,
-                    "source_component": obj.source.owner.name,
-                    "target_component": obj.target.owner.name 
+                    "source_component": obj.source.owner.name if obj.source and obj.source.owner else None,
+                    "target_component": obj.target.owner.name if obj.target and obj.target.owner else None 
                 }
             return object_info
 
