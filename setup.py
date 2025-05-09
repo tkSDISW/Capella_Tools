@@ -10,6 +10,7 @@ setup(
         "polarion",
         "openai",
         "ipywidgets",
+        "pyvis",
         "jupyter_ui_poll"
     ],
 )
