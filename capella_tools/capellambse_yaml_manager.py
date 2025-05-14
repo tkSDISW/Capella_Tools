@@ -1006,7 +1006,7 @@ class CapellaYAMLHandler:
       {% for inv in involved %}
       - name: {{  inv.name }}
         type: {{ inv.type}}
-        ref_uuid: uuid : {{ inv.uuid }}
+        ref_uuid:{{ inv.uuid }}
       {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
