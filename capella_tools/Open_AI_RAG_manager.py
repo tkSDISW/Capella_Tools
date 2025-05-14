@@ -20,6 +20,10 @@ import re
 import networkx as nx
 import plotly.graph_objects as go
 from pyvis.network import Network
+import nbformat
+from docx import Document
+import PyPDF2
+
 Network(notebook=True)
 
 def get_api_key():
@@ -43,6 +47,10 @@ def get_api_key():
 
 
 class ChatGPTAnalyzer:
+    ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.pdf', '.docx'}
+    TEXT_BASED_EXTS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html'}
+    PDF_EXTS = {'.pdf'}
+    DOCX_EXTS = {'.docx'}
     def __init__(self, yaml_content):
         """Initialize the analyzer with YAML content."""
         try:
@@ -107,63 +115,111 @@ Please format the response in .html format.
 
 
 
+        print("Chat session ended. Moving to the next cell.")
+
+
+    
+    
     def interactive_chat(self):
-        """Start an interactive chat session using `jupyter_ui_poll`."""
+        """Start an enhanced interactive chat session using `jupyter_ui_poll`."""
         print("Starting interactive chat...")
+    
         chat_history = widgets.Output()
         user_input = widgets.Textarea(
             placeholder="Type your prompt...",
             rows=3,
-            layout=widgets.Layout(
-                width="100%",
-                border="2px solid #4A90E2",  # ChatGPT-style blue border
-                border_radius="8px",         # Smooth rounded corners
-                padding="12px",              # Extra padding for a spacious feel
-                background_color="#F7F9FC",  # Soft white-blue background
-                box_shadow="3px 3px 10px rgba(0, 0, 0, 0.1)"  # Subtle shadow for depth
-            ),
-            style={'description_width': 'initial'}
+            layout=widgets.Layout(width="100%", border="2px solid #4A90E2", border_radius="8px",
+                                  padding="12px", background_color="#F7F9FC", 
+                                  box_shadow="3px 3px 10px rgba(0, 0, 0, 0.1)")
         )
+    
         send_button = widgets.Button(description="Execute", button_style="primary")
         exit_button = widgets.Button(description="Exit", button_style="danger")
- 
-        # Function to process and send user message
+    
+        # File picker from current directory
+        file_list = [f for f in os.listdir(os.getcwd())
+             if os.path.isfile(f) and os.path.splitext(f)[1].lower() in self.ALLOWED_EXTENSIONS]
+        file_dropdown = widgets.Dropdown(
+            options=[""] + file_list,
+            description="Load file:",
+            layout=widgets.Layout(width="auto")
+        )
+    
+        def load_file(_):
+            filename = file_dropdown.value
+            if not filename:
+                return
+    
+            ext = os.path.splitext(filename)[1].lower()
+            if ext not in self.ALLOWED_EXTENSIONS:
+                with chat_history:
+                    display(Markdown(f"⚠️ **Unsupported file type `{ext}`. Allowed types:** {', '.join(self.ALLOWED_EXTENSIONS)}"))
+                return
+    
+            try:
+                if ext in self.TEXT_BASED_EXTS:
+                    with open(filename, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                elif ext in self.PDF_EXTS:
+                    with open(filename, 'rb') as f:
+                        reader = PyPDF2.PdfReader(f)
+                        content = "\n".join(page.extract_text() for page in reader.pages if page.extract_text())
+                elif ext in   self.DOCX_EXTS:
+                    doc = Document(filename)
+                    content = "\n".join([p.text for p in doc.paragraphs])
+                else:
+                    content = ""
+    
+                self.messages.append({
+                    "role": "user",
+                    "content": f"File `{filename}` was added for analysis:\n---\n{content}\n---"
+                })
+    
+                with chat_history:
+                    display(Markdown(f"✅ **File `{filename}` was added and appended for analysis.**"))
+
+                
+    
+            except Exception as e:
+                with chat_history:
+                    display(Markdown(f"❌ Error reading `{filename}`: {str(e)}"))
+    
+        file_dropdown.observe(load_file, names="value")
+    
         def send_message(_):
             prompt = user_input.value.strip()
             if not prompt:
                 return
-
+    
             with chat_history:
                 display(Markdown(f"**Your prompt:** {prompt}"))
                 display(Markdown(f"**Generating a response..** "))
                 self.follow_up_prompt(prompt)
                 chatbot_response = self.get_response()
                 if "<table" in chatbot_response or "<html" in chatbot_response:
-                    display(HTML(chatbot_response))  # Render HTML
+                    display(HTML(chatbot_response))
                 else:
                     display(Markdown(f"**ChatGPT Response:**\n\n{chatbot_response}\n"))
-
-            user_input.value = ""  # Clear input box
-        
-        # Function to exit and allow execution to move to the next cell
+    
+            user_input.value = ""
+    
         def exit_chat(_):
-            self.chat_active = False  # ✅ Ends the chat session
-
+            self.chat_active = False
+    
         send_button.on_click(send_message)
         exit_button.on_click(exit_chat)
-        
-        # Display the chat UI
-        display(chat_history, user_input, widgets.HBox([send_button, exit_button]))
-
-        # ✅ Wait using `jupyter_ui_poll` to keep UI responsive
+    
+        display(chat_history, user_input,
+                widgets.HBox([send_button, exit_button]),
+                file_dropdown)
+    
         print("Waiting for chat interactions...")
         with ui_events() as poll:
-            while self.chat_active:  # ✅ Only exits when user clicks "Exit"
-                poll(10)  # ✅ Process up to 10 UI events (keeps UI interactive)
-                time.sleep(1)  # ✅ Non-blocking pause before rechecking
+            while self.chat_active:
+                poll(10)
+                time.sleep(1)
 
-        print("Chat session ended. Moving to the next cell.")
-
+    print("Chat session ended. Moving to the next cell.")
 
 
 
