@@ -108,6 +108,16 @@ class EmbeddingManager :
                     "target_component": "" 
                 }
             return object_info
+        def get_physical_component_info(object, phase ) :
+            object_info = {
+                    "uuid": object.uuid,
+                    "name": object.name,
+                    "type": f"{type(object).__name__}-{object.nature}",
+                    "phase" : phase,
+                    "source_component": "",
+                    "target_component": "" 
+                }
+            return object_info
         def get_component_exchange_info(object, phase ) :
             object_info = {
                     "uuid": object.uuid,
@@ -219,7 +229,7 @@ class EmbeddingManager :
             #PA
             phase = "Physical Architecture PA"
             for component in model.pa.all_components:  
-                object_info = get_object_info(component,phase)
+                object_info = get_physical_component_info(component,phase)
                 add_unique_object(object_data,object_info)
             for obj in model.pa.all_functions:  
                 object_info = get_object_info(obj,phase)
@@ -402,7 +412,17 @@ class EmbeddingManager :
         
         # Display widgets
         display(widgets.VBox([query_input, multi_select, submit_button, reset_button, output_area]))
+        # ✅ Wait using `ui_events()` to keep UI responsive
+        print("Waiting for selection...")
+        with ui_events() as poll:
+            while not self.selection_done:
+                poll(10)  # ✅ Process up to 10 UI events (keeps UI interactive)
+                time.sleep(1)  # ✅ Non-blocking pause before rechecking
 
+
+        
+
+    
     def get_selected_objects(self):
         """
         Retrieve the selected objects after the widget interaction is complete.
@@ -447,10 +467,12 @@ class EmbeddingManager :
                 #print("\nSelected Objects:")
                 #for obj in selected_objects:
                 #    print(f"Name: {obj['name']}, Type: {obj['type']}")
-                return selected_objects
+                return selected_object
             except (ValueError, IndexError):
                 # Handle invalid input
                 print("\nInvalid input. Please enter valid indices or retry.")
+
+
 
     def query_and_select_top_objects(self, prompt, top_n=20):
         """

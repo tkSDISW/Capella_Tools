@@ -11,6 +11,8 @@ setup(
         "openai",
         "ipywidgets",
         "pyvis",
-        "jupyter_ui_poll"
+        "jupyter_ui_poll",
+        "python-docx",
+        "PyPDF2"     
     ],
 )
