@@ -84,6 +84,7 @@ Please format the response in .html format.
         """Set the initial user prompt in the conversation."""
         user_prompt = user_prompt + " Format the response in .html format."
         self.messages.append({"role": "user", "content": user_prompt})
+        display(Markdown(f"**Your prompt:** {user_prompt}"))
 
 
     def follow_up_prompt(self, user_prompt):
@@ -119,11 +120,6 @@ Please format the response in .html format.
         except Exception as e:
             return f"Error communicating with OpenAI API: {e}"
 
-        
-
-
-
-    
     
     def interactive_chat(self):
         """Start an enhanced interactive chat session using `jupyter_ui_poll`."""
@@ -182,9 +178,7 @@ Please format the response in .html format.
     
                 with chat_history:
                     display(Markdown(f"✅ **File `{filename}` was added and appended for analysis.**"))
-
-                
-    
+ 
             except Exception as e:
                 with chat_history:
                     display(Markdown(f"❌ Error reading `{filename}`: {str(e)}"))
@@ -197,9 +191,8 @@ Please format the response in .html format.
                 return
     
             with chat_history:
-                display(Markdown(f"**Your prompt:** {prompt}"))
-                display(Markdown(f"**Generating a response..** "))
                 self.follow_up_prompt(prompt)
+                display(Markdown(f"**Generating a response..** "))
                 chatbot_response = self.get_response()
                 
     
