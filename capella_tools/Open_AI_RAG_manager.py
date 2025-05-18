@@ -85,9 +85,11 @@ Please format the response in .html format.
         user_prompt = user_prompt + " Format the response in .html format."
         self.messages.append({"role": "user", "content": user_prompt})
 
+
     def follow_up_prompt(self, user_prompt):
         """Add a follow-up prompt continuing the conversation."""
         self.messages.append({"role": "user", "content": user_prompt})
+        display(Markdown(f"**Your prompt:** {prompt}"))
 
     def get_response(self):
         """Send messages to ChatGPT and get a response."""
@@ -108,15 +110,16 @@ Please format the response in .html format.
 
             # Render the cleaned HTML
             assistant_message = str(soup)
+            if "<table" in chatbot_response or "<html" in assistant_message:
+                display(HTML(chatbot_response))
+            else:
+                display(Markdown(f"**ChatGPT Response:**\n\n{assistant_message}\n"))
             return assistant_message
-
+            
         except Exception as e:
             return f"Error communicating with OpenAI API: {e}"
 
-        if "<table" in chatbot_response or "<html" in chatbot_response:
-            display(HTML(chatbot_response))
-        else:
-            display(Markdown(f"**ChatGPT Response:**\n\n{chatbot_response}\n"))
+        
 
 
 
