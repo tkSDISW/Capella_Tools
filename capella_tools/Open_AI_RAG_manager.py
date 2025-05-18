@@ -113,9 +113,11 @@ Please format the response in .html format.
         except Exception as e:
             return f"Error communicating with OpenAI API: {e}"
 
+        if "<table" in chatbot_response or "<html" in chatbot_response:
+            display(HTML(chatbot_response))
+        else:
+            display(Markdown(f"**ChatGPT Response:**\n\n{chatbot_response}\n"))
 
-
-        print("Chat session ended. Moving to the next cell.")
 
 
     
@@ -196,10 +198,7 @@ Please format the response in .html format.
                 display(Markdown(f"**Generating a response..** "))
                 self.follow_up_prompt(prompt)
                 chatbot_response = self.get_response()
-                if "<table" in chatbot_response or "<html" in chatbot_response:
-                    display(HTML(chatbot_response))
-                else:
-                    display(Markdown(f"**ChatGPT Response:**\n\n{chatbot_response}\n"))
+                
     
             user_input.value = ""
     
@@ -219,7 +218,6 @@ Please format the response in .html format.
                 poll(10)
                 time.sleep(1)
 
-    print("Chat session ended. Moving to the next cell.")
 
 
 
