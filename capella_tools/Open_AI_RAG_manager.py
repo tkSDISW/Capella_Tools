@@ -102,7 +102,10 @@ Please format the response in .html format.
             )
             assistant_message = response.choices[0].message.content
             self.messages.append({"role": "assistant", "content": assistant_message})
-
+            if assistant_message.startswith("```html"):
+                assistant_message = assistant_message[7:]  # Remove the first 7 characters (```html\n)
+            if assistant_message.endswith("```"):
+                assistant_message = assistant_message[:-3]  # Remove the last 3 characters (```)
             soup = BeautifulSoup(assistant_message, "html.parser")
 
             # Remove <script> and <style> tags
