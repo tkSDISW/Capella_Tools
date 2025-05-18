@@ -89,7 +89,7 @@ Please format the response in .html format.
     def follow_up_prompt(self, user_prompt):
         """Add a follow-up prompt continuing the conversation."""
         self.messages.append({"role": "user", "content": user_prompt})
-        display(Markdown(f"**Your prompt:** {prompt}"))
+        display(Markdown(f"**Your prompt:** {user_prompt}"))
 
     def get_response(self):
         """Send messages to ChatGPT and get a response."""
@@ -110,8 +110,8 @@ Please format the response in .html format.
 
             # Render the cleaned HTML
             assistant_message = str(soup)
-            if "<table" in chatbot_response or "<html" in assistant_message:
-                display(HTML(chatbot_response))
+            if "<table" in assistant_message or "<html" in assistant_message:
+                display(HTML(assistant_message))
             else:
                 display(Markdown(f"**ChatGPT Response:**\n\n{assistant_message}\n"))
             return assistant_message
