@@ -45,189 +45,94 @@ def get_api_key():
 
     return api_key
 
-
 class ChatGPTAnalyzer:
-    ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.pdf', '.docx'}
-    TEXT_BASED_EXTS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html'}
+    ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.pdf', '.docx', '.sysml'}
+    TEXT_BASED_EXTS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.sysml'}
     PDF_EXTS = {'.pdf'}
     DOCX_EXTS = {'.docx'}
-    def __init__(self, yaml_content):
-        """Initialize the analyzer with YAML content."""
+
+    def __init__(self, yaml_content=None):
         try:
             self.api_key = get_api_key()
             print("OpenAI API Key retrieved successfully.")
         except (FileNotFoundError, ValueError) as e:
             print(e)
-            sys.exit(1)  # Exit with an error code
+            sys.exit(1)
 
-        self.yaml_content = yaml_content
-        self.chat_active = True  # ✅ Flag to manage chat session
-        self.messages = [
-            {
+        self.yaml_content = yaml_content or ""
+        self.chat_active = True
+        self.messages = []
+        if self.yaml_content:
+            self.messages.append({
                 "role": "system",
                 "content": f"You are an expert in analyzing YAML files for system design. Here is the YAML file:\n---\n{self.yaml_content}\n---",
-            }
-        ]
+            })
 
-    def _construct_prompt(self, user_prompt):
-        """Construct the full prompt with YAML content."""
-        return f"""
-The following is a YAML file describing a system design component in Capella:
----
-{self.yaml_content}
----
-{user_prompt}
-Please format the response in .html format.
-"""
-
-    def initial_prompt(self, user_prompt):
-        """Set the initial user prompt in the conversation."""
-        user_prompt = user_prompt + " Format the response in .html format."
+    def submit_prompt(self, user_prompt, is_initial=True):
+        user_prompt = user_prompt + " Format the response in .html format." if is_initial else user_prompt
         self.messages.append({"role": "user", "content": user_prompt})
         display(Markdown(f"**Your prompt:** {user_prompt}"))
 
+    initial_prompt = lambda self, prompt: self.submit_prompt(prompt, is_initial=True)
+    follow_up_prompt = lambda self, prompt: self.submit_prompt(prompt, is_initial=False)
 
-    def follow_up_prompt(self, user_prompt):
-        """Add a follow-up prompt continuing the conversation."""
-        self.messages.append({"role": "user", "content": user_prompt})
-        display(Markdown(f"**Your prompt:** {user_prompt}"))
+    def add_text_file_to_messages(self, filepath):
+        ext = os.path.splitext(filepath)[1].lower()
+        if ext not in self.ALLOWED_EXTENSIONS:
+            raise ValueError(f"Unsupported file type '{ext}'. Allowed types are: {', '.join(self.ALLOWED_EXTENSIONS)}")
+
+        if ext in self.TEXT_BASED_EXTS:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+        elif ext in self.PDF_EXTS:
+            with open(filepath, 'rb') as f:
+                reader = PyPDF2.PdfReader(f)
+                content = "\n".join(page.extract_text() for page in reader.pages if page.extract_text())
+        elif ext in self.DOCX_EXTS:
+            doc = Document(filepath)
+            content = "\n".join([p.text for p in doc.paragraphs])
+        else:
+            content = ""
+
+        self.messages.append({
+            "role": "user",
+            "content": f"File `{filepath}` was added for analysis:\n---\n{content}\n---"
+        })
+        print(f"✅ File `{filepath}` added to messages for analysis.")
 
     def get_response(self):
-        """Send messages to ChatGPT and get a response."""
+        token_usage_info = ""
         try:
             client = OpenAI(api_key=self.api_key)
             response = client.chat.completions.create(
+                
                 messages=self.messages,
                 model="gpt-4o",
+                stream=False
             )
+            usage = response.usage
+            if usage:
+                token_usage_info = f"_Tokens used: prompt={usage.prompt_tokens}, completion={usage.completion_tokens}, total={usage.total_tokens}_"
             assistant_message = response.choices[0].message.content
             self.messages.append({"role": "assistant", "content": assistant_message})
             if assistant_message.startswith("```html"):
-                assistant_message = assistant_message[7:]  # Remove the first 7 characters (```html\n)
+                assistant_message = assistant_message[7:]
             if assistant_message.endswith("```"):
-                assistant_message = assistant_message[:-3]  # Remove the last 3 characters (```)
+                assistant_message = assistant_message[:-3]
             soup = BeautifulSoup(assistant_message, "html.parser")
-
-            # Remove <script> and <style> tags
             for tag in soup(["script", "style"]):
                 tag.decompose()
-
-            # Render the cleaned HTML
-            assistant_message = str(soup)
+            assistant_message = str(soup) + token_usage_info
             if "<table" in assistant_message or "<html" in assistant_message:
                 display(HTML(assistant_message))
             else:
                 display(Markdown(f"**ChatGPT Response:**\n\n{assistant_message}\n"))
             return assistant_message
-            
         except Exception as e:
             return f"Error communicating with OpenAI API: {e}"
 
-    
-    def interactive_chat(self):
-        """Start an enhanced interactive chat session using `jupyter_ui_poll`."""
-        print("Starting interactive chat...")
-    
-        chat_history = widgets.Output()
-        user_input = widgets.Textarea(
-            placeholder="Type your prompt...",
-            rows=3,
-            layout=widgets.Layout(width="100%", border="2px solid #4A90E2", border_radius="8px",
-                                  padding="12px", background_color="#F7F9FC", 
-                                  box_shadow="3px 3px 10px rgba(0, 0, 0, 0.1)")
-        )
-    
-        send_button = widgets.Button(description="Execute", button_style="primary")
-        exit_button = widgets.Button(description="Exit", button_style="danger")
-    
-        # File picker from current directory
-        file_list = [f for f in os.listdir(os.getcwd())
-             if os.path.isfile(f) and os.path.splitext(f)[1].lower() in self.ALLOWED_EXTENSIONS]
-        file_dropdown = widgets.Dropdown(
-            options=[""] + file_list,
-            description="Load file:",
-            layout=widgets.Layout(width="auto")
-        )
-    
-        def load_file(_):
-            filename = file_dropdown.value
-            if not filename:
-                return
-    
-            ext = os.path.splitext(filename)[1].lower()
-            if ext not in self.ALLOWED_EXTENSIONS:
-                with chat_history:
-                    display(Markdown(f"⚠️ **Unsupported file type `{ext}`. Allowed types:** {', '.join(self.ALLOWED_EXTENSIONS)}"))
-                return
-    
-            try:
-                if ext in self.TEXT_BASED_EXTS:
-                    with open(filename, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                elif ext in self.PDF_EXTS:
-                    with open(filename, 'rb') as f:
-                        reader = PyPDF2.PdfReader(f)
-                        content = "\n".join(page.extract_text() for page in reader.pages if page.extract_text())
-                elif ext in   self.DOCX_EXTS:
-                    doc = Document(filename)
-                    content = "\n".join([p.text for p in doc.paragraphs])
-                else:
-                    content = ""
-    
-                self.messages.append({
-                    "role": "user",
-                    "content": f"File `{filename}` was added for analysis:\n---\n{content}\n---"
-                })
-    
-                with chat_history:
-                    display(Markdown(f"✅ **File `{filename}` was added and appended for analysis.**"))
- 
-            except Exception as e:
-                with chat_history:
-                    display(Markdown(f"❌ Error reading `{filename}`: {str(e)}"))
-    
-        file_dropdown.observe(load_file, names="value")
-    
-        def send_message(_):
-            prompt = user_input.value.strip()
-            if not prompt:
-                return
-    
-            with chat_history:
-                self.follow_up_prompt(prompt)
-                display(Markdown(f"**Generating a response..** "))
-                chatbot_response = self.get_response()
-                
-    
-            user_input.value = ""
-    
-        def exit_chat(_):
-            self.chat_active = False
-    
-        send_button.on_click(send_message)
-        exit_button.on_click(exit_chat)
-    
-        display(chat_history, user_input,
-                widgets.HBox([send_button, exit_button]),
-                file_dropdown)
-    
-        print("Waiting for chat interactions...")
-        with ui_events() as poll:
-            while self.chat_active:
-                poll(10)
-                time.sleep(1)
-
-
-
-
     def generate_pyvis_graph_from_relations(self, relations, output_file="graph.html"):
-        """
-        Generate a draggable, labeled, arrowed graph using PyVis with tighter spacing.
-        """
         net = Network(height="750px", width="100%", directed=True, notebook=True, cdn_resources="in_line")
-
-        
-        # Optional tighter layout (or skip for default)
         net.set_options("""
         var options = {
           "physics": {
@@ -242,7 +147,6 @@ Please format the response in .html format.
           }
         }
         """)
-    
         added_nodes = set()
         for src, tgt, lbl in relations:
             for node in (src, tgt):
@@ -252,12 +156,7 @@ Please format the response in .html format.
             net.add_edge(src, tgt, label=lbl)
         net.show(output_file)
 
-
     def analyze_and_generate_graph(self):
-        """
-        Analyze YAML content, extract relations, and generate a graph.
-        If extraction fails, fallback to text summary display.
-        """
         special_prompt = """
 Analyze the YAML content and extract relationships suitable for a graph.
 
@@ -267,37 +166,81 @@ Analyze the YAML content and extract relationships suitable for a graph.
 - Output ONLY a Python list of these tuples.
 - No explanation, no extra text, just the list in Python syntax.
 """
-
         print("Sending prompt to extract graphable relations...")
-        self.initial_prompt(special_prompt)
-
+        self.submit_prompt(special_prompt)
         relations_text = self.get_response()
-
         try:
-            print("Relations Text:",relations_text)
+            print("Relations Text:", relations_text)
             cleaned_text = re.sub(r"^```[a-zA-Z]*\n", "", relations_text.strip())
             cleaned_text = cleaned_text.replace("```", "").strip()
             relations = ast.literal_eval(cleaned_text)
-            #print("Relations:",relations)
             if isinstance(relations, list) and all(isinstance(r, tuple) for r in relations):
-                #print("Relations extracted successfully. Drawing graph...")
-                #self.generate_interactive_graph_from_relation(relations)
                 self.generate_pyvis_graph_from_relations(relations)
             else:
-                print("Relations:",relations_text)
+                print("Relations:", relations_text)
                 raise ValueError("Extracted data is not a valid list of tuples.")
         except Exception as e:
             print(f"Failed to parse structured relations ({e}). Falling back to text summary.")
-
-            # Fallback: Ask for a textual summary instead
             fallback_prompt = """
 Please summarize the key conclusions from the YAML content in a short bullet list.
 Format it nicely for .html display.
 """
-            self.initial_prompt(fallback_prompt)
+            self.submit_prompt(fallback_prompt)
             fallback_response = self.get_response()
-
-            # Display the fallback Markdown
             display(HTML(f"Fallback Summary:**\n\n{fallback_response}"))
-            
+
+    def interactive_chat(self):
+        print("Starting interactive chat...")
+        chat_history = widgets.Output()
+        user_input = widgets.Textarea(
+            placeholder="Type your prompt...",
+            rows=3,
+            layout=widgets.Layout(width="100%", border="2px solid #4A90E2", border_radius="8px",
+                                  padding="12px", background_color="#F7F9FC", 
+                                  box_shadow="3px 3px 10px rgba(0, 0, 0, 0.1)")
+        )
+        send_button = widgets.Button(description="Execute", button_style="primary")
+        exit_button = widgets.Button(description="Exit", button_style="danger")
+        file_list = [f for f in os.listdir(os.getcwd()) if os.path.isfile(f) and os.path.splitext(f)[1].lower() in self.ALLOWED_EXTENSIONS]
+        file_dropdown = widgets.Dropdown(
+            options=[""] + file_list,
+            description="Load file:",
+            layout=widgets.Layout(width="auto")
+        )
+
+        def load_file(_):
+            filename = file_dropdown.value
+            if not filename:
+                return
+            try:
+                self.add_text_file_to_messages(filename)
+                with chat_history:
+                    display(Markdown(f"✅ **File `{filename}` was added and appended for analysis.**"))
+            except Exception as e:
+                with chat_history:
+                    display(Markdown(f"❌ Error reading `{filename}`: {str(e)}"))
+
+        file_dropdown.observe(load_file, names="value")
+
+        def send_message(_):
+            prompt = user_input.value.strip()
+            if not prompt:
+                return
+            with chat_history:
+                self.submit_prompt(prompt, is_initial=False)
+                display(Markdown("**Generating a response..** "))
+                chatbot_response = self.get_response()
+            user_input.value = ""
+
+        def exit_chat(_):
+            self.chat_active = False
+
+        send_button.on_click(send_message)
+        exit_button.on_click(exit_chat)
+        display(chat_history, user_input, widgets.HBox([send_button, exit_button]), file_dropdown)
+        print("Waiting for chat interactions...")
+        with ui_events() as poll:
+            while self.chat_active:
+                poll(10)
+                time.sleep(1)
 
