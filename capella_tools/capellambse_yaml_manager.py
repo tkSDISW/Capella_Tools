@@ -1174,12 +1174,12 @@ model:
       property value groups:
       {% for pvg in property_value_groups %}
       - name: {{  pvg.name }}
-        ref_uuid: uuid : {{ pvg.uuid }}
+        ref_uuid: {{ pvg.uuid }}
       {% endfor %}
       property values:
       {% for pv in property_values %}
       - name: {{  pv.name }}
-        ref_uuid: uuid : {{ pv.uuid }}
+        ref_uuid: {{ pv.uuid }}
       {% endfor %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
