@@ -2173,7 +2173,6 @@ model:
             }
             # Render the template
             template = Template( Traceability_artifact)
-            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             
 
@@ -2213,7 +2212,6 @@ model:
 
         else :
             #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processiong.")
-            print(obj)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": getattr(obj, "name", None), # Safe access to name
