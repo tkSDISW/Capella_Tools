@@ -1,6 +1,9 @@
 import yaml
 from jinja2 import Template
 import capellambse
+import re
+import base64
+from pathlib import Path
 
 class CapellaYAMLHandler:
     def __init__(self):
@@ -8,10 +11,13 @@ class CapellaYAMLHandler:
         self.referenced_objects = []
         self.primary_objects = []
         self.yaml_content = """
-      # YAML file for system model relationships
-      schema:
-        primary_uuid: Unique identifier for the primary object
-        ref_uuid: Unique identifier for a referenced object
+---  
+# YAML file for system model relationships
+model:
+  schema:
+    primary_uuid: Unique identifier for the primary object
+    ref_uuid: Unique identifier for a referenced object
+  objects:
 """
         
     def get_yaml_content(self):
@@ -585,61 +591,133 @@ class CapellaYAMLHandler:
         if obj.__class__.__name__ ==  "Part" :
             if obj.type not in self.referenced_objects:
                 self.referenced_objects.append(obj.type)
-    
+        if obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort":   
+            if obj.owner not in self.referenced_objects:
+                self.referenced_objects.append(obj.owner)
     
     def generate_yaml(self, obj):
+        
+
+        
+        def sanitize_description_images(html: str, img_dir: Path, prefix="img") -> str:
+            """
+            Extract base64-encoded images from HTML and replace them with file references.
+        
+            :param html: HTML content with embedded base64 images
+            :param img_dir: Path to the directory where image files will be saved
+            :param prefix: Filename prefix for images (default: 'img')
+            :return: Sanitized HTML with image references
+            """
+            if html is None:
+                return ""
+
+            img_dir.mkdir(parents=True, exist_ok=True)
+        
+            def replacer(match):
+                b64_data = match.group(1)
+                img_index = len(list(img_dir.glob(f"{prefix}_*.png"))) + 1
+                filename = f"{prefix}_{img_index}.png"
+                filepath = img_dir / filename
+        
+                # Write image file
+                with open(filepath, "wb") as f:
+                    f.write(base64.b64decode(b64_data))
+        
+                return f'<img src="{filename}"'
+        
+            # Match and replace <img src="data:image/png;base64,...">
+            pattern = r'<img\s+[^>]*src="data:image\/png;base64,([^"]+)"'
+            html = re.sub(pattern, replacer, html)
+        
+            return html
+
+
+        img_dir = Path("capella_yaml_images")        
 
         """Generate YAML for primary objects and manage references."""
 
         diagram = """
-    - name: {{ name }}
+    - name: '{{ name }}'
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       nodes or element :
       {% for n in nodes %}
       - name: {{ n.name }}
-        ref_uuid : {{ n.uuid }}
+        ref_uuid: {{ n.uuid }}
       {% endfor %}
 """   
         part = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       reference object  :
       - name: {{ type_name }}
-        ref_uuid : {{ type_uuid }}
+        ref_uuid: {{ type_uuid }}
 """   
 
-        
-        default_template = """
+        port_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
+      owner:
+        name: {{ owner_name }}
+        ref_uuid: {{ owner_uuid }}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-         ref_uuid : {{ apv.uuid }}
+         ref_uuid: {{ apv.uuid }}
        {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
       - name: {{ cons.name }}
-        ref_uuid : {{ cons.uuid }}
+        ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
-      - name: {{  e.name }}
-        ref_uuid : {{ e.uuid }}
+       - name: {{  e.name }}
+        ref_uuid: {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
+"""
+        
+        default_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: {{ description }}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid: {{ apv.uuid }}
+       {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid: {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+       - name: {{  e.name }}
+        ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -647,26 +725,26 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       abstract type of: 
-      - name {{ abstract_type_name }}
-        ref_uuid : {{ abstract_type_uuid }}
+      - name: {{ abstract_type_name }}
+        ref_uuid: {{ abstract_type_uuid }}
       {% if applied_property_value_groups %} applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }}
+        ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %} applied property values:
       {% for apv in applied_property_values %}
       - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %} constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -674,29 +752,29 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       {% if elements %}elements of:
       {% for e in elements %}
       - name: {{ e.name }}
-        ref_uuid : {{ e.uuid }}
+        ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }}
+        ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
         {% for apv in applied_property_values %}
         - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
         {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }} 
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
 
@@ -706,12 +784,12 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}} Polarion Workitem Requirement
       primary_uuid: {{ uuid }}
-      url : {{ url }}
-      identifier : {{ identifier }}
+      url: {{ url }}
+      identifier: {{ identifier }}
       {% if artifact_links %}linked model elements:
       {% for link in artifact_links %}
-       - name : {{ link.name}}
-         ref_uuid : {{ link.model_element_uuid}}
+       - name: {{ link.name}}
+         ref_uuid: {{ link.model_element_uuid}}
       {% endfor %}
       {% endif %}
 """     
@@ -719,19 +797,19 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type:{{type}} 
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       regions:
       {% for region in regions %}
       - name: "{{ region.name }}"
         states:
         {% for state in region.states %}
          - name: "{{ state.name }}"
-           ref_uuid : {{ state.uuid }}
+           ref_uuid: {{ state.uuid }}
         {% endfor %}
         transitions:
         {% for transition in region.transitions %}
          - name: "{{ transition.name }}"
-           ref_uuid : {{ transition.uuid }}
+           ref_uuid: {{ transition.uuid }}
         {% endfor %}
       {% endfor %}
 """     
@@ -739,42 +817,42 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       outgoing transtions:
         {% for og in outgoing_transitions %}
         - name: {{ og.name }}
-          ref_uuid : {{ og.uuid }}
+          ref_uuid: {{ og.uuid }}
         {% endfor %}
       incoming transtions:
         {% for inc in incoming_transitions %}
         - name: {{ inc.name }}
-          ref_uuid : {{ inc.uuid }}
+          ref_uuid: {{ inc.uuid }}
         {% endfor %}
       do functions:
         {% for da in do_activity %}
         - name: {{ da.name }}
-          ref_uuid : {{ da.uuid }}
+          ref_uuid: {{ da.uuid }}
         {% endfor %}
       entry functions:
         {% for en in entries %}
         - name: {{ en.name }}
-          ref_uuid : {{ en.uuid }}
+          ref_uuid: {{ en.uuid }}
         {% endfor %}
       exits functions:
         {% for ex in exits %}
         - name: {{ ex.name }}
-          ref_uuid : {{ ex.uuid }}
+          ref_uuid: {{ ex.uuid }}
         {% endfor %}
 """    
         psusdo_state_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       outgoing transtions:
         {% for og in outgoing_transitions %}
         - name: {{ og.name }}
-          ref_uuid : {{ og.uuid }}
+          ref_uuid: {{ og.uuid }}
         {% endfor %}
 """   
         
@@ -782,30 +860,30 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       guard: {{ guard }}
       triggers:
         {% for t in triggers %}
         - name: {{ t.name }}
-          ref_uuid : {{ t.uuid }}
+          ref_uuid: {{ t.uuid }}
         {% endfor %}
         source state:
         - name: {{ source_name }}
-          ref_uuid : {{ source_uuid }}
+          ref_uuid: {{ source_uuid }}
         destination state:
           - name: {{ dest_name }}
-            ref_uuid : {{ dest_uuid }}
+            ref_uuid: {{ dest_uuid }}
         after functions:
         {% for ef in effects %}
             - name: {{ ef.name }}
-              ref_uuid : {{ ef.uuid }}
+              ref_uuid: {{ ef.uuid }}
         {% endfor %}
 """  
         interaction_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       source activity:
           - name: {{ source_activity }}
             ref_uuid: {{ source_activity_uuid }}
@@ -815,37 +893,37 @@ class CapellaYAMLHandler:
       {% if involving_ops %}involved operational processes:
       {% for op in involving_ops %}
       - name: {{ op.name }}
-        ref_uuid : {{ op.uuid }}
+        ref_uuid: {{ op.uuid }}
         {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
         {% for apvg in applied_property_value_groups %}
         - name: {{ apvg.name }}
-          ref_uuid : {{ apvg.uuid }}
+          ref_uuid: {{ apvg.uuid }}
         {% endfor %}
       {% endif %}
       {% if exchanges_items %}allocated exchanges items:
       {% for ei in exchange_items %}
        - name: {{  ei.name }}
-         ref_uuid : {{ ei.uuid }}
+         ref_uuid: {{ ei.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-         ref_uuid : {{ apv.uuid }}
+         ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
        - name: {{  e.name }}
-         ref_uuid : {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
        {% endfor %}
       {% endif %}
 """       
@@ -853,47 +931,47 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
-      source function or activity:
+      description: {{ description }}
+      source function or activity port:
       - name: {{ source_function }}
         ref_uuid: {{ source_function_uuid }}
-      target function or activity:
+      target function or activity port:
       - name: {{ target_function }}
         ref_uuid: {{ target_function_uuid }}
       {% if involving_fcs %}involving functional chain:
       {% for fc in involving_fcs %}
        - name: {{ fc.name }}
-         ref_uuid : {{ fc.uuid }}
+         ref_uuid: {{ fc.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges_items %}allocated exchanges items:
       {% for ei in exchange_items %}
       - name: {{  ei.name }}
-        ref_uuid : {{ ei.uuid }}
+        ref_uuid: {{ ei.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-         ref_uuid : {{ apv.uuid }}
+         ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
       - name: {{ cons.name }}
-        ref_uuid : {{ cons.uuid }}
+        ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
        - name: {{  e.name }}
-         ref_uuid : {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -903,7 +981,7 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       source component:
       - name: {{ source_component }}
         ref_uuid: {{ source_component_uuid }}
@@ -913,37 +991,37 @@ class CapellaYAMLHandler:
         {% if applied_property_value_groups %}applied property value groups:
         {% for apvg in applied_property_value_groups %}
           - name: {{ apvg.name }}
-            ref_uuid : {{ apvg.uuid }}
+            ref_uuid: {{ apvg.uuid }}
         {% endfor %}
         {% endif %}
       {% if exchanges_items %} allocated exchanges items:
       {% for ei in exchange_items %}
       - name: {{  ei.name }}
-        ref_uuid : {{ ei.uuid }}
+        ref_uuid: {{ ei.uuid }}
       {% endfor %}
       {% endif %}
       {% if allocated_functional_exchanges %}allocated functional exchanges:
       {% for fe in allocated_functional_exchanges  %}
        - name: {{  fe.name }}
-         ref_uuid : {{ fe.uuid }}
+         ref_uuid: {{ fe.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-          ref_uuid : {{ apv.uuid }}
+          ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
       - name: {{ cons.name }}
-        ref_uuid : {{ cons.uuid }}
+        ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
       - name: {{  e.name }}
-        ref_uuid : {{ e.uuid }}
+        ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -951,11 +1029,11 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       {% if physical_paths %}involving physical_paths:
       {% for pp in physical_paths %}
        - name: {{ pp.name }}
-         ref_uuid : {{ pp.uuid }}
+         ref_uuid: {{ pp.uuid }}
       {% endfor %}
       {% endif %}
       source component:
@@ -967,31 +1045,31 @@ class CapellaYAMLHandler:
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }}
+        ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if allocated_component_exchanges  %}allocated component exchanges:
       {% for ce in allocated_component_exchanges  %}
       - name: {{  ce.name }}
-        ref_uuid : {{ ce.uuid }}
+        ref_uuid: {{ ce.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
       - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
       - name: {{  e.name }}
-        ref_uuid : {{ e.uuid }}
+        ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -1001,35 +1079,35 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       involve:
       {% for inv in involved %}
       - name: {{  inv.name }}
         type: {{ inv.type}}
-        ref_uuid:{{ inv.uuid }}
+        ref_uuid: {{ inv.uuid }}
       {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
       - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
       - name: {{ cons.name }}
-        ref_uuid : {{ cons.uuid }}
+        ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
       - name: {{  e.name }}
-        ref_uuid : {{ e.uuid }}
+        ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """ 
@@ -1037,7 +1115,7 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       involve:
       {% for inv in involved_items %}
       - name: {{  inv.name }}
@@ -1046,25 +1124,25 @@ class CapellaYAMLHandler:
       {% if allocated_component_exchanges  %}allocated component exchanges:
       {% for excs in allocated_component_exchanges %}
       - name: {{  excs.name }}
-        ref_uuid : {{ excs.uuid }}
+        ref_uuid: {{ excs.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %} 
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-         ref_uuid : {{ apv.uuid }}
+         ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
 
@@ -1073,24 +1151,24 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       value :  {{ value }}
 """
         property_value_group_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }}
+        ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
       - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       property value groups:
@@ -1106,7 +1184,7 @@ class CapellaYAMLHandler:
       {% if constraints %}constraints:
       {% for cons in constraints %}
       - name: {{ cons.name }}
-        ref_uuid : {{ cons.uuid }}
+        ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
         
@@ -1115,28 +1193,26 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
-      is_human : {{ is_human }}
+      description: {{ description }}
+      is_human: {{ is_human }}
       components:
       {% for comp in components %}
-       - component {{ comp.name }}
-         ref_uuid : {{ comp.uuid }}
+       - name: {{ comp.name }}
+         ref_uuid: {{ comp.uuid }}
       {% endfor %}
       functions allocated to:
       {% for func in allocated_functions %}
        - name: {{ func.name }}
-         ref_uuid : {{ func.uuid }}
+         ref_uuid: {{ func.uuid }}
       {% endfor %}
       ports:
       {% for port in ports %}
        - name: {{ port.name }}
-         description :  {{ port.description }}
-         ref_uuid : {{ port.uuid }}
+         ref_uuid: {{ port.uuid }}
          exchanges:
          {% for exchange in port.exchanges %}
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
-            description :  {{ exchange.description }}
             source_component_name: {{ exchange.source_component }}
             ref__uuid: {{ exchange.source_component_uuid }}
             target_component_name: {{ exchange.target_component }}
@@ -1146,31 +1222,31 @@ class CapellaYAMLHandler:
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }}
+        ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
       - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
        - name: {{  e.name }}
-         ref_uuid : {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
       {% if state_machines %}state machines:
       {% for sm in state_machines %}
        - name: {{  sm.name }}
-         ref_uuid : {{ sm.uuid }}
+         ref_uuid: {{ sm.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -1179,47 +1255,47 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
-      is_human : {{ is_human }}
-      is_actor : {{ is_actor }}
+      description: {{ description }}
+      is_human: {{ is_human }}
+      is_actor: {{ is_actor }}
       entities:
       {% for ent in entities %}
        - component {{ ent.name }}
-         ref_uuid : {{ ent.uuid }}
+         ref_uuid: {{ ent.uuid }}
       {% endfor %}
       allocated activities:
       {% for act in allocated_activities %}
        - name: {{ act.name }}
-         ref_uuid : {{ act.uuid }}
+         ref_uuid: {{ act.uuid }}
       {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
       - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
       - name: {{ cons.name }} 
-        ref_uuid : {{ cons.uuid }}
+        ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
        - name: {{  e.name }} 
-         ref_uuid : {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
       {% if state_machines %}state machines:
       {% for sm in state_machines %}
        - name: {{  sm.name }}
-         ref_uuid : {{ sm.uuid }}
+         ref_uuid: {{ sm.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -1227,28 +1303,26 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}} Node 
       primary_uuid: {{ uuid }}
-      description : {{ description }}
-      is_human : {{ is_human }}
+      description: {{ description }}
+      is_human: {{ is_human }}
       components owned:
       {% for comp in components %}
       - component {{ comp.name }}
-        ref_uuid : {{ comp.uuid }}
+        ref_uuid: {{ comp.uuid }}
       {% endfor %}
       behavior components deployed to:
       {% for dc in deployed_components %}
       - deployed_behavior_component {{ dc.name }}
-        ref_uuid : {{ dc.uuid }}
+        ref_uuid: {{ dc.uuid }}
       {% endfor %}
       physical ports:
       {% for physical_port in physical_ports %}
        - name: {{ physical_port.name }}
-         description :  {{ physical_port.description }}
-         ref_uuid : {{ physical_port.uuid }}
+         ref_uuid: {{ physical_port.uuid }}
          links:
          {% for link in physical_port.links %}
           - name: {{ link.name }}
             ref_uuid:  {{ link.uuid }}
-            description :  {{ link.description }}
             source_component_name: {{ link.source_component }}
             ref__uuid: {{ link.source_component_uuid }}
             target_component_name: {{ link.target_component }}
@@ -1258,25 +1332,25 @@ class CapellaYAMLHandler:
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
-        ref_uuid : {{ apvg.uuid }}
+        ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-         ref_uuid : {{ apv.uuid }}
+         ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
       - name: {{  e.name }}
-        ref_uuid : {{ e.uuid }}
+        ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -1285,25 +1359,23 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       allocated from :
       - name : {{owner_name}}
-        ref_uuid : {{owner_uuid}}
+        ref_uuid: {{owner_uuid}}
       functions owned:
       {% for func in child_functions %}
        - name: {{ func.name }}
-         ref_uuid : {{ func.uuid }}
+         ref_uuid: {{ func.uuid }}
       {% endfor %}  
       inputs:
       {% for port in inputs %}
        - name: {{ port.name }}
-         description :  {{ port.description }}
-         ref_uuid : {{ port.uuid }}
+         ref_uuid: {{ port.uuid }}
          exchanges:
          {% for exchange in port.exchanges %}
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
-            description :  {{ exchange.description }} 
             source_function_name: {{ exchange.source_component }}
             ref_uuid: {{ exchange.source_component_uuid }}
             target_function_name: {{ exchange.target_component }}
@@ -1313,13 +1385,11 @@ class CapellaYAMLHandler:
       outputs:
       {% for port in outputs %}
       - name: {{ port.name }}
-        description :  {{ port.description }}
-        ref_uuid : {{ port.uuid }}
+        ref_uuid: {{ port.uuid }}
         exchanges:
         {% for exchange in port.exchanges %}
          - name: {{ exchange.name }}
            ref_uuid:  {{ exchange.uuid }}
-           description :  {{ exchange.description }}
            source_function_name: {{ exchange.source_component }}
            ref_uuid: {{ exchange.source_component_uuid }}
            target_function_name: {{ exchange.target_component }}
@@ -1329,25 +1399,25 @@ class CapellaYAMLHandler:
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-        ref_uuid : {{ apv.uuid }}
+        ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
       - name: {{ cons.name }}
-        ref_uuid : {{ cons.uuid }}
+        ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
        - name: {{  e.name }}         
-         ref_uuid : {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
        {% endfor %}
        {% endif %}
 """
@@ -1356,25 +1426,23 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
-      owner :
+      description: {{ description }}
+      owner:
       - name : {{owner_name}}
-        ref_uuid : {{owner_uuid}}
+        ref_uuid: {{owner_uuid}}
       activities owned:
       {% for act in child_activities %}
        - name: {{ act.name }}
-         ref_uuid : {{ act.uuid }}
+         ref_uuid: {{ act.uuid }}
       {% endfor %}
       inputs to:
       {% for port in inputs %}
        - name: {{ port.name }}
-         description :  {{ port.description }}
-         ref_uuid : {{ port.uuid }}
+         ref_uuid: {{ port.uuid }}
          exchanges:
          {% for exchange in port.exchanges %}
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
-            description :  {{ exchange.description }}
             source_function_name: {{ exchange.source_component }}
             ref_uuid: {{ exchange.source_component_uuid }}
             target_function_name: {{ exchange.target_component }}
@@ -1384,13 +1452,11 @@ class CapellaYAMLHandler:
       outputs from:
       {% for port in outputs %}
        - name: {{ port.name }}
-         description :  {{ port.description }}
-         ref_uuid : {{ port.uuid }}
+         ref_uuid: {{ port.uuid }}
          exchanges:
          {% for exchange in port.exchanges %}
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
-            description :  {{ exchange.description }}
             source_function_name: {{ exchange.source_component }}
             ref_uuid: {{ exchange.source_component_uuid }}
             target_function_name: {{ exchange.target_component }}
@@ -1400,25 +1466,25 @@ class CapellaYAMLHandler:
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-         ref_uuid : {{ apv.uuid }}
+         ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
        - name: {{  e.name }}
-         ref_uuid : {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -1427,59 +1493,59 @@ class CapellaYAMLHandler:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description : {{ description }}
+      description: {{ description }}
       {% if includes_capabilities %}included capability:
       {% for obj in includes_capabilities %}
        - name: {{ obj.name }}
-         ref_uuid : {{ obj.uuid }}
+         ref_uuid: {{ obj.uuid }}
       {% endfor %}
       {% endif %}
       {% if extended_capabilities %}extended capability:
       {% for obj in extended_capabilities %}
        - name: {{ obj.name }}
-         ref_uuid : {{ obj.uuid }}
+         ref_uuid: {{ obj.uuid }}
       {% endfor %}
       {% endif %}
       {% if involved_activities %}involved activity:
       {% for obj in involved_activities %}
        - name: {{ obj.name }}
-         ref_uuid : {{ obj.uuid }}
+         ref_uuid: {{ obj.uuid }}
       {% endfor %}
       {% endif %}
       {% if involved_entities %}involved entity or actor:
       {% for obj in  involved_entities %}
        - name: {{ obj.name }}
-         ref_uuid : {{ obj.uuid }}
+         ref_uuid: {{ obj.uuid }}
       {% endfor %}
       {% endif %}
       {% if involved_operational_processes %}involved operational process:
       {% for obj in involved_operational_processes %}
        - name: {{ obj.name }}
-         ref_uuid : {{ obj.uuid }}
+         ref_uuid: {{ obj.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
-         ref_uuid : {{ apvg.uuid }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
-         ref_uuid : {{ apv.uuid }}
+         ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
-         ref_uuid : {{ cons.uuid }}
+         ref_uuid: {{ cons.uuid }}
       {% endfor %}
         {% endif %}
         {% if exchanges %}exchanges:
         {% for excs in exchanges %}
           - name: {{  e.name }}
-            ref_uuid : {{ e.uuid }}
+            ref_uuid: {{ e.uuid }}
         {% endfor %}
         {% endif %}
 """
@@ -1516,7 +1582,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(logical_component_template)
-
+            data["description"] = sanitize_description_images(data["description"], img_dir)
  
             self.yaml_content = self.yaml_content + template.render(data)
 
@@ -1545,7 +1611,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(entity_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
         # Build the data for the YAML generation      
@@ -1567,7 +1633,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(functional_chain_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
 
@@ -1607,6 +1673,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(function_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             
  
@@ -1643,7 +1710,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(activity_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 # Build the data for the YAML generation
 
@@ -1669,7 +1736,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(oc_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 # Build the data for the YAML generation
         
@@ -1697,7 +1764,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(interaction_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)        
         elif obj.__class__.__name__ ==  "FunctionalExchange" : 
             #print(obj)
@@ -1723,7 +1790,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(function_exchange_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
         elif obj.__class__.__name__ ==  "ComponentExchange" : 
             data = {
@@ -1748,7 +1815,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(component_exchange_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
         elif obj.__class__.__name__ ==  "PhysicalLink" : 
@@ -1775,7 +1842,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(physical_link_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
         elif obj.__class__.__name__ ==  "PhysicalPath" : 
@@ -1798,7 +1865,7 @@ class CapellaYAMLHandler:
             # Render the template
             template = Template(physicalpath_template)
 
- 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
              
@@ -1831,6 +1898,7 @@ class CapellaYAMLHandler:
         
                 # Render the template
                 template = Template(node_component_template)
+                data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
                 
                
@@ -1860,10 +1928,30 @@ class CapellaYAMLHandler:
         
                 # Render the template
                 template = Template(logical_component_template)
+                data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
                 
               
-
+        elif obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort":  
+                data = {
+                "type" : obj.__class__.__name__,
+                "owner_name": obj.owner.name if obj.parent else None,                
+                "owner_uuid": obj.owner.uuid if obj.parent else None,
+                "name": obj.name,
+                "uuid" : obj.uuid,
+                "description" :obj.description,
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                }
+        
+                # Add referenced objects for expansion
+                self._track_referenced_objects(obj)
+        
+                # Render the template
+                template = Template(port_template)
+                data["description"] = sanitize_description_images(data["description"], img_dir)
+                self.yaml_content = self.yaml_content + template.render(data)
 
                 
         elif obj.__class__.__name__ ==  "StringPropertyValue"  or obj.__class__.__name__ ==  "FloatPropertyValue":    
@@ -1887,6 +1975,7 @@ class CapellaYAMLHandler:
             template = Template(property_value_template)
             #print(template)
             #print(data)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content +  template.render(data)
             
           
@@ -1912,6 +2001,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(property_value_group_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             
         elif obj.__class__.__name__ ==  "StateMachine" :   
@@ -1943,6 +2033,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(state_machine_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
         elif obj.__class__.__name__ ==  "State" :  
@@ -1969,6 +2060,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(state_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)           
         elif obj.__class__.__name__ ==  "InitialPseudoState" :    
             data = {
@@ -1990,6 +2082,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(psusdo_state_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)           
 
         
@@ -2019,6 +2112,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(transition_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)           
                       
         elif obj.__class__.__name__ ==  "ExchangeItem" :   
@@ -2040,6 +2134,7 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(exchangeitem_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)    
             self.yaml_content = self.yaml_content + template.render(data)           
 
         elif obj.__class__.__name__ ==  "ExchangeItemElement" :   
@@ -2063,7 +2158,9 @@ class CapellaYAMLHandler:
     
             # Render the template
             template = Template(exchangeitemelement_template)
-            self.yaml_content = self.yaml_content + template.render(data)    
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)     
+   
         elif obj.__class__.__name__ ==  "Traceability_Artifact" :   
             #print("This is a Pub4C Artifact",obj)   
             data = {
@@ -2076,6 +2173,7 @@ class CapellaYAMLHandler:
             }
             # Render the template
             template = Template( Traceability_artifact)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             
 
@@ -2091,6 +2189,7 @@ class CapellaYAMLHandler:
             # Render the template
             self._track_referenced_objects(obj)
             template = Template(diagram)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)     
 
         elif obj.__class__.__name__ ==  "Part" : 
@@ -2108,12 +2207,13 @@ class CapellaYAMLHandler:
             # Render the template
             self._track_referenced_objects(obj)
             template = Template(part)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)                     
 
 
         else :
             #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processiong.")
-            #print(obj)
+            print(obj)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": getattr(obj, "name", None), # Safe access to name
@@ -2134,6 +2234,7 @@ class CapellaYAMLHandler:
             }
             # Render the template
             template = Template(default_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
         
