@@ -795,7 +795,7 @@ model:
 """     
         state_machine_template = """
     - name: {{ name }}
-      type:{{type}} 
+      type: {{type}} 
       primary_uuid: {{ uuid }}
       description: {{ description }}
       regions:
