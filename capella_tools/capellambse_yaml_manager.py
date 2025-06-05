@@ -825,36 +825,36 @@ model:
       type: {{ type }}
       primary_uuid: {{ uuid }}
       description: {{ description }}
-      outgoing transitions:
       {% if outgoing_transitions %}
+      outgoing transitions:
         {% for og in outgoing_transitions %}
         - name: {{ og.name }}
           ref_uuid: {{ og.uuid }}
         {% endfor %}
       {% endif %}
-      incoming transitions:
       {% if incoming_transitions %}
+      incoming transitions:
         {% for inc in incoming_transitions %}
         - name: {{ inc.name }}
           ref_uuid: {{ inc.uuid }}
         {% endfor %}
       {% endif %}
-      do functions:
       {% if do_activity %}
+      do functions:
         {% for da in do_activity %}
         - name: {{ da.name }}
           ref_uuid: {{ da.uuid }}
         {% endfor %}
       {% endif %}
-      entry functions:
       {% if entries %}
+      entry functions:
         {% for en in entries %}
         - name: {{ en.name }}
           ref_uuid: {{ en.uuid }}
         {% endfor %}
       {% endif %}
-      exits functions:
       {% if exits %}
+      exits functions:
         {% for ex in exits %}
         - name: {{ ex.name }}
           ref_uuid: {{ ex.uuid }}
@@ -866,8 +866,8 @@ model:
       type: {{ type }}
       primary_uuid: {{ uuid }}
       description: {{ description }}
-      outgoing transitions:
       {% if outgoing_transitions %}
+      outgoing transitions:
         {% for og in outgoing_transitions %}
         - name: {{ og.name }}
           ref_uuid: {{ og.uuid }}
@@ -881,8 +881,8 @@ model:
       primary_uuid: {{ uuid }}
       description: {{ description }}
       guard: {{ guard }}
-      triggers:
       {% if triggers %}
+      triggers:
         {% for t in triggers %}
         - name: {{ t.name }}
           ref_uuid: {{ t.uuid }}
@@ -894,8 +894,8 @@ model:
       destination state:
         - name: {{ dest_name }}
           ref_uuid: {{ dest_uuid }}
-      after functions:
       {% if effects %}
+      after functions:
         {% for ef in effects %}
         - name: {{ ef.name }}
           ref_uuid: {{ ef.uuid }}
