@@ -859,6 +859,7 @@ model:
         - name: {{ ex.name }}
           ref_uuid: {{ ex.uuid }}
         {% endfor %}
+       {% endif %}
 """    
         psusdo_state_template = """
     - name: {{ name }}
