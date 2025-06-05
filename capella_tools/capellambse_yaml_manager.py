@@ -731,14 +731,14 @@ model:
         ref_uuid: {{ abstract_type_uuid }}
       {% if applied_property_value_groups %} applied property value groups:
       {% for apvg in applied_property_value_groups %}
-      - name: {{ apvg.name }}
-        ref_uuid: {{ apvg.uuid }}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %} applied property values:
       {% for apv in applied_property_values %}
-      - name: {{ apv.name }}
-        ref_uuid: {{ apv.uuid }}
+       - name: {{ apv.name }}
+         ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
       {% if constraints %} constraints:
@@ -766,9 +766,9 @@ model:
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
-        {% for apv in applied_property_values %}
-        - name: {{ apv.name }}
-        ref_uuid: {{ apv.uuid }}
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid: {{ apv.uuid }}
         {% endfor %}
       {% endif %}
       {% if constraints %}constraints:
@@ -799,46 +799,62 @@ model:
       primary_uuid: {{ uuid }}
       description: {{ description }}
       regions:
-      {% for region in regions %}
-      - name: "{{ region.name }}"
-        states:
-        {% for state in region.states %}
-         - name: "{{ state.name }}"
-           ref_uuid: {{ state.uuid }}
+      {% if regions %}
+        {% for region in regions %}
+        - name: "{{ region.name }}"
+          states:
+          {% if region.states %}
+            {% for state in region.states %}
+            - name: "{{ state.name }}"
+              ref_uuid: {{ state.uuid }}
+            {% endfor %}
+          {% endif %}
+          transitions:
+          {% if region.transitions %}
+            {% for transition in region.transitions %}
+            - name: "{{ transition.name }}"
+              ref_uuid: {{ transition.uuid }}
+            {% endfor %}
+          {% endif %}
         {% endfor %}
-        transitions:
-        {% for transition in region.transitions %}
-         - name: "{{ transition.name }}"
-           ref_uuid: {{ transition.uuid }}
-        {% endfor %}
-      {% endfor %}
+      {% endif %}
+
 """     
         state_template = """
     - name: {{ name }}
-      type: {{type}}
+      type: {{ type }}
       primary_uuid: {{ uuid }}
       description: {{ description }}
-      outgoing transtions:
+      outgoing transitions:
+      {% if outgoing_transitions %}
         {% for og in outgoing_transitions %}
         - name: {{ og.name }}
           ref_uuid: {{ og.uuid }}
         {% endfor %}
-      incoming transtions:
+      {% endif %}
+      incoming transitions:
+      {% if incoming_transitions %}
         {% for inc in incoming_transitions %}
         - name: {{ inc.name }}
           ref_uuid: {{ inc.uuid }}
         {% endfor %}
+      {% endif %}
       do functions:
+      {% if do_activity %}
         {% for da in do_activity %}
         - name: {{ da.name }}
           ref_uuid: {{ da.uuid }}
         {% endfor %}
+      {% endif %}
       entry functions:
+      {% if entries %}
         {% for en in entries %}
         - name: {{ en.name }}
           ref_uuid: {{ en.uuid }}
         {% endfor %}
+      {% endif %}
       exits functions:
+      {% if exits %}
         {% for ex in exits %}
         - name: {{ ex.name }}
           ref_uuid: {{ ex.uuid }}
@@ -846,14 +862,16 @@ model:
 """    
         psusdo_state_template = """
     - name: {{ name }}
-      type: {{type}}
+      type: {{ type }}
       primary_uuid: {{ uuid }}
       description: {{ description }}
-      outgoing transtions:
+      outgoing transitions:
+      {% if outgoing_transitions %}
         {% for og in outgoing_transitions %}
         - name: {{ og.name }}
           ref_uuid: {{ og.uuid }}
         {% endfor %}
+      {% endif %}
 """   
         
         transition_template = """
