@@ -877,26 +877,30 @@ model:
         
         transition_template = """
     - name: {{ name }}
-      type: {{type}}
+      type: {{ type }}
       primary_uuid: {{ uuid }}
       description: {{ description }}
       guard: {{ guard }}
       triggers:
+      {% if triggers %}
         {% for t in triggers %}
         - name: {{ t.name }}
           ref_uuid: {{ t.uuid }}
         {% endfor %}
-        source state:
+      {% endif %}
+      source state:
         - name: {{ source_name }}
           ref_uuid: {{ source_uuid }}
-        destination state:
-          - name: {{ dest_name }}
-            ref_uuid: {{ dest_uuid }}
-        after functions:
+      destination state:
+        - name: {{ dest_name }}
+          ref_uuid: {{ dest_uuid }}
+      after functions:
+      {% if effects %}
         {% for ef in effects %}
-            - name: {{ ef.name }}
-              ref_uuid: {{ ef.uuid }}
+        - name: {{ ef.name }}
+          ref_uuid: {{ ef.uuid }}
         {% endfor %}
+      {% endif %}
 """  
         interaction_template = """
     - name: {{ name }}
