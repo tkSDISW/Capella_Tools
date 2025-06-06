@@ -756,7 +756,7 @@ model:
       {% if elements %}elements of:
       {% for e in elements %}
        - name: {{ e.name }}
-        ref_uuid: {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
