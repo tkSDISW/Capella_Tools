@@ -729,19 +729,19 @@ model:
       abstract type of: 
       - name: {{ abstract_type_name }}
         ref_uuid: {{ abstract_type_uuid }}
-      {% if applied_property_value_groups %} applied property value groups:
+      {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
          ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
-      {% if applied_property_values %} applied property values:
+      {% if applied_property_values %}applied property values:
       {% for apv in applied_property_values %}
        - name: {{ apv.name }}
          ref_uuid: {{ apv.uuid }}
       {% endfor %}
       {% endif %}
-      {% if constraints %} constraints:
+      {% if constraints %}constraints:
       {% for cons in constraints %}
        - name: {{ cons.name }}
          ref_uuid: {{ cons.uuid }}
@@ -755,14 +755,14 @@ model:
       description: {{ description }}
       {% if elements %}elements of:
       {% for e in elements %}
-      - name: {{ e.name }}
+       - name: {{ e.name }}
         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
-      - name: {{ apvg.name }}
-        ref_uuid: {{ apvg.uuid }}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
@@ -1017,7 +1017,7 @@ model:
             ref_uuid: {{ apvg.uuid }}
         {% endfor %}
         {% endif %}
-      {% if exchanges_items %} allocated exchanges items:
+      {% if exchanges_items %}allocated exchanges items:
       {% for ei in exchange_items %}
       - name: {{  ei.name }}
         ref_uuid: {{ ei.uuid }}
