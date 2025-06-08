@@ -99,37 +99,51 @@ class ChatGPTAnalyzer:
             "content": f"File `{filepath}` was added for analysis:\n---\n{content}\n---"
         })
         print(f"✅ File `{filepath}` added to messages for analysis.")
-
+        
     def get_response(self):
-        token_usage_info = ""
+        """Send messages to ChatGPT and get a response with separate token usage info."""
         try:
             client = OpenAI(api_key=self.api_key)
             response = client.chat.completions.create(
-                
                 messages=self.messages,
                 model="gpt-4o",
-                stream=False
             )
-            usage = response.usage
-            if usage:
-                token_usage_info = f"_Tokens used: prompt={usage.prompt_tokens}, completion={usage.completion_tokens}, total={usage.total_tokens}_"
             assistant_message = response.choices[0].message.content
+            usage = response.usage
+            token_usage_info = (
+                f"Tokens used: prompt={usage.prompt_tokens}, "
+                f"completion={usage.completion_tokens}, total={usage.total_tokens}"
+            ) if usage else "Token usage unavailable."
+    
             self.messages.append({"role": "assistant", "content": assistant_message})
+            
+            # Strip unwanted code fences
             if assistant_message.startswith("```html"):
                 assistant_message = assistant_message[7:]
             if assistant_message.endswith("```"):
                 assistant_message = assistant_message[:-3]
+    
+            # Clean up with BeautifulSoup
             soup = BeautifulSoup(assistant_message, "html.parser")
             for tag in soup(["script", "style"]):
                 tag.decompose()
-            assistant_message = str(soup) + token_usage_info
-            if "<table" in assistant_message or "<html" in assistant_message:
-                display(HTML(assistant_message))
+    
+            assistant_message_cleaned = str(soup)
+    
+            # Display response and then token usage separately
+            if "<table" in assistant_message_cleaned or "<html" in assistant_message_cleaned:
+                display(HTML(assistant_message_cleaned))
             else:
-                display(Markdown(f"**ChatGPT Response:**\n\n{assistant_message}\n"))
-            return assistant_message
+                display(Markdown(f"**ChatGPT Response:**\n\n{assistant_message_cleaned}"))
+    
+            # Display token info separately
+            display(Markdown(f"**Token Usage Info:**\n\n{token_usage_info}"))
+    
+            return assistant_message_cleaned
+    
         except Exception as e:
             return f"Error communicating with OpenAI API: {e}"
+    
 
     def generate_pyvis_graph_from_relations(self, relations, output_file="graph.html"):
         net = Network(height="750px", width="100%", directed=True, notebook=True, cdn_resources="in_line")
