@@ -209,6 +209,7 @@ model:
             for sm in obj.state_machines:
                 if sm not in self.referenced_objects:
                     self.referenced_objects.append(sm)
+                    
         if obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "NODE":  
             for dc in getattr(obj, "deployed_components", []):  # Ensure it's iterable
                 if hasattr(dc, "name") and hasattr(dc, "uuid"):  # Avoid AttributeError
@@ -257,6 +258,11 @@ model:
                 for con in obj.constraints:
                     if con not in self.referenced_objects:
                         self.referenced_objects.append(con)
+        if obj.__class__.__name__  ==  "Requirement" :  
+            for rel in obj.relations:
+                    if rel not in self.referenced_objects:
+                        self.referenced_objects.append(rel)
+                
         if obj.__class__.__name__ ==  "LogicalFunction" or obj.__class__.__name__ ==  "SystemFunction" or obj.__class__.__name__ ==  "PhysicalFunction":
             if obj.owner not in self.referenced_objects:
                     self.referenced_objects.append(obj.owner)
@@ -591,10 +597,11 @@ model:
         if obj.__class__.__name__ ==  "Part" :
             if obj.type not in self.referenced_objects:
                 self.referenced_objects.append(obj.type)
+                
         if obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort":   
             if obj.owner not in self.referenced_objects:
                 self.referenced_objects.append(obj.owner)
-    
+               
     def generate_yaml(self, obj):
         
 
@@ -640,7 +647,7 @@ model:
     - name: '{{ name }}'
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       nodes or element :
       {% for n in nodes %}
       - name: {{ n.name }}
@@ -651,7 +658,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       reference object  :
       - name: {{ type_name }}
         ref_uuid: {{ type_uuid }}
@@ -661,7 +668,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       owner:
         name: {{ owner_name }}
         ref_uuid: {{ owner_uuid }}
@@ -695,7 +702,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
@@ -717,42 +724,51 @@ model:
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
        - name: {{  e.name }}
-        ref_uuid: {{ e.uuid }}
+         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
-        exchangeitemelement_template = """
-    - name: {{ name }}
+
+
+        Requirement_template = """
+    - name: {{ long_name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
-      abstract type of: 
-      - name: {{ abstract_type_name }}
-        ref_uuid: {{ abstract_type_uuid }}
-      {% if applied_property_value_groups %}applied property value groups:
-      {% for apvg in applied_property_value_groups %}
-       - name: {{ apvg.name }}
-         ref_uuid: {{ apvg.uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      short name: {{ name }}
+      prefix: {{ prefix }}
+      chapter name: {{ chapter_name }}
+      type:
+        - name:  {{ type_name }}
+          ref_uuid: {{ type_uuid }}
+      {% if relations %}relations:
+      {% for rels in relations %}
+       - name: {{  rels.name }}
+         ref_uuid: {{ rels.uuid }}
       {% endfor %}
       {% endif %}
-      {% if applied_property_values %}applied property values:
-      {% for apv in applied_property_values %}
-       - name: {{ apv.name }}
-         ref_uuid: {{ apv.uuid }}
-      {% endfor %}
-      {% endif %}
-      {% if constraints %}constraints:
-      {% for cons in constraints %}
-       - name: {{ cons.name }}
-         ref_uuid: {{ cons.uuid }}
-      {% endfor %}
-      {% endif %}
+"""
+        CapellaOutgoingRelation_template = """    
+    - name: {{ long_name if long_name.strip() else type_name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      short name: {{ name }}
+      type:
+        - name: {{ type_name }}
+          ref_uuid: {{ type_uuid }}
+      source:
+       - name: {{ source_name }}
+         ref_uuid: {{ source_uuid }}
+      target:
+       - name: {{ target_name }}
+         ref_uuid: {{ target_uuid }}
 """
         exchangeitem_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       {% if elements %}elements of:
       {% for e in elements %}
        - name: {{ e.name }}
@@ -797,7 +813,7 @@ model:
     - name: {{ name }}
       type: {{type}} 
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       regions:
       {% if regions %}
         {% for region in regions %}
@@ -824,7 +840,7 @@ model:
     - name: {{ name }}
       type: {{ type }}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       {% if outgoing_transitions %}
       outgoing transitions:
         {% for og in outgoing_transitions %}
@@ -865,7 +881,7 @@ model:
     - name: {{ name }}
       type: {{ type }}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       {% if outgoing_transitions %}
       outgoing transitions:
         {% for og in outgoing_transitions %}
@@ -879,7 +895,7 @@ model:
     - name: {{ name }}
       type: {{ type }}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       guard: {{ guard }}
       {% if triggers %}
       triggers:
@@ -906,7 +922,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       source activity:
           - name: {{ source_activity }}
             ref_uuid: {{ source_activity_uuid }}
@@ -954,7 +970,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       source function or activity port:
       - name: {{ source_function }}
         ref_uuid: {{ source_function_uuid }}
@@ -1004,7 +1020,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       source component:
       - name: {{ source_component }}
         ref_uuid: {{ source_component_uuid }}
@@ -1052,7 +1068,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       {% if physical_paths %}involving physical_paths:
       {% for pp in physical_paths %}
        - name: {{ pp.name }}
@@ -1102,7 +1118,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       involve:
       {% for inv in involved %}
       - name: {{  inv.name }}
@@ -1138,11 +1154,11 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       involve:
       {% for inv in involved_items %}
       - name: {{  inv.name }}
-        ref_uuid: uuid : {{ inv.uuid }}
+        ref_uuid: {{ inv.uuid }}
       {% endfor %}
       {% if allocated_component_exchanges  %}allocated component exchanges:
       {% for excs in allocated_component_exchanges %}
@@ -1174,14 +1190,14 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       value :  {{ value }}
 """
         property_value_group_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
       - name: {{ apvg.name }}
@@ -1216,7 +1232,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       is_human: {{ is_human }}
       components:
       {% for comp in components %}
@@ -1278,7 +1294,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       is_human: {{ is_human }}
       is_actor: {{ is_actor }}
       entities:
@@ -1326,17 +1342,17 @@ model:
     - name: {{ name }}
       type: {{type}} Node 
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       is_human: {{ is_human }}
       components owned:
       {% for comp in components %}
-      - component {{ comp.name }}
-        ref_uuid: {{ comp.uuid }}
+       - name: {{ comp.name }}
+         ref_uuid: {{ comp.uuid }}
       {% endfor %}
       behavior components deployed to:
       {% for dc in deployed_components %}
-      - deployed_behavior_component {{ dc.name }}
-        ref_uuid: {{ dc.uuid }}
+       - name: {{ dc.name }}
+         ref_uuid: {{ dc.uuid }}
       {% endfor %}
       physical ports:
       {% for physical_port in physical_ports %}
@@ -1354,8 +1370,8 @@ model:
         {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
-      - name: {{ apvg.name }}
-        ref_uuid: {{ apvg.uuid }}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
@@ -1372,8 +1388,8 @@ model:
       {% endif %}
       {% if exchanges %}exchanges:
       {% for excs in exchanges %}
-      - name: {{  e.name }}
-        ref_uuid: {{ e.uuid }}
+       - name: {{  e.name }}
+         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -1382,9 +1398,9 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       allocated from :
-      - name : {{owner_name}}
+      - name: {{owner_name}}
         ref_uuid: {{owner_uuid}}
       functions owned:
       {% for func in child_functions %}
@@ -1407,16 +1423,16 @@ model:
         {% endfor %}
       outputs:
       {% for port in outputs %}
-      - name: {{ port.name }}
-        ref_uuid: {{ port.uuid }}
-        exchanges:
-        {% for exchange in port.exchanges %}
-         - name: {{ exchange.name }}
-           ref_uuid:  {{ exchange.uuid }}
-           source_function_name: {{ exchange.source_component }}
-           ref_uuid: {{ exchange.source_component_uuid }}
-           target_function_name: {{ exchange.target_component }}
-           ref_uuid: {{ exchange.target_component_uuid }}
+       - name: {{ port.name }}
+         ref_uuid: {{ port.uuid }}
+         exchanges:
+         {% for exchange in port.exchanges %}
+          - name: {{ exchange.name }}
+            ref_uuid:  {{ exchange.uuid }}
+            source_function_name: {{ exchange.source_component }}
+            ref_uuid: {{ exchange.source_component_uuid }}
+            target_function_name: {{ exchange.target_component }}
+            ref_uuid: {{ exchange.target_component_uuid }}
         {% endfor %}
       {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
@@ -1449,10 +1465,10 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       owner:
-      - name : {{owner_name}}
-        ref_uuid: {{owner_uuid}}
+       - name: {{owner_name}}
+         ref_uuid: {{owner_uuid}}
       activities owned:
       {% for act in child_activities %}
        - name: {{ act.name }}
@@ -1516,7 +1532,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: {{ description }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
       {% if includes_capabilities %}included capability:
       {% for obj in includes_capabilities %}
        - name: {{ obj.name }}
@@ -1955,7 +1971,8 @@ model:
                 self.yaml_content = self.yaml_content + template.render(data)
                 
               
-        elif obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort":  
+        elif obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort": 
+
                 data = {
                 "type" : obj.__class__.__name__,
                 "owner_name": obj.owner.name if obj.parent else None,                
@@ -2200,7 +2217,7 @@ model:
             
 
         elif obj.__class__.__name__ ==  "Diagram" :   
-   
+
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
@@ -2223,7 +2240,8 @@ model:
                 "description" :obj.description,
                 "uuid":obj.uuid,
                 "type_name":obj.type.name,
-                "type_uuid":obj.type.uuid,
+                "type_uuid":obj.type.uuid
+
                 
             }
             # Render the template
@@ -2232,9 +2250,48 @@ model:
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)                     
 
+        elif obj.__class__.__name__ ==  "Requirement" : 
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "long_name": obj.long_name,
+                "prefix": obj.prefix,
+                "chapter_name" : obj.chapter_name,    
+                "description" : obj.description,
+                "uuid": obj.uuid,
+                "type_name": obj.type.long_name,
+                "type_uuid": obj.type.uuid,
+                "relations": [{"name": r.name , "uuid": r.uuid} for r in obj.relations]            
+            }
+            # Render the template
+            self._track_referenced_objects(obj)
+            template = Template(Requirement_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data) 
+            
+        elif obj.__class__.__name__ ==  "CapellaOutgoingRelation" : 
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,  
+                "long_name": obj.long_name,   
+                "description" :obj.description,
+                "uuid":obj.uuid,
+                "source_name":  obj.source.long_name,
+                "source_uuid":  obj.source.uuid,
+                "target_name":  obj.target.name,
+                "target_uuid":  obj.target.uuid,
+                "type_name": obj.type.long_name,
+                "type_uuid": obj.type.uuid
+            }
+            # Render the template
+            self._track_referenced_objects(obj)
+            template = Template(CapellaOutgoingRelation_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data) 
 
         else :
-            #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processiong.")
+            #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processing.")
+
             data = {
                 "type" : obj.__class__.__name__,
                 "name": getattr(obj, "name", None), # Safe access to name

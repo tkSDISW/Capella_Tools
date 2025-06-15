@@ -34,7 +34,7 @@ def get_api_key():
         raise ValueError("API Key file is empty. Provide a valid API key.")
 
     return api_key
-
+    
 
 class EmbeddingManager :
     def __init__(self):
@@ -69,21 +69,39 @@ class EmbeddingManager :
 
     def is_embedding_up_to_date(self):
         """Checks if the embedding file exists and is up to date with the model."""
-        
+        aird_file = self.model_file
+        base = Path(aird_file).with_suffix("")  # Strip .aird
+        capella_file = base.with_suffix(".capella")
+        afm_file = base.with_suffix(".afm")    
         # ✅ Ensure embedding file exists before accessing it
         if not os.path.exists(self.embedding_file):
             print("❌ Embedding file not found. A new one will be created.")
             return False
-    
-        if not os.path.exists(self.model_file):
-            print("❌ Model file not found. Check the file path.")
+        if not os.path.exists(aird_file):
+            print("❌ Model .aird file not found. Check the file path.")
+            return False
+        if not os.path.exists(afm_file):
+            print("❌ Model .afm file not found. Check the file path.")
+            return False
+        if not os.path.exists(capella_file):
+            print("❌ Modle .capella file not found. Check the file path.")
             return False
     
         # ✅ Compare timestamps only if both files exist
-        model_time = os.path.getmtime(self.model_file)
+        aird_file = self.model_file
+        base = Path(aird_file).with_suffix("")  # Strip .aird
+        capella_file = base.with_suffix(".capella")
+        afm_file = base.with_suffix(".afm")
         embedding_time = os.path.getmtime(self.embedding_file)
+        for related_file in (aird_file,capella_file, afm_file):
+            related_time = os.path.getmtime(related_file)
+            if related_time > embedding_time:
+                return False  # One of the files is newer than .aird
+
+        return True  # .aird is at least as recent as .capella and .afm
+
+
     
-        return embedding_time >= model_time
     
     def generate_object_embeddings(self, objects):
         for obj in objects:
@@ -97,6 +115,43 @@ class EmbeddingManager :
         return objects
 
     def create_model_embeddings(self, model) :
+        def get_project_requirements(model):
+            """ Get all requirement not located in a phase and created by TC requirement integration"""
+            all_requirements = []
+            
+            def collect_requirements(module):
+                """Recursively collect all requirements from a CapellaModuprintle."""
+                #print(module)
+                if hasattr(module, "requirements"):
+                    for req in module.requirements:
+                        all_requirements.append(req)
+            
+                if hasattr(module, "owned_modules"):
+                    for submodule in module.owned_modules:
+                        collect_requirements(submodule)
+            
+                if hasattr(module, "folders"):
+                    for folder in module.folders:
+                        collect_requirements(folder)
+            
+            
+            # Search through all extensions in the project
+            for ext in model.project.model_root.extensions:
+                for subext in getattr(ext, "extensions", []):
+                    if getattr(subext, "xtype", "") == "CapellaRequirements:CapellaModule":
+                        collect_requirements(subext)
+            return all_requirements
+
+        def get_req_info(object, phase ) :
+            object_info = {
+                    "uuid": object.uuid,
+                    "name": object.long_name,
+                    "type": type(object).__name__,
+                    "phase" : phase,
+                    "source_component": "",
+                    "target_component": "" 
+                }
+            return object_info
         
         def get_object_info(object, phase ) :
             object_info = {
@@ -108,6 +163,8 @@ class EmbeddingManager :
                     "target_component": "" 
                 }
             return object_info
+
+        
         def get_physical_component_info(object, phase ) :
             object_info = {
                     "uuid": object.uuid,
@@ -157,8 +214,15 @@ class EmbeddingManager :
         else : 
             print("Creating Embeddings")
             object_data = []
-            #OA  
+            phase = "Project"
+            for component in get_project_requirements(model):  
+                object_info = get_req_info(component,phase)
+                add_unique_object(object_data,object_info)
+            #OA 
             phase = "Operational Analysis OA"
+            for component in model.oa.all_requirements:  
+                object_info = get_req_info(component,phase)
+                add_unique_object(object_data,object_info)
             for component in model.oa.all_entities:  
                 object_info = get_object_info(component,phase)
                 add_unique_object(object_data,object_info)
@@ -179,6 +243,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             #SA
             phase = "System Analysis SA"
+            for component in model.oa.all_requirements:  
+                object_info = get_req_info(component,phase)
+                add_unique_object(object_data,object_info)
             for component in model.sa.all_components: 
                 object_info = get_object_info(component,phase)
                 add_unique_object(object_data,object_info)
@@ -202,6 +269,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             #LA
             phase = "Logical Architecture LA"
+            for component in model.oa.all_requirements:  
+                object_info = get_req_info(component,phase)
+                add_unique_object(object_data,object_info) 
             for obj in model.la.all_capabilities:  
                 object_info = get_object_info(obj,phase)
                 add_unique_object(object_data,object_info)
@@ -228,6 +298,9 @@ class EmbeddingManager :
                 add_unique_object(object_data,object_info)
             #PA
             phase = "Physical Architecture PA"
+            for component in model.oa.all_requirements:  
+                object_info = get_req_info(component,phase)
+                add_unique_object(object_data,object_info) 
             for component in model.pa.all_components:  
                 object_info = get_physical_component_info(component,phase)
                 add_unique_object(object_data,object_info)
