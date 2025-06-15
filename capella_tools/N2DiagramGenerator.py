@@ -118,7 +118,6 @@ class N2DiagramGenerator:
             print(f"⚠️ No {self.mode} exchanges found in model.")
         else:
             self.display_n2_diagram()
-        print("Matrix preview:\n", self.matrix.head())
         self.save_to_excel()
         self.save_to_html()
 
