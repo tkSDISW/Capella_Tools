@@ -2259,8 +2259,8 @@ model:
                 "chapter_name" : obj.chapter_name,    
                 "description" : obj.description,
                 "uuid": obj.uuid,
-                "type_name": obj.type.long_name,
-                "type_uuid": obj.type.uuid,
+                "type_name": obj.type.long_name if obj.type else "None",
+                "type_uuid": obj.type.uuid if obj.type else "None",
                 "relations": [{"name": r.name , "uuid": r.uuid} for r in obj.relations]            
             }
             # Render the template
@@ -2280,8 +2280,8 @@ model:
                 "source_uuid":  obj.source.uuid,
                 "target_name":  obj.target.name,
                 "target_uuid":  obj.target.uuid,
-                "type_name": obj.type.long_name,
-                "type_uuid": obj.type.uuid
+                "type_name": obj.type.long_name if obj.type else "None",
+                "type_uuid": obj.type.uuid if obj.type else "None",
             }
             # Render the template
             self._track_referenced_objects(obj)
