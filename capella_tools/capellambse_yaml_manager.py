@@ -795,6 +795,36 @@ model:
       {% endif %}
 
 """
+        exchangeitemelement_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      {% if abstract_type_name %}abstract type:
+       -name {{ abstract_type_name}}
+       -ref_uuid {{abstract_type_uuid}}
+      {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid: {{ apv.uuid }}
+        {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }} 
+         ref_uuid: {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+
+"""
+
         
         Traceability_artifact = """
     - name: {{ name }}
@@ -2178,7 +2208,6 @@ model:
             self.yaml_content = self.yaml_content + template.render(data)           
 
         elif obj.__class__.__name__ ==  "ExchangeItemElement" :   
-            
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,

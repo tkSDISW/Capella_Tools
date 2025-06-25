@@ -122,7 +122,8 @@ class ChatGPTAnalyzer:
                 assistant_message = assistant_message[7:]
             if assistant_message.endswith("```"):
                 assistant_message = assistant_message[:-3]
-    
+            if assistant_message.startswith("```python"):
+                assistant_message = assistant_message[9:]
             # Clean up with BeautifulSoup
             soup = BeautifulSoup(assistant_message, "html.parser")
             for tag in soup(["script", "style"]):
