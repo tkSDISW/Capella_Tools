@@ -6,10 +6,11 @@ import base64
 from pathlib import Path
 
 class CapellaYAMLHandler:
-    def __init__(self):
+    def __init__(self,parser=None):
         self.file_name = None
         self.referenced_objects = []
         self.primary_objects = []
+        self.parser = parser
         self.yaml_content = """
 ---  
 # YAML file for system model relationships
@@ -19,7 +20,36 @@ model:
     ref_uuid: Unique identifier for a referenced object
   objects:
 """
-        
+
+    def generate_teamcenter_yaml_snippet(self, uuid, indent="    "):
+        """
+        Generate Teamcenter metadata snippet with proper YAML indentation.
+    
+        Args:
+            uuid (str): UUID of the Capella element.
+            indent (str): Indentation string (default: 4 spaces).
+    
+        Returns:
+            str: YAML-formatted metadata string with consistent indentation.
+        """
+        if not self.parser:
+            return ""
+    
+        item = self.parser.get_by_id(uuid)
+        if not item:
+            return ""
+    
+        lines = []
+        if item.get("itemId"):
+            lines.append(f"{indent}teamcenter item id: {item['itemId']}")
+        if item.get("revisionId"):
+            lines.append(f"{indent}teamcenter revision id: {item['revisionId']}")
+        if item.get("url"):
+            lines.append(f"{indent}teamcenter url: {item['url']}")
+    
+        return "\n".join(lines)
+
+    
     def get_yaml_content(self):
         stripped_yaml_content = "\n".join([line for line in self.yaml_content.splitlines() if line.strip()])
         """Returen the Yaml content created."""
@@ -1619,6 +1649,7 @@ model:
         {% endif %}
 """
 
+     
         
         # Build the data for the YAML generation
         #print("Type:", obj.__class__.__name__)
@@ -1652,8 +1683,8 @@ model:
             # Render the template
             template = Template(logical_component_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
- 
-            self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
 
         # Build the data for the YAML generation
         elif obj.__class__.__name__ ==  "Entity" :    
@@ -1682,7 +1713,8 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
-
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
         # Build the data for the YAML generation      
         elif obj.__class__.__name__ ==  "FunctionalChain" or obj.__class__.__name__ ==  "OperationalProcess":    
             data = {
@@ -1704,7 +1736,8 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
-
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
 
 
 # Build the data for the YAML generation
@@ -1744,7 +1777,8 @@ model:
             template = Template(function_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
-            
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+                       
  
 
         elif obj.__class__.__name__ ==  "OperationalActivity" : 
@@ -1781,6 +1815,9 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
+        
 # Build the data for the YAML generation
 
         elif obj.__class__.__name__ ==  "OperationalCapability" : 
@@ -1807,6 +1844,9 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
+        
 # Build the data for the YAML generation
         
         elif obj.__class__.__name__ ==  "Interaction" :
@@ -1834,7 +1874,10 @@ model:
             template = Template(interaction_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
-            self.yaml_content = self.yaml_content + template.render(data)        
+            self.yaml_content = self.yaml_content + template.render(data) 
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
+        
         elif obj.__class__.__name__ ==  "FunctionalExchange" : 
             #print(obj)
             data = {
@@ -1861,6 +1904,9 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
+        
         elif obj.__class__.__name__ ==  "ComponentExchange" : 
             data = {
                 "type" : obj.__class__.__name__,
@@ -1886,6 +1932,8 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
 
         elif obj.__class__.__name__ ==  "PhysicalLink" : 
             #print(obj)
@@ -1913,6 +1961,8 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
 
         elif obj.__class__.__name__ ==  "PhysicalPath" : 
             #print(obj)
@@ -1936,6 +1986,8 @@ model:
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
 
              
         elif obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "NODE":  
@@ -1969,6 +2021,8 @@ model:
                 template = Template(node_component_template)
                 data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
+                self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
                 
                
         elif obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "BEHAVIOR":  
@@ -1999,6 +2053,8 @@ model:
                 template = Template(logical_component_template)
                 data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
+                self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
                 
               
         elif obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort": 
@@ -2022,6 +2078,8 @@ model:
                 template = Template(port_template)
                 data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
+                self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
 
                 
         elif obj.__class__.__name__ ==  "StringPropertyValue"  or obj.__class__.__name__ ==  "FloatPropertyValue":    
@@ -2073,6 +2131,8 @@ model:
             template = Template(property_value_group_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
             
         elif obj.__class__.__name__ ==  "StateMachine" :   
             data = {
@@ -2205,9 +2265,12 @@ model:
             # Render the template
             template = Template(exchangeitem_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)    
-            self.yaml_content = self.yaml_content + template.render(data)           
+            self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
 
         elif obj.__class__.__name__ ==  "ExchangeItemElement" :   
+            
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
@@ -2296,7 +2359,9 @@ model:
             self._track_referenced_objects(obj)
             template = Template(Requirement_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
-            self.yaml_content = self.yaml_content + template.render(data) 
+            self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
             
         elif obj.__class__.__name__ ==  "CapellaOutgoingRelation" : 
             data = {
