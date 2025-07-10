@@ -1075,6 +1075,54 @@ model:
       {% endif %}
 """
 
+        communication_mean_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      source entity:
+      - name: {{ source_entity }}
+        ref_uuid: {{ source_entity_uuid }}
+      target entity:
+      - name: {{ target_entity }}
+        ref_uuid: {{ target_entity_uuid  }}
+        {% if applied_property_value_groups %}applied property value groups:
+        {% for apvg in applied_property_value_groups %}
+          - name: {{ apvg.name }}
+            ref_uuid: {{ apvg.uuid }}
+        {% endfor %}
+        {% endif %}
+      {% if exchanges_items %}allocated exchanges items:
+      {% for ei in allocated_exchange_items %}
+      - name: {{  ei.name }}
+        ref_uuid: {{ ei.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if allocated_interactions %}allocated interactions:
+      {% for fe in allocated_interactions  %}
+       - name: {{  fe.name }}
+         ref_uuid: {{ fe.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+          ref_uuid: {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid: {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+      - name: {{  e.name }}
+        ref_uuid: {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
+"""
         
         component_exchange_template = """
     - name: {{ name }}
@@ -1934,7 +1982,33 @@ model:
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
             
+        elif obj.__class__.__name__ ==  "CommunicationMean" : 
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid" : obj.uuid,
+                "description" :obj.description,
+                "source_entity": obj.source.name,
+                "source_entity_uuid": obj.source.uuid,
+                "target_entity": obj.target.name, 
+                "target_entity_uuid": obj.target.uuid ,
+                "allocated_exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in obj.allocated_exchange_items],
+                "allocated_interactions": [{"name": fe.name, "uuid": fe.uuid} for fe in obj.allocated_interactions],
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+            }
+    
+            # Add referenced objects for expansion
+            self._track_referenced_objects(obj)
+    
+            # Render the template
+            template = Template(communication_mean_template)
 
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
         elif obj.__class__.__name__ ==  "PhysicalLink" : 
             #print(obj)
             data = {
