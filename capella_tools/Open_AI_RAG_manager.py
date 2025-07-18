@@ -135,7 +135,7 @@ class ChatGPTAnalyzer:
             if "<table" in assistant_message_cleaned or "<html" in assistant_message_cleaned:
                 display(HTML(assistant_message_cleaned))
             else:
-                display(Markdown(f"**ChatGPT Response:**\n\n{assistant_message_cleaned}"))
+                display(Markdown(f"**Response:**\n\n{assistant_message_cleaned}"))
     
             # Display token info separately
             display(Markdown(f"**Token Usage Info:**\n\n{token_usage_info}"))
