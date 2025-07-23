@@ -259,3 +259,36 @@ Format it nicely for .html display.
                 poll(10)
                 time.sleep(1)
 
+
+
+    def save_to_word(self, filename: str, html_response: str):
+        """
+        Save an HTML-formatted ChatGPT response to a Word document.
+        
+        Parameters:
+        - filename: str - the name of the Word file to save (e.g., 'output.docx')
+        - html_response: str - HTML content returned by the assistant
+        """
+        from docx import Document
+        from bs4 import BeautifulSoup
+        import os
+    
+        soup = BeautifulSoup(html_response, 'html.parser')
+        doc = Document()
+    
+        for element in soup.find_all(['h1', 'h2', 'h3', 'p', 'li', 'ul', 'ol', 'strong']):
+            text = element.get_text(strip=True)
+    
+            if element.name.startswith('h'):
+                doc.add_heading(text, level=int(element.name[1]))
+            elif element.name == 'p':
+                doc.add_paragraph(text)
+            elif element.name == 'li':
+                doc.add_paragraph(text, style='ListBullet')
+            elif element.name == 'strong':
+                doc.add_paragraph(text).bold = True
+    
+        output_path = os.path.join(os.getcwd(), filename)
+        doc.save(output_path)
+        print(f"✅ Word document saved: {output_path}")
+
