@@ -292,3 +292,27 @@ Format it nicely for .html display.
         doc.save(output_path)
         print(f"✅ Word document saved: {output_path}")
 
+    def save_to_csv(self, filename: str, csv_response: str):
+        """
+        Save a CSV-formatted string to a .csv file for Excel compatibility.
+    
+        Parameters:
+        - filename: str - the output file name (e.g., 'output.csv')
+        - csv_response: str - response text that is CSV-formatted
+        """
+        import csv
+        import os
+        from io import StringIO
+    
+        # Use StringIO to read CSV string as file-like
+        csv_stream = StringIO(csv_response.strip())
+    
+        reader = csv.reader(csv_stream)
+        output_path = os.path.join(os.getcwd(), filename)
+    
+        with open(output_path, "w", newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            for row in reader:
+                writer.writerow(row)
+    
+        print(f"✅ CSV file saved: {output_path}")
