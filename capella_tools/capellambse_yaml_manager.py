@@ -360,6 +360,51 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con)
+        if obj.__class__.__name__ ==  "Capability"  :  
+            for this_obj in obj.includes:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj.target)
+            for this_obj in obj.extends:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj.target)
+            for this_obj in obj.involved_components:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)
+            for this_obj in obj.involved_functions:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)
+            for this_obj in obj.involved_chains:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)         
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
+            for apv in obj.applied_property_values:
+                if apv not in self.referenced_objects:
+                    self.referenced_objects.append(apv)
+            for con in obj.constraints:
+                if con not in self.referenced_objects:
+                    self.referenced_objects.append(con)        
+        if obj.__class__.__name__ == "CapabilityRealization" :  
+
+            for this_obj in obj.involved_components:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)
+            for this_obj in obj.involved_functions:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)
+            for this_obj in obj.involved_chains:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)         
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
+            for apv in obj.applied_property_values:
+                if apv not in self.referenced_objects:
+                    self.referenced_objects.append(apv)
+            for con in obj.constraints:
+                if con not in self.referenced_objects:
+                    self.referenced_objects.append(con)                            
         if obj.__class__.__name__ ==  "FunctionalChain" or obj.__class__.__name__ ==  "OperationalProcess" :  
             for inv in obj.involved:
                 if inv not in self.referenced_objects:
@@ -1697,7 +1742,66 @@ model:
         {% endif %}
 """
 
-     
+        cap_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      {% if includes_capabilities %}included capability:
+      {% for obj in includes_capabilities %}
+       - name: {{ obj.name }}
+         ref_uuid: {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if extended_capabilities %}extended capability:
+      {% for obj in extended_capabilities %}
+       - name: {{ obj.name }}
+         ref_uuid: {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if involved_functions %}involved functions:
+      {% for obj in involved_functions %}
+       - name: {{ obj.name }}
+         ref_uuid: {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if involved_components %}involved actors:
+      {% for obj in  involved_components %}
+       - name: {{ obj.name }}
+         ref_uuid: {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if involved_chains %}involved functional chains:
+      {% for obj in involved_chains %}
+       - name: {{ obj.name }}
+         ref_uuid: {{ obj.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid: {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid: {{ cons.uuid }}
+      {% endfor %}
+        {% endif %}
+        {% if exchanges %}exchanges:
+        {% for excs in exchanges %}
+          - name: {{  e.name }}
+            ref_uuid: {{ e.uuid }}
+        {% endfor %}
+        {% endif %}
+"""     
         
         # Build the data for the YAML generation
         #print("Type:", obj.__class__.__name__)
@@ -1888,13 +1992,64 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(oc_template)
+            template = Template(cap_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
-            
-        
+
+        elif obj.__class__.__name__ ==  "Capability" : 
+            print(obj.involved_chains)
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid" : obj.uuid,
+                "description" :obj.description,
+                "includes_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.includes],
+                "extended_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.extends],
+                "involved_functions" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_functions],
+                "involved_components" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_components],
+                "involved_chains" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_chains],
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+            }
+    
+            # Add referenced objects for expansion
+            self._track_referenced_objects(obj)
+    
+            # Render the template
+            template = Template(cap_template)
+
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+                        
+        elif  obj.__class__.__name__ == "CapabilityRealization" : 
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid" : obj.uuid,
+                "description" :obj.description,
+                "involved_functions" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_functions],
+                "involved_components" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_components],
+                "involved_chains" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_chains],
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+            }
+    
+            # Add referenced objects for expansion
+            self._track_referenced_objects(obj)
+    
+            # Render the template
+            template = Template(cap_template)
+
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+                        
+              
 # Build the data for the YAML generation
         
         elif obj.__class__.__name__ ==  "Interaction" :
@@ -2458,8 +2613,8 @@ model:
             self.yaml_content = self.yaml_content + template.render(data) 
 
         else :
-            #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processing.")
-
+            print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processing.")
+           # print(obj)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": getattr(obj, "name", None), # Safe access to name
