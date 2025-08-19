@@ -1999,7 +1999,6 @@ model:
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
 
         elif obj.__class__.__name__ ==  "Capability" : 
-            print(obj.involved_chains)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
@@ -2613,7 +2612,7 @@ model:
             self.yaml_content = self.yaml_content + template.render(data) 
 
         else :
-            print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processing.")
+            #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processing.")
            # print(obj)
             data = {
                 "type" : obj.__class__.__name__,
