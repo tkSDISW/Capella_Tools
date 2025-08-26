@@ -4,7 +4,6 @@ from openai import OpenAI
 from IPython.display import display, Markdown
 from IPython.core.display import HTML
 from ipywidgets import widgets
-import numpy as np
 import json
 import os
 from datetime import datetime
