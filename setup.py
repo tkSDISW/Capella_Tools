@@ -13,6 +13,9 @@ setup(
         "pyvis",
         "jupyter_ui_poll",
         "python-docx",
-        "PyPDF2"     
+        "PyPDF2",
+        "plotly",
+        "openpyxl"
+        
     ],
 )
