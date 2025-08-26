@@ -1611,7 +1611,7 @@ model:
       type: {{type}}
       primary_uuid: {{ uuid }}
       description: "{{ description | escape | replace('\n', ' ') }}"
-      allocated from :
+      owner :
       - name: {{owner_name}}
         ref_uuid: {{owner_uuid}}
       functions owned:

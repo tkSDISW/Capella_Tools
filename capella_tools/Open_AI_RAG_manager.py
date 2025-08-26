@@ -175,7 +175,7 @@ class ChatGPTAnalyzer:
 Analyze the YAML content and extract relationships suitable for a graph.
 
 - Each relationship should be a tuple: (source, target, label).
-- Use simple labels like 'abstract type of','property value group','property value','constrains','linked model element',"region','states','transitions','outgoing transition','incoming transtion','do function','entry function','exits function','triggers','source state','destination state','after function','source','target','involves','exchange items','exchanges','allocated to', 'involving','components','deployed to','port','state machine','entities', 'elements of'.
+- Use simple labels like 'abstract type of','property value group','property value','constrains','linked model element',"region','states','transitions','outgoing transition','incoming transtion','do function','entry function','exits function','triggers','source state','destination state','after function','source','target','involves','exchange items','exchanges','allocated to', 'involving','components','deployed to','port','state machine','entities', 'elements of','owner'.
 - Use ref_id to navigate primary_id but do not list them in tuples.
 - Output ONLY a Python list of these tuples.
 - No explanation, no extra text, just the list in Python syntax.
