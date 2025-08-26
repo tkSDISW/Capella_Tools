@@ -405,7 +405,7 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con)                            
-        if obj.__class__.__name__ ==  "FunctionalChain" or obj.__class__.__name__ ==  "OperationalProcess" :  
+        if  obj.__class__.__name__ ==  "OperationalProcess" :  
             for inv in obj.involved:
                 if inv not in self.referenced_objects:
                     self.referenced_objects.append(inv)
@@ -418,7 +418,22 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con) 
-                    
+        if obj.__class__.__name__ ==  "FunctionalChain"  :  
+            for inv in obj.involved:
+                if inv not in self.referenced_objects:
+                    self.referenced_objects.append(inv)
+            for inv in obj.involved_chains:
+                if inv not in self.referenced_objects:
+                    self.referenced_objects.append(inv)
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
+            for apv in obj.applied_property_values:
+                if apv not in self.referenced_objects:
+                    self.referenced_objects.append(apv)
+            for con in obj.constraints:
+                if con not in self.referenced_objects:
+                    self.referenced_objects.append(con)                     
         if obj.__class__.__name__ ==  "StateTransition" :  
             for eff in obj.effects:
                 if eff not in self.referenced_objects:
@@ -1267,7 +1282,7 @@ model:
 """
 
         
-        functional_chain_template = """
+        op_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
@@ -1278,6 +1293,50 @@ model:
         type: {{ inv.type}}
         ref_uuid: {{ inv.uuid }}
       {% endfor %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+      - name: {{ apv.name }}
+        ref_uuid: {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+      - name: {{ cons.name }}
+        ref_uuid: {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+      - name: {{  e.name }}
+        ref_uuid: {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
+""" 
+
+        fc_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      involve:
+      {% for inv in involved %}
+      - name: {{  inv.name }}
+        type: {{ inv.type}}
+        ref_uuid: {{ inv.uuid }}
+      {% endfor %}
+      {% if involved_chains %}      involve:
+      {% for inv in involved_chains %}
+      - name: {{  inv.name }}
+        type: {{ inv.type}}
+        ref_uuid: {{ inv.uuid }}
+      {% endfor %}
+      {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
@@ -1868,7 +1927,7 @@ model:
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
             
         # Build the data for the YAML generation      
-        elif obj.__class__.__name__ ==  "FunctionalChain" or obj.__class__.__name__ ==  "OperationalProcess":    
+        elif  obj.__class__.__name__ ==  "OperationalProcess":    
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
@@ -1879,12 +1938,39 @@ model:
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
             }
+
+            
     
             # Add referenced objects for expansion
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(functional_chain_template)
+            template = Template(op_template)
+
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)
+            self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
+            
+        elif obj.__class__.__name__ ==  "FunctionalChain":    
+            data = {
+                "type" : obj.__class__.__name__,
+                "name": obj.name,
+                "uuid" : obj.uuid,
+                "description" :obj.description,
+                "involved": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved],
+                "involved_chains": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved_chains],
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+            }
+
+            
+    
+            # Add referenced objects for expansion
+            self._track_referenced_objects(obj)
+    
+            # Render the template
+            template = Template(fc_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
