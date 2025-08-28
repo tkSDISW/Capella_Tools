@@ -281,6 +281,9 @@ class EmbeddingManager :
             for obj in model.la.all_functions:  
                 object_info = get_object_info(obj,phase)
                 add_unique_object(object_data,object_info)
+            for obj in model.la.all_function_exchanges:  
+                object_info = get_object_info(obj,phase)
+                add_unique_object(object_data,object_info)
             for obj in model.la.all_functional_chains:  
                 object_info = get_object_info(obj,phase)
                 add_unique_object(object_data,object_info)
@@ -308,6 +311,9 @@ class EmbeddingManager :
                 object_info = get_object_info(obj,phase)
                 add_unique_object(object_data,object_info)
             for obj in model.pa.all_functional_chains:  
+                object_info = get_object_info(obj,phase)
+                add_unique_object(object_data,object_info)
+            for obj in model.pa.all_function_exchanges:  
                 object_info = get_object_info(obj,phase)
                 add_unique_object(object_data,object_info)
             for obj in model.pa.all_capabilities:  

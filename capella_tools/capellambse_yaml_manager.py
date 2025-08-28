@@ -889,14 +889,12 @@ model:
       {% endfor %}
       {% endif %}
 """
-
-
         Requirement_template = """
-    - name: {{ long_name }}
+    - name: {{  name  }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
-      short name: {{ name }}
+      text: "{{ text | escape | replace('\n', ' ') }}"
+      long name: {{ long_name }}
       prefix: {{ prefix }}
       chapter name: {{ chapter_name }}
       type:
@@ -909,6 +907,7 @@ model:
       {% endfor %}
       {% endif %}
 """
+
         CapellaOutgoingRelation_template = """    
     - name: {{ long_name if long_name.strip() else type_name }}
       type: {{type}}
@@ -2734,7 +2733,7 @@ model:
                 "long_name": obj.long_name,
                 "prefix": obj.prefix,
                 "chapter_name" : obj.chapter_name,    
-                "description" : obj.description,
+                "text" : obj.text,
                 "uuid": obj.uuid,
                 "type_name": obj.type.long_name if obj.type else "None",
                 "type_uuid": obj.type.uuid if obj.type else "None",
@@ -2743,7 +2742,7 @@ model:
             # Render the template
             self._track_referenced_objects(obj)
             template = Template(Requirement_template)
-            data["description"] = sanitize_description_images(data["description"], img_dir)
+            data["text"] = sanitize_description_images(data["text"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
             
