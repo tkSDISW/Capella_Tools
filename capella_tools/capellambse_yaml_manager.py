@@ -216,6 +216,9 @@ model:
             for sm in obj.state_machines:
                 if sm not in self.referenced_objects:
                     self.referenced_objects.append(sm)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
 
         if obj.__class__.__name__ ==  "Entity" :  
             for ent in obj.entities:
@@ -239,7 +242,10 @@ model:
             for sm in obj.state_machines:
                 if sm not in self.referenced_objects:
                     self.referenced_objects.append(sm)
-                    
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
+        
         if obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "NODE":  
             for dc in getattr(obj, "deployed_components", []):  # Ensure it's iterable
                 if hasattr(dc, "name") and hasattr(dc, "uuid"):  # Avoid AttributeError
@@ -263,6 +269,9 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "BEHAVIOR":  
             for dc in obj.deployed_components:
                     if dc not in self.referenced_objects:
@@ -288,6 +297,9 @@ model:
                 for con in obj.constraints:
                     if con not in self.referenced_objects:
                         self.referenced_objects.append(con)
+                for req in obj.requirements:
+                    if req not in self.referenced_objects:
+                        self.referenced_objects.append(req)
         if obj.__class__.__name__  ==  "Requirement" :  
             for rel in obj.relations:
                     if rel not in self.referenced_objects:
@@ -317,6 +329,9 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "OperationalActivity" :  
             if obj.owner not in self.referenced_objects:
                     self.referenced_objects.append(obj.owner)
@@ -335,6 +350,9 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "OperationalCapability" :  
             for this_obj in obj.includes:
                 if this_obj not in self.referenced_objects:
@@ -360,6 +378,9 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "Capability"  :  
             for this_obj in obj.includes:
                 if this_obj not in self.referenced_objects:
@@ -384,7 +405,10 @@ model:
                     self.referenced_objects.append(apv)
             for con in obj.constraints:
                 if con not in self.referenced_objects:
-                    self.referenced_objects.append(con)        
+                    self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ == "CapabilityRealization" :  
 
             for this_obj in obj.involved_components:
@@ -404,7 +428,10 @@ model:
                     self.referenced_objects.append(apv)
             for con in obj.constraints:
                 if con not in self.referenced_objects:
-                    self.referenced_objects.append(con)                            
+                    self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if  obj.__class__.__name__ ==  "OperationalProcess" :  
             for inv in obj.involved:
                 if inv not in self.referenced_objects:
@@ -417,7 +444,10 @@ model:
                     self.referenced_objects.append(apv)
             for con in obj.constraints:
                 if con not in self.referenced_objects:
-                    self.referenced_objects.append(con) 
+                    self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "FunctionalChain"  :  
             for inv in obj.involved:
                 if inv not in self.referenced_objects:
@@ -433,7 +463,10 @@ model:
                     self.referenced_objects.append(apv)
             for con in obj.constraints:
                 if con not in self.referenced_objects:
-                    self.referenced_objects.append(con)                     
+                    self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "StateTransition" :  
             for eff in obj.effects:
                 if eff not in self.referenced_objects:
@@ -449,7 +482,10 @@ model:
                     self.referenced_objects.append(apv)
             for con in obj.constraints:
                 if con not in self.referenced_objects:
-                    self.referenced_objects.append(con) 
+                    self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
 
         if obj.__class__.__name__ ==  "State" : 
             for og in obj.outgoing_transitions:
@@ -475,7 +511,10 @@ model:
                     self.referenced_objects.append(apv)
             for con in obj.constraints:
                 if con not in self.referenced_objects:
-                    self.referenced_objects.append(con) 
+                    self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "InitialPseudoState" :  
             for og in obj.outgoing_transitions:
                 if og not in self.referenced_objects:
@@ -488,7 +527,10 @@ model:
                     self.referenced_objects.append(apv)
             for con in obj.constraints:
                 if con not in self.referenced_objects:
-                    self.referenced_objects.append(con)       
+                    self.referenced_objects.append(con)  
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         
         if obj.__class__.__name__ ==  "StateMachine" :  
             for region in obj.regions:
@@ -507,6 +549,9 @@ model:
             for con in obj.constraints:
                 if con not in self.referenced_objects:
                     self.referenced_objects.append(con) 
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
 
         if obj.__class__.__name__ ==  "PropertyValueGroup" :  
             for apvg in obj.applied_property_value_groups:
@@ -524,6 +569,9 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
 
         if obj.__class__.__name__ ==  "FunctionalExchange" :
             for ei in obj.exchange_items:
@@ -547,6 +595,9 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "Interaction" :
             for ei in obj.exchange_items:
                 if ei not in self.referenced_objects:
@@ -569,6 +620,9 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "PhysicalLink" :
             #print(obj)
             for obj in obj.exchanges:
@@ -594,6 +648,9 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
 
         if obj.__class__.__name__ ==  "PhysicalPath" :
             for inv in obj.involved_items:
@@ -617,7 +674,9 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
-                        
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)                        
                
         if obj.__class__.__name__ ==  "ComponentExchange" :
             for ei in obj.exchange_items:
@@ -641,7 +700,10 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
-        
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
+                    
         if obj.__class__.__name__ ==  "ExchangeItem" :
             for e in obj.elements:
                 if e not in self.referenced_objects:
@@ -661,6 +723,9 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
                     
         if obj.__class__.__name__ ==  "ExchangeItemElement" :
             if obj.abstract_type not in self.referenced_objects:
@@ -680,6 +745,9 @@ model:
             for pv in obj.property_values:
                 if pv not in self.referenced_objects:
                     self.referenced_objects.append(pv)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "Diagram" :
             for node in obj.nodes:
                 if node not in self.referenced_objects:
@@ -691,7 +759,10 @@ model:
         if obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort":   
             if obj.owner not in self.referenced_objects:
                 self.referenced_objects.append(obj.owner)
-               
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
+                    
     def generate_yaml(self, obj):
         
 
