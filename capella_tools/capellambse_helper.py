@@ -42,7 +42,6 @@ def display_context_diagram(obj):
         obj.__class__.__name__ == "LogicalComponent" or \
         obj.__class__.__name__ == "ComponentExchange" or \
         obj.__class__.__name__ == "LogicalFunction" or \
-        obj.__class__.__name__ == "FunctionalExchange" or \
         obj.__class__.__name__ == "PhysicalComponent" or \
         obj.__class__.__name__ == "PhysicalFunction" :
         display.display(obj.context_diagram)
