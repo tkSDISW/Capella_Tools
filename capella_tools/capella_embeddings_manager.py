@@ -14,42 +14,46 @@ import time
 from IPython import get_ipython
 from jupyter_ui_poll import ui_events
 import time
+from model_configurator import get_api_key, get_base_url, get_model
 
 
-def get_api_key():
-    """Retrieve the OpenAI API key from a hidden file."""
-    home_dir = Path.home()
-    key_file = home_dir / ".secrets" / "openai_api_key.txt"
-
-    if not key_file.exists():
-        raise FileNotFoundError(
-            f"API Key file not found at {key_file}. "
-            "Please ensure the key is saved correctly."
-        )
-
-    with key_file.open("r") as f:
-        api_key = f.read().strip()
-
-    if not api_key:
-        raise ValueError("API Key file is empty. Provide a valid API key.")
-
-    return api_key
     
 
 class EmbeddingManager :
-    def __init__(self):
+    def __init__(self, model=None, base_url=None, api_key=None, config_name=None):
         """Initialize the analyzer with YAML content."""
-        try:
-            self.api_key = get_api_key()
-            print("OpenAI API Key retrieved successfully.")
-        except (FileNotFoundError, ValueError) as e:
-            print(e)
-            sys.exit(1)  # Exit with an error code
-
-       
-        self.client = OpenAI(
-            api_key=self.api_key,  # This is the default and can be omitted
-            )
+        config = {}
+        if config_name:
+            config_path = Path.home() / ".secrets" / "model_configs.json"
+            if config_path.exists():
+                with config_path.open() as f:
+                    configs = json.load(f)
+                config = configs.get(config_name, {})
+                if not config:
+                    raise ValueError(f"No config named '{config_name}' found in model_configs.json.")
+        elif model is None and base_url is None and api_key is None:
+            config_path = Path.home() / ".secrets" / "model_configs.json"
+            if config_path.exists():
+                with config_path.open() as f:
+                    configs = json.load(f)
+                default_name = configs.get("_default")
+                if default_name:
+                    config = configs.get(default_name, {})
+        
+        def nonempty(value):
+            return value if value and value.strip() else None
+        
+        self.api_key = nonempty(api_key) or nonempty(config.get("api_key")) or get_api_key()
+        self.llm_url = nonempty(base_url) or nonempty(config.get("base_url")) or get_base_url()
+        self.model = nonempty(model) or nonempty(config.get("model")) or get_model()
+        
+        from openai import OpenAI
+        self.client = OpenAI(api_key=self.api_key, base_url=self.llm_url)
+        
+        print(f"✅ EmbeddingManager initialized")
+        print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
+        print(f"🌐 Base URL: {self.llm_url or 'Default'}")
+        print(f"🤖 Model: {self.model}")
         self.model = "text-embedding-3-small"
         self.embedding_file =''
         self.model_file = ''

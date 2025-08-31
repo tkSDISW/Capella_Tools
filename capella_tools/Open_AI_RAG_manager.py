@@ -22,27 +22,11 @@ from pyvis.network import Network
 import nbformat
 from docx import Document
 import PyPDF2
-
+from model_configurator import get_api_key, get_base_url, get_model
 Network(notebook=True)
+import traceback
 
-def get_api_key():
-    """Retrieve the OpenAI API key from a hidden file."""
-    home_dir = Path.home()
-    key_file = home_dir / ".secrets" / "openai_api_key.txt"
 
-    if not key_file.exists():
-        raise FileNotFoundError(
-            f"API Key file not found at {key_file}. "
-            "Please ensure the key is saved correctly."
-        )
-
-    with key_file.open("r") as f:
-        api_key = f.read().strip()
-
-    if not api_key:
-        raise ValueError("API Key file is empty. Provide a valid API key.")
-
-    return api_key
 
 class ChatGPTAnalyzer:
     ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.pdf', '.docx', '.sysml'}
@@ -50,14 +34,37 @@ class ChatGPTAnalyzer:
     PDF_EXTS = {'.pdf'}
     DOCX_EXTS = {'.docx'}
 
-    def __init__(self, yaml_content=None):
-        try:
-            self.api_key = get_api_key()
-            print("OpenAI API Key retrieved successfully.")
-        except (FileNotFoundError, ValueError) as e:
-            print(e)
-            sys.exit(1)
+    def __init__(self, yaml_content=None, model=None, base_url=None, api_key=None, config_name=None):
 
+
+        config = {}
+        if config_name:
+            config_path = Path.home() / ".secrets" / "model_configs.json"
+            if config_path.exists():
+                with config_path.open() as f:
+                    configs = json.load(f)
+                config = configs.get(config_name, {})
+                if not config:
+                    raise ValueError(f"No config named '{config_name}' found in model_configs.json.")
+        elif model is None and base_url is None and api_key is None:
+            # Use default config if no overrides and no name given
+            config_path = Path.home() / ".secrets" / "model_configs.json"
+            if config_path.exists():
+                with config_path.open() as f:
+                    configs = json.load(f)
+                default_name = configs.get("_default")
+                if default_name:
+                    config = configs.get(default_name, {})
+        
+        # Choose from: passed args > config file > .secrets fallback
+        self.api_key = api_key or config.get("api_key") or get_api_key()
+        self.llm_url = base_url or config.get("base_url") or get_base_url()
+        self.llm_model = model or config.get("model") or get_model()
+    
+        print(f"✅ ChatGPTAnalyzer initialized")
+        print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
+        print(f"🌐 Base URL: {self.llm_url or 'Default'}")
+        print(f"🤖 Model: {self.llm_model}")
         self.yaml_content = yaml_content or ""
         self.chat_active = True
         self.messages = []
@@ -66,6 +73,7 @@ class ChatGPTAnalyzer:
                 "role": "system",
                 "content": f"You are an expert in analyzing YAML files for system design. Here is the YAML file:\n---\n{self.yaml_content}\n---",
             })
+
 
     def submit_prompt(self, user_prompt, is_initial=True):
         user_prompt = user_prompt + " Format the response in .html format." if is_initial else user_prompt
@@ -102,10 +110,10 @@ class ChatGPTAnalyzer:
     def get_response(self):
         """Send messages to ChatGPT and get a response with separate token usage info."""
         try:
-            client = OpenAI(api_key=self.api_key)
+            client = OpenAI(api_key=self.api_key, base_url=self.llm_url )
             response = client.chat.completions.create(
                 messages=self.messages,
-                model="gpt-4o",
+                model=self.llm_model,
             )
             assistant_message = response.choices[0].message.content
             usage = response.usage
@@ -124,10 +132,10 @@ class ChatGPTAnalyzer:
             if assistant_message.startswith("```python"):
                 assistant_message = assistant_message[9:]
             # Clean up with BeautifulSoup
+
             soup = BeautifulSoup(assistant_message, "html.parser")
             for tag in soup(["script", "style"]):
                 tag.decompose()
-    
             assistant_message_cleaned = str(soup)
     
             # Display response and then token usage separately
@@ -142,7 +150,28 @@ class ChatGPTAnalyzer:
             return assistant_message_cleaned
     
         except Exception as e:
-            return f"Error communicating with OpenAI API: {e}"
+            error_type = type(e).__name__
+            tb = traceback.format_exc()
+        
+            display(Markdown("❌ **Error communicating with the OpenAI-compatible API.**"))
+            display(Markdown(f"**Exception:** `{error_type}`  \n**Message:** `{str(e)}`"))
+        
+            if "401" in str(e) or "Unauthorized" in str(e):
+                display(Markdown("🔐 **It looks like your API key may be missing or invalid.**"))
+            elif "403" in str(e) or "Permission" in str(e):
+                display(Markdown("🚫 **You may not have access to this model or endpoint.**"))
+            elif "Name or service not known" in str(e) or "Failed to establish a new connection" in str(e):
+                display(Markdown("🌐 **Check your base URL. It may be incorrect or unreachable.**"))
+            elif "model" in str(e).lower():
+                display(Markdown("🤖 **There may be an issue with the model name.** Double-check your configuration."))
+
+            # Optionally show traceback in collapsed view
+            print("📄 Full Traceback (for debugging):")
+            print(tb)
+
+            return f"Error: {error_type} – {str(e)}"
+
+        
     
 
     def generate_pyvis_graph_from_relations(self, relations, output_file="graph.html"):
@@ -175,7 +204,7 @@ class ChatGPTAnalyzer:
 Analyze the YAML content and extract relationships suitable for a graph.
 
 - Each relationship should be a tuple: (source, target, label).
-- Use simple labels like 'abstract type of','property value group','property value','constrains','linked model element',"region','states','transitions','outgoing transition','incoming transtion','do function','entry function','exits function','triggers','source state','destination state','after function','source','target','involves','exchange items','exchanges','allocated to', 'involving','components','deployed to','port','state machine','entities', 'elements of','owner'.
+- Use simple labels like 'abstract type of','property value group','property value','constrains','linked model element',"region','states','transitions','outgoing transition','incoming transtion','do function','entry function','exits function','triggers','source state','destination state','after function','source','target','involves','exchange items','exchanges','allocated to', 'involving','components','deployed to','port','state machine','entities', 'elements of'.
 - Use ref_id to navigate primary_id but do not list them in tuples.
 - Output ONLY a Python list of these tuples.
 - No explanation, no extra text, just the list in Python syntax.
