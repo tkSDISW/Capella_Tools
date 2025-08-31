@@ -22,7 +22,7 @@ from pyvis.network import Network
 import nbformat
 from docx import Document
 import PyPDF2
-from capella_tools import get_api_key, get_base_url, get_model
+from capella_tools.model_configurator import get_api_key, get_base_url, get_model
 Network(notebook=True)
 import traceback
 
