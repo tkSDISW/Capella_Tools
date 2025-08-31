@@ -14,7 +14,7 @@ import time
 from IPython import get_ipython
 from jupyter_ui_poll import ui_events
 import time
-from model_configurator import get_api_key, get_base_url, get_model
+from capella_tools import get_api_key, get_base_url, get_model
 
 
     
