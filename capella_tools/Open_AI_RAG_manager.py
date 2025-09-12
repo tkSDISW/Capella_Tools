@@ -109,11 +109,19 @@ class ChatGPTAnalyzer:
         
     def get_response(self):
         """Send messages to ChatGPT and get a response with separate token usage info."""
+        # inside your Open_AI_RAG_manager
+
         try:
             client = OpenAI(api_key=self.api_key, base_url=self.llm_url )
             response = client.chat.completions.create(
                 messages=self.messages,
                 model=self.llm_model,
+                seed=42,            #  repeatability
+                temperature=0.0,    #  deterministic choice of highest-probability token
+                top_p=1.0,          #  disables nucleus sampling (keeps distribution intact)
+                max_tokens=800,     #  control output length to avoid truncation
+                presence_penalty=0, #  don't bias against repetition unless you want to
+                frequency_penalty=0 #  same here
             )
             assistant_message = response.choices[0].message.content
             usage = response.usage
