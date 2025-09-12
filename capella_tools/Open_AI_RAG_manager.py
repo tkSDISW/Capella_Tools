@@ -119,7 +119,6 @@ class ChatGPTAnalyzer:
                 seed=42,            #  repeatability
                 temperature=0.0,    #  deterministic choice of highest-probability token
                 top_p=1.0,          #  disables nucleus sampling (keeps distribution intact)
-                max_tokens=800,     #  control output length to avoid truncation
                 presence_penalty=0, #  don't bias against repetition unless you want to
                 frequency_penalty=0 #  same here
             )
