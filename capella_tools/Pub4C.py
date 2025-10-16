@@ -1,3 +1,14 @@
+
+# Copyright Siemens AG
+# Licensed under the Apache License, Version 2.0 (see full text in LICENSES/Apache-2.0.txt)
+
+# Dot-files are licensed under CC0-1.0 (see full text in LICENSES/CC0-1.0.txt)
+
+# To provide the same look and feel across platforms, this library is bundled
+# with the OpenSans font (capellambse/OpenSans-Regular.ttf).
+# The OpenSans font is Copyright 2020 The Open Sans Project Authors,
+# licensed under OFL-1.1 (see full text in LICENSES/OFL-1.1.txt)
+
 import os
 from xml.etree import ElementTree as ET
 
