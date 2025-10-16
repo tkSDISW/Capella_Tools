@@ -37,7 +37,7 @@ import PyPDF2
 from capella_tools.model_configurator import get_api_key, get_base_url, get_model
 Network(notebook=True)
 import traceback
-
+from pathlib import Path
 
 
 class ChatGPTAnalyzer:
