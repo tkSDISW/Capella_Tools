@@ -2479,7 +2479,7 @@ model:
             
 
                 
-        elif obj.__class__.__name__ ==  "StringPropertyValue"  or obj.__class__.__name__ ==  "FloatPropertyValue":    
+        elif obj.__class__.__name__ ==  "StringPropertyValue"  or obj.__class__.__name__ ==  "FloatPropertyValue" or obj.__class__.__name__ ==  "IntegerPropertyValue":    
             data = {
                 "type" : obj.__class__.__name__,
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
