@@ -63,7 +63,10 @@ class EmbeddingManager:
         print(f"🌐 Base URL: {self.llm_url or 'Default'}")
         print(f"🤖 Model: {self.model}")
 
-
+        if self.model and not str(self.model).startswith("text-embedding-"):
+            raise ValueError(
+                f"EmbeddingManager requires an embedding model, got: {self.model}"
+            )
         self.embedding_file = ''
         self.model_file = ''
         self.selected_objects_output = []  # Stores selected objects persistently
@@ -408,8 +411,6 @@ class EmbeddingManager:
                 add_unique_object(object_data, get_component_exchange_info(obj, phase))
             for obj in model.pa.all_physical_paths:
                 add_unique_object(object_data, get_object_info(obj, phase))
-            for obj in model.pa.all_physical_exchanges:
-                add_unique_object(object_data, get_component_exchange_info(obj, phase))
             for obj in model.pa.diagrams:
                 add_unique_object(object_data, get_diagram_info(obj, phase))
 
