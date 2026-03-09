@@ -237,7 +237,8 @@ class EmbeddingManager:
         Keeps things generic so agents can pass it around.
         """
         info = self.get_embedding_file_info()
-        return {
+ 3
+return {
             "type": "embedding_file",
             "path": info["path"],
             "meta": info["meta"],
