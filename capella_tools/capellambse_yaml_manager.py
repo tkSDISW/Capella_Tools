@@ -402,6 +402,7 @@ model:
                     self.referenced_objects.append(req)
             if self.realize_refs:
                 for cr in obj.realizing_capabilities:
+                    print("Realizing Capability", cr.name  )
                     if cr not in self.referenced_objects:
                         self.referenced_objects.append(cr)
 
@@ -2172,7 +2173,7 @@ model:
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
-                "realizing_caps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_capabilities]
+                "realizing_caps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_capabilities] if self.realize_refs else []
 
                         
             }
