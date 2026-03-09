@@ -1947,12 +1947,13 @@ model:
        - name: {{ cons.name }}
          ref_uuid: {{ cons.uuid }}
       {% endfor %}
+      {% endif %}
       {% if realizing_caps %}realizing capabilities:
       {% for rc in realizing_caps %}
        - name: {{ rc.name }}
          ref_uuid: {{ rc.uuid }}
       {% endfor %}
-        {% endif %}
+      {% endif %}
         {% if exchanges %}exchanges:
         {% for excs in exchanges %}
           - name: {{  e.name }}
