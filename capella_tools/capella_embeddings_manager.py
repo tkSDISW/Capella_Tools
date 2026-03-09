@@ -51,7 +51,8 @@ class EmbeddingManager:
                     "code_points_head": [hex(ord(c)) for c in text[:200]],
                 }, f, indent=2, ensure_ascii=False)
             print(f"📝 Saved bad payload to {failure_path}")
-        def __init__(self, model=None, base_url=None, api_key=None, config_name=None):
+            
+    def __init__(self, model=None, base_url=None, api_key=None, config_name=None):
         """Initialize the analyzer with YAML content."""
         config = {}
         if config_name:
