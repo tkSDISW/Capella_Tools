@@ -24,7 +24,7 @@ class CapellaYAMLHandler:
         self.referenced_objects = []
         self.primary_objects = []
         self.parser = parser
-        self.realize_refs = Fales
+        self.realize_refs = False
         self.yaml_content = """
 ---  
 # YAML file for system model relationships
