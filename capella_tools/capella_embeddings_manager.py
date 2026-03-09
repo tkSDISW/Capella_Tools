@@ -62,8 +62,7 @@ class EmbeddingManager:
         print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
         print(f"🌐 Base URL: {self.llm_url or 'Default'}")
         print(f"🤖 Model: {self.model}")
-        # Preserve prior behavior: override to embeddings model
-        self.model = "text-embedding-3-small"
+
 
         self.embedding_file = ''
         self.model_file = ''
