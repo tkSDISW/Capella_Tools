@@ -29,6 +29,28 @@ from capella_tools.model_configurator import get_api_key, get_base_url, get_mode
 
 
 class EmbeddingManager:
+        def _sanitize_embedding_text(self, text: str) -> str:
+            text = "" if text is None else str(text)
+            text = text.replace("\x00", " ")
+            text = re.sub(r"[\ud800-\udfff]", "", text)
+            text = re.sub(r"[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]", " ", text)
+            text = unicodedata.normalize("NFKC", text)
+            return " ".join(text.split()).strip()
+
+        def _save_failed_payload(self, text: str, context: str, error: Exception):
+            failure_dir = Path(self.embedding_file).parent if self.embedding_file else Path(".")
+            failure_path = failure_dir / "embedding_bad_payload.json"
+            with open(failure_path, "w", encoding="utf-8") as f:
+                json.dump({
+                    "context": context,
+                    "error_type": type(error).__name__,
+                    "error": repr(error),
+                    "text_repr": repr(text),
+                    "text": text,
+                    "length": len(text),
+                    "code_points_head": [hex(ord(c)) for c in text[:200]],
+                }, f, indent=2, ensure_ascii=False)
+            print(f"📝 Saved bad payload to {failure_path}")
     def __init__(self, model=None, base_url=None, api_key=None, config_name=None):
         """Initialize the analyzer with YAML content."""
         config = {}
@@ -233,7 +255,8 @@ class EmbeddingManager:
             obj.get("source_component", ""),
             obj.get("target_component", ""),
         ]
-        metadata_text = " ".join(str(p).strip() for p in parts if p).replace("\n", " ").strip()
+        metadata_text = " ".join(str(p).strip() for p in parts if p)
+        metadata_text = self._sanitize_embedding_text(metadata_text)
         if not metadata_text:
             raise ValueError(f"Empty embedding text for uuid={obj.get('uuid')}")
         return metadata_text
@@ -273,7 +296,13 @@ class EmbeddingManager:
         except BadRequestError as e:
             elapsed = time.time() - start
             print(f"❌ BadRequestError after {elapsed:.2f}s [{context}]")
+            print(f"   Base URL: {self.llm_url}")
+            print(f"   Model: {self.model}")
             print(f"   Detail: {repr(e)}")
+            print(f"   Text length: {len(text)}")
+            print(f"   Text repr: {repr(text[:500])}")
+            print(f"   Code points: {[hex(ord(c)) for c in text[:80]]}")
+            self._save_failed_payload(text, context, e)
             raise
         except Exception as e:
             elapsed = time.time() - start
@@ -564,7 +593,8 @@ class EmbeddingManager:
         return np.dot(vec1, vec2) / (norm1 * norm2)
 
     def find_similar_objects(self, query, top_n=10):
-        query_embedding = self._create_embedding(query, context=f"query={query[:80]}")
+        query_text = self._sanitize_embedding_text(query)
+        query_embedding = self._create_embedding(query_text, context=f"query={query_text[:80]}")
         similarities = []
         for obj in self.embeddings:
             similarity = self.cosine_similarity(query_embedding, obj["embedding"])
