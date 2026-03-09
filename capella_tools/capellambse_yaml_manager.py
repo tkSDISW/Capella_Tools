@@ -24,6 +24,7 @@ class CapellaYAMLHandler:
         self.referenced_objects = []
         self.primary_objects = []
         self.parser = parser
+        self.realize_refs = Fales
         self.yaml_content = """
 ---  
 # YAML file for system model relationships
@@ -33,6 +34,11 @@ model:
     ref_uuid: Unique identifier for a referenced object
   objects:
 """
+
+
+    def set_realize_refs(self, True_or_False):
+        self.realize_refs = True_or_False
+
 
     def generate_teamcenter_yaml_snippet(self, uuid, indent="    "):
         """
@@ -394,6 +400,11 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realize_refs:
+                for cr in obj.realizing_capabilities:
+                    if cr not in self.referenced_objects:
+                        self.referenced_objects.append(cr)
+
         if obj.__class__.__name__ ==  "Capability"  :  
             for this_obj in obj.includes:
                 if this_obj not in self.referenced_objects:
@@ -1936,6 +1947,11 @@ model:
        - name: {{ cons.name }}
          ref_uuid: {{ cons.uuid }}
       {% endfor %}
+      {% if realizing_caps %}realizing capabilities:
+      {% for rc in realizing_caps %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
         {% endif %}
         {% if exchanges %}exchanges:
         {% for excs in exchanges %}
@@ -2155,6 +2171,9 @@ model:
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                "realizing_caps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_capabilities]
+
+                        
             }
     
             # Add referenced objects for expansion
