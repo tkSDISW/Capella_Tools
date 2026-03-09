@@ -86,10 +86,10 @@ class EmbeddingManager:
         print(f"🌐 Base URL: {self.llm_url or 'Default'}")
         print(f"🤖 Model: {self.model}")
 
-        if self.model and not str(self.model).startswith("text-embedding-"):
-            raise ValueError(
-                f"EmbeddingManager requires an embedding model, got: {self.model}"
-            )
+        #if self.model and not str(self.model).startswith("text-embedding-"):
+        #    raise ValueError(
+        #        f"EmbeddingManager requires an embedding model, got: {self.model}"
+        #    )
         self.embedding_file = ''
         self.model_file = ''
         self.selected_objects_output = []  # Stores selected objects persistently
