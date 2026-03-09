@@ -7,7 +7,8 @@
 # with the OpenSans font (capellambse/OpenSans-Regular.ttf).
 # The OpenSans font is Copyright 2020 The Open Sans Project Authors,
 # licensed under OFL-1.1 (see full text in LICENSES/OFL-1.1.txt)
-
+import re
+import unicodedata
 import sys
 from pathlib import Path
 from openai import OpenAI, APIConnectionError, APITimeoutError, APIStatusError, BadRequestError
@@ -29,28 +30,28 @@ from capella_tools.model_configurator import get_api_key, get_base_url, get_mode
 
 
 class EmbeddingManager:
-        def _sanitize_embedding_text(self, text: str) -> str:
-            text = "" if text is None else str(text)
-            text = text.replace("\x00", " ")
-            text = re.sub(r"[\ud800-\udfff]", "", text)
-            text = re.sub(r"[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]", " ", text)
-            text = unicodedata.normalize("NFKC", text)
-            return " ".join(text.split()).strip()
+    def _sanitize_embedding_text(self, text: str) -> str:
+        text = "" if text is None else str(text)
+        text = text.replace("\x00", " ")
+        text = re.sub(r"[\ud800-\udfff]", "", text)
+        text = re.sub(r"[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]", " ", text)
+        text = unicodedata.normalize("NFKC", text)
+        return " ".join(text.split()).strip()
 
-        def _save_failed_payload(self, text: str, context: str, error: Exception):
-            failure_dir = Path(self.embedding_file).parent if self.embedding_file else Path(".")
-            failure_path = failure_dir / "embedding_bad_payload.json"
-            with open(failure_path, "w", encoding="utf-8") as f:
-                json.dump({
-                    "context": context,
-                    "error_type": type(error).__name__,
-                    "error": repr(error),
-                    "text_repr": repr(text),
-                    "text": text,
-                    "length": len(text),
-                    "code_points_head": [hex(ord(c)) for c in text[:200]],
-                }, f, indent=2, ensure_ascii=False)
-            print(f"📝 Saved bad payload to {failure_path}")
+    def _save_failed_payload(self, text: str, context: str, error: Exception):
+        failure_dir = Path(self.embedding_file).parent if self.embedding_file else Path(".")
+        failure_path = failure_dir / "embedding_bad_payload.json"
+        with open(failure_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "context": context,
+                "error_type": type(error).__name__,
+                "error": repr(error),
+                "text_repr": repr(text),
+                "text": text,
+                "length": len(text),
+                "code_points_head": [hex(ord(c)) for c in text[:200]],
+            }, f, indent=2, ensure_ascii=False)
+        print(f"📝 Saved bad payload to {failure_path}")
             
     def __init__(self, model=None, base_url=None, api_key=None, config_name=None):
         """Initialize the analyzer with YAML content."""
@@ -238,14 +239,14 @@ class EmbeddingManager:
         Keeps things generic so agents can pass it around.
         """
         info = self.get_embedding_file_info()
- 3
-return {
-            "type": "embedding_file",
-            "path": info["path"],
-            "meta": info["meta"],
-            "count": info["count"],
-            "display_name": f"Embeddings ({info['count']}) - {info['meta'].get('capella_model_name') if info['meta'] else 'Unknown'}"
-        }
+ 
+        return {
+                    "type": "embedding_file",
+                    "path": info["path"],
+                    "meta": info["meta"],
+                    "count": info["count"],
+                    "display_name": f"Embeddings ({info['count']}) - {info['meta'].get('capella_model_name') if info['meta'] else 'Unknown'}"
+                }
 
     # ---------- Embedding creation / loading ----------
 
