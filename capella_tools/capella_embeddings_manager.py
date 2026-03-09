@@ -32,15 +32,15 @@ class EmbeddingManager:
         """Initialize the analyzer with YAML content."""
         config = {}
         if config_name:
-            config_path = Path.home() / ".secrets" / "model_configs.json"
+            config_path = Path.home() / ".secrets" / "embeddings_configs.json"
             if config_path.exists():
                 with config_path.open() as f:
                     configs = json.load(f)
                 config = configs.get(config_name, {})
                 if not config:
-                    raise ValueError(f"No config named '{config_name}' found in model_configs.json.")
+                    raise ValueError(f"No config named '{config_name}' found in embeddings_configs.json.")
         elif model is None and base_url is None and api_key is None:
-            config_path = Path.home() / ".secrets" / "model_configs.json"
+            config_path = Path.home() / ".secrets" / "embeddings_configs.json"
             if config_path.exists():
                 with config_path.open() as f:
                     configs = json.load(f)
