@@ -2077,12 +2077,6 @@ model:
          ref_uuid: {{ rc.uuid }}
       {% endfor %}
       {% endif %}
-      {% if exchanges %}exchanges:
-      {% for excs in exchanges %}
-       - name: {{  e.name }}
-         ref_uuid: {{ e.uuid }}
-      {% endfor %}
-      {% endif %}
 """
 
         cap_template = """
@@ -2144,12 +2138,6 @@ model:
          ref_uuid: {{ rc.uuid }}
       {% endfor %}
       {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid: {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
 """     
         
         # Build the data for the YAML generation
@@ -2637,7 +2625,8 @@ model:
                      "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                      "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                      "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
-                     "realized_func_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_functional_exchanges] if self.realized_refs else []
+                     "realized_comps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_components] if self.realized_refs else []
+
                 }
                 # Add referenced objects for expansion
                 self._track_referenced_objects(obj)
@@ -2669,7 +2658,7 @@ model:
                  "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                  "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                  "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
-                 "realized_func_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_functional_exchanges] if self.realized_refs else []
+                 "realized_comps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_components] if self.realized_refs else []
                 }
         
                 # Add referenced objects for expansion
