@@ -24,7 +24,8 @@ class CapellaYAMLHandler:
         self.referenced_objects = []
         self.primary_objects = []
         self.parser = parser
-        self.realize_refs = False
+        self.realizing_refs = False
+        self.realized_refs = False
         self.yaml_content = """
 ---  
 # YAML file for system model relationships
@@ -36,9 +37,12 @@ model:
 """
 
 
-    def set_realize_refs(self, True_or_False):
-        self.realize_refs = True_or_False
+    def set_realizing_refs(self, True_or_False):
+        self.realizing_refs = True_or_False
 
+
+    def set_realized_refs(self, True_or_False):
+        self.realized_refs = True_or_False
 
     def generate_teamcenter_yaml_snippet(self, uuid, indent="    "):
         """
@@ -238,6 +242,14 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_components:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+            if self.realized_refs:
+                for rr in obj.realized_components:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)            
 
         if obj.__class__.__name__ ==  "Entity" :  
             for ent in obj.entities:
@@ -264,6 +276,14 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_components:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+            if self.realized_refs:
+                for rr in obj.realized_components:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)        
         
         if obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "NODE":  
             for dc in getattr(obj, "deployed_components", []):  # Ensure it's iterable
@@ -351,9 +371,35 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_functions:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+            if self.realized_refs:
+                for rr in obj.realized_functions:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr) 
+
+
         if obj.__class__.__name__ ==  "OperationalActivity" :  
-            if obj.owner not in self.referenced_objects:
-                    self.referenced_objects.append(obj.owner)
+            for this_obj in obj.includes:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj.target)
+            for this_obj in obj.extends:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj.target)
+            for this_obj in obj.involved_entities:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)
+            for this_obj in obj.involved_activities:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)
+            for this_obj in obj.involved_processes:
+                if this_obj not in self.referenced_objects:
+                    self.referenced_objects.append(this_obj)         
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
             for ain in obj.inputs:
                 if ain not in self.referenced_objects:
                     self.referenced_objects.append(ain)
@@ -372,6 +418,12 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_system_functions:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+
+
         if obj.__class__.__name__ ==  "OperationalCapability" :  
             for this_obj in obj.includes:
                 if this_obj not in self.referenced_objects:
@@ -400,11 +452,11 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
-            if self.realize_refs:
-                for cr in obj.realizing_capabilities:
-                    print("Realizing Capability", cr.name  )
-                    if cr not in self.referenced_objects:
-                        self.referenced_objects.append(cr)
+            if self.realizing_refs:
+                for rr in obj.realizing_capabilities:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+
 
         if obj.__class__.__name__ ==  "Capability"  :  
             for this_obj in obj.includes:
@@ -434,6 +486,7 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+
         if obj.__class__.__name__ == "CapabilityRealization" :  
 
             for this_obj in obj.involved_components:
@@ -457,6 +510,7 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+
         if  obj.__class__.__name__ ==  "OperationalProcess" :  
             for inv in obj.involved:
                 if inv not in self.referenced_objects:
@@ -473,6 +527,15 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_chains:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+            if self.realized_refs:
+                for rr in obj.realized_chains:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr) 
+
         if obj.__class__.__name__ ==  "FunctionalChain"  :  
             for inv in obj.involved:
                 if inv not in self.referenced_objects:
@@ -492,6 +555,15 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_chains:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+            if self.realized_refs:
+                for rr in obj.realized_chains:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr) 
+
         if obj.__class__.__name__ ==  "StateTransition" :  
             for eff in obj.effects:
                 if eff not in self.referenced_objects:
@@ -623,6 +695,15 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_functional_exchanges:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+            if self.realized_refs:
+                for rr in obj.realized_functional_exchanges:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr) 
+
         if obj.__class__.__name__ ==  "Interaction" :
             for ei in obj.exchange_items:
                 if ei not in self.referenced_objects:
@@ -728,6 +809,14 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realizing_refs:
+                for rr in obj.realizing_component_exchanges:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)
+            if self.realized_refs:
+                for rr in obj.realized_component_exchanges:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr) 
                     
         if obj.__class__.__name__ ==  "ExchangeItem" :
             for e in obj.elements:
@@ -1228,6 +1317,18 @@ model:
          ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
+      {% if realizing_func_exchs %}realizing functional exchanges:
+      {% for rc in realizing_func_exchs %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realized_func_exchs %}realized functional exchanges:
+      {% for rc in realized_func_exchs %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}  
 """
 
         communication_mean_template = """
@@ -1326,6 +1427,18 @@ model:
         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
+      {% if realizing_comp_exchs %}realizing component exchanges:
+      {% for rc in realizing_comp_exchs %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realized_comp_exchs %}realized component exchanges:
+      {% for rc in realized_comp_exchs %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}      
 """
         physical_link_template = """
     - name: {{ name }}
@@ -1412,6 +1525,18 @@ model:
         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
+      {% if realizing_chains %}realizing chains:
+      {% for rc in realizing_chains %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realized_chains %}realized chains:
+      {% for rc in realized_chains %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %} 
 """ 
 
         fc_template = """
@@ -1456,6 +1581,18 @@ model:
         ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
+      {% if realizing_chains %}realizing chains:
+      {% for rc in realizing_chains %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realized_chains %}realized chains:
+      {% for rc in realized_chains %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %} 
 """ 
         physicalpath_template = """
     - name: {{ name }}
@@ -1595,6 +1732,18 @@ model:
          ref_uuid: {{ sm.uuid }}
       {% endfor %}
       {% endif %}
+      {% if realizing_comps %}realizing components:
+      {% for rc in realizing_comps %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realized_comps %}realized components:
+      {% for rc in realized_comps %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         entity_template = """
@@ -1642,6 +1791,18 @@ model:
       {% for sm in state_machines %}
        - name: {{  sm.name }}
          ref_uuid: {{ sm.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realizing_comps %}realizing components:
+      {% for rc in realizing_comps %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realized_comps %}realized components:
+      {% for rc in realized_comps %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
       {% endfor %}
       {% endif %}
 """
@@ -1764,8 +1925,20 @@ model:
       {% for excs in exchanges %}
        - name: {{  e.name }}         
          ref_uuid: {{ e.uuid }}
-       {% endfor %}
-       {% endif %}
+      {% endfor %}
+      {% endif %}
+      {% if realizing_funcs %}realizing functions:
+      {% for rf in realizing_funcs %}
+       - name: {{ rf.name }}
+         ref_uuid: {{ rf.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if realized_funcs %}realized functions:
+      {% for rf in realized_funcs %}
+       - name: {{ rf.name }}
+         ref_uuid: {{ rf.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         activity_template = """
@@ -1833,6 +2006,12 @@ model:
          ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
+      {% if realizing_sys_funcs %}realizing system functions:
+      {% for rsf in realizing_sys_funcs %}
+       - name: {{ rsf.name }}
+         ref_uuid: {{ rsf.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         oc_template = """
@@ -1887,6 +2066,12 @@ model:
        - name: {{ cons.name }}
          ref_uuid: {{ cons.uuid }}
       {% endfor %}
+      {% if realizing_caps %}realizing capabilities:
+      {% for rc in realizing_caps %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
         {% endif %}
         {% if exchanges %}exchanges:
         {% for excs in exchanges %}
@@ -1986,7 +2171,10 @@ model:
                  "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                  "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                  "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
-                 "state_machines": [{"name": sm.name, "uuid": sm.uuid} for sm in obj.state_machines]
+                 "state_machines": [{"name": sm.name, "uuid": sm.uuid} for sm in obj.state_machines],
+                 "realizing_comps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_components] if self.realizing_refs else [],
+                 "realized_comps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_components] if self.realized_refs else []
+
             }
     
             # Add referenced objects for expansion
@@ -2013,7 +2201,10 @@ model:
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
-                "state_machines": [{"name": sm.name, "uuid": sm.uuid} for sm in obj.state_machines]
+                "state_machines": [{"name": sm.name, "uuid": sm.uuid} for sm in obj.state_machines],
+                "realizing_comps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_components] if self.realizing_refs else [],
+                "realized_comps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_components] if self.realized_refs else []
+
             }
             #print(data)
     
@@ -2037,7 +2228,9 @@ model:
                 "involved": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                "realizing_chains": [{"name": rf.name, "uuid": rf.uuid} for rf in obj.realizing_chains] if self.realizing_refs else [],
+                "realized_chains": [{"name": rf.name, "uuid": rf.uuid} for rf in obj.realized_chains] if self.realized_refs else []
             }
 
             
@@ -2062,7 +2255,9 @@ model:
                 "involved_chains": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved_chains],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                "realizing_chains": [{"name": rf.name, "uuid": rf.uuid} for rf in obj.realizing_chains] if self.realizing_refs else [],
+                "realized_chains": [{"name": rf.name, "uuid": rf.uuid} for rf in obj.realized_chains] if self.realized_refs else []
             }
 
             
@@ -2106,10 +2301,12 @@ model:
                          } for p in obj.outputs],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                "realizing_funcs": [{"name": rf.name, "uuid": rf.uuid} for rf in obj.realizing_functions] if self.realizing_refs else [],
+                "realized_funcs": [{"name": rf.name, "uuid": rf.uuid} for rf in obj.realized_functions] if self.realized_refs else []
             }
     
-            # Add referenced objects for expansion
+            # Add referenced objects for expansion  
             self._track_referenced_objects(obj)
     
             # Render the template
@@ -2143,7 +2340,8 @@ model:
                          } for p in obj.outputs],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                "realizing_sys_funcs": [{"name": rr.name, "uuid": rr.uuid} for rr in obj.realizing_system_functions] if self.realizing_refs else []
             }
     
             # Add referenced objects for expansion
@@ -2173,7 +2371,7 @@ model:
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
-                "realizing_caps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_capabilities] if self.realize_refs else []
+                "realizing_caps": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_capabilities] if self.realizing_refs else []
 
                         
             }
@@ -2182,7 +2380,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(cap_template)
+            template = Template(oc_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2285,7 +2483,9 @@ model:
                 "exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in obj.exchange_items],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                "realizing_func_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_functional_exchanges] if self.realizing_refs else [],
+                "realized_func_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_functional_exchanges] if self.realized_refs else []
             }
     
             # Add referenced objects for expansion
@@ -2313,7 +2513,9 @@ model:
                 "allocated_functional_exchanges": [{"name": fe.name, "uuid": fe.uuid} for fe in obj.allocated_functional_exchanges],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                "realizing_comp_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realizing_component_exchanges] if self.realizing_refs else [],
+                "realized_comp_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_component_exchanges] if self.realized_refs else []
             }
     
             # Add referenced objects for expansion
