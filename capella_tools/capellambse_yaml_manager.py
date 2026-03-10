@@ -311,6 +311,11 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            if self.realized_refs:
+                for rr in obj.realized_components:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)  
+
         if obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "BEHAVIOR":  
             for dc in obj.deployed_components:
                     if dc not in self.referenced_objects:
@@ -324,21 +329,27 @@ model:
                 for e in port.exchanges:
                     if e not in self.referenced_objects:
                         self.referenced_objects.append(e)
-                for func in obj.allocated_functions:
-                    if func not in self.referenced_objects:
-                        self.referenced_objects.append(func)
-                for apvg in obj.applied_property_value_groups:
-                    if apvg not in self.referenced_objects:
-                        self.referenced_objects.append(apvg)
-                for apv in obj.applied_property_values:
-                    if apv not in self.referenced_objects:
-                        self.referenced_objects.append(apv)
-                for con in obj.constraints:
-                    if con not in self.referenced_objects:
-                        self.referenced_objects.append(con)
-                for req in obj.requirements:
-                    if req not in self.referenced_objects:
-                        self.referenced_objects.append(req)
+            for func in obj.allocated_functions:
+                if func not in self.referenced_objects:
+                    self.referenced_objects.append(func)
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
+            for apv in obj.applied_property_values:
+                if apv not in self.referenced_objects:
+                    self.referenced_objects.append(apv)
+            for con in obj.constraints:
+                if con not in self.referenced_objects:
+                    self.referenced_objects.append(con)
+            for req in obj.requirements:
+                if req not in self.referenced_objects:
+                    self.referenced_objects.append(req)
+            if self.realized_refs:
+                for rr in obj.realized_components:
+                    if rr not in self.referenced_objects:
+                        self.referenced_objects.append(rr)  
+
+
         if obj.__class__.__name__  ==  "Requirement" :  
             for rel in obj.relations:
                     if rel not in self.referenced_objects:
@@ -1847,6 +1858,12 @@ model:
          ref_uuid: {{ e.uuid }}
       {% endfor %}
       {% endif %}
+      {% if realized_comps %}realized components:
+      {% for rc in realized_comps %}
+       - name: {{ rc.name }}
+         ref_uuid: {{ rc.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         function_template = """
@@ -2053,19 +2070,19 @@ model:
        - name: {{ cons.name }}
          ref_uuid: {{ cons.uuid }}
       {% endfor %}
+      {% endif %}
       {% if realizing_caps %}realizing capabilities:
       {% for rc in realizing_caps %}
        - name: {{ rc.name }}
          ref_uuid: {{ rc.uuid }}
       {% endfor %}
       {% endif %}
-        {% endif %}
-        {% if exchanges %}exchanges:
-        {% for excs in exchanges %}
-          - name: {{  e.name }}
-            ref_uuid: {{ e.uuid }}
-        {% endfor %}
-        {% endif %}
+      {% if exchanges %}exchanges:
+      {% for excs in exchanges %}
+       - name: {{  e.name }}
+         ref_uuid: {{ e.uuid }}
+      {% endfor %}
+      {% endif %}
 """
 
         cap_template = """
@@ -2619,7 +2636,8 @@ model:
                              } for p in obj.physical_ports],
                      "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                      "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                     "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                     "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                     "realized_func_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_functional_exchanges] if self.realized_refs else []
                 }
                 # Add referenced objects for expansion
                 self._track_referenced_objects(obj)
@@ -2650,7 +2668,8 @@ model:
                          } for p in obj.ports],
                  "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                  "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
-                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
+                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+                 "realized_func_exchs": [{"name": rc.name, "uuid": rc.uuid} for rc in obj.realized_functional_exchanges] if self.realized_refs else []
                 }
         
                 # Add referenced objects for expansion
