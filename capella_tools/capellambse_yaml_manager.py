@@ -382,21 +382,8 @@ model:
 
 
         if obj.__class__.__name__ ==  "OperationalActivity" :  
-            for this_obj in obj.includes:
-                if this_obj not in self.referenced_objects:
-                    self.referenced_objects.append(this_obj.target)
-            for this_obj in obj.extends:
-                if this_obj not in self.referenced_objects:
-                    self.referenced_objects.append(this_obj.target)
-            for this_obj in obj.involved_entities:
-                if this_obj not in self.referenced_objects:
-                    self.referenced_objects.append(this_obj)
-            for this_obj in obj.involved_activities:
-                if this_obj not in self.referenced_objects:
-                    self.referenced_objects.append(this_obj)
-            for this_obj in obj.involved_processes:
-                if this_obj not in self.referenced_objects:
-                    self.referenced_objects.append(this_obj)         
+            if obj.owner not in self.referenced_objects:
+                    self.referenced_objects.append(obj.owner)
             for apvg in obj.applied_property_value_groups:
                 if apvg not in self.referenced_objects:
                     self.referenced_objects.append(apvg)
