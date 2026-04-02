@@ -7,10 +7,11 @@
 # with the OpenSans font (capellambse/OpenSans-Regular.ttf).
 # The OpenSans font is Copyright 2020 The Open Sans Project Authors,
 # licensed under OFL-1.1 (see full text in LICENSES/OFL-1.1.txt)
-
+import re
+import unicodedata
 import sys
 from pathlib import Path
-from openai import OpenAI
+from openai import OpenAI, APIConnectionError, APITimeoutError, APIStatusError, BadRequestError
 from IPython.display import display, Markdown
 from IPython.core.display import HTML
 import numpy as np
@@ -24,23 +25,47 @@ import time
 from IPython import get_ipython
 from jupyter_ui_poll import ui_events
 import time
+import traceback
 from capella_tools.model_configurator import get_api_key, get_base_url, get_model
 
 
 class EmbeddingManager:
+    def _sanitize_embedding_text(self, text: str) -> str:
+        text = "" if text is None else str(text)
+        text = text.replace("\x00", " ")
+        text = re.sub(r"[\ud800-\udfff]", "", text)
+        text = re.sub(r"[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]", " ", text)
+        text = unicodedata.normalize("NFKC", text)
+        return " ".join(text.split()).strip()
+
+    def _save_failed_payload(self, text: str, context: str, error: Exception):
+        failure_dir = Path(self.embedding_file).parent if self.embedding_file else Path(".")
+        failure_path = failure_dir / "embedding_bad_payload.json"
+        with open(failure_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "context": context,
+                "error_type": type(error).__name__,
+                "error": repr(error),
+                "text_repr": repr(text),
+                "text": text,
+                "length": len(text),
+                "code_points_head": [hex(ord(c)) for c in text[:200]],
+            }, f, indent=2, ensure_ascii=False)
+        print(f"📝 Saved bad payload to {failure_path}")
+            
     def __init__(self, model=None, base_url=None, api_key=None, config_name=None):
         """Initialize the analyzer with YAML content."""
         config = {}
         if config_name:
-            config_path = Path.home() / ".secrets" / "model_configs.json"
+            config_path = Path.home() / ".secrets" / "embeddings_configs.json"
             if config_path.exists():
                 with config_path.open() as f:
                     configs = json.load(f)
                 config = configs.get(config_name, {})
                 if not config:
-                    raise ValueError(f"No config named '{config_name}' found in model_configs.json.")
+                    raise ValueError(f"No config named '{config_name}' found in embeddings_configs.json.")
         elif model is None and base_url is None and api_key is None:
-            config_path = Path.home() / ".secrets" / "model_configs.json"
+            config_path = Path.home() / ".secrets" / "embeddings_configs.json"
             if config_path.exists():
                 with config_path.open() as f:
                     configs = json.load(f)
@@ -62,9 +87,11 @@ class EmbeddingManager:
         print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
         print(f"🌐 Base URL: {self.llm_url or 'Default'}")
         print(f"🤖 Model: {self.model}")
-        # Preserve prior behavior: override to embeddings model
-        self.model = "text-embedding-3-small"
 
+        #if self.model and not str(self.model).startswith("text-embedding-"):
+        #    raise ValueError(
+        #        f"EmbeddingManager requires an embedding model, got: {self.model}"
+        #    )
         self.embedding_file = ''
         self.model_file = ''
         self.selected_objects_output = []  # Stores selected objects persistently
@@ -212,29 +239,143 @@ class EmbeddingManager:
         Keeps things generic so agents can pass it around.
         """
         info = self.get_embedding_file_info()
+ 
         return {
-            "type": "embedding_file",
-            "path": info["path"],
-            "meta": info["meta"],
-            "count": info["count"],
-            "display_name": f"Embeddings ({info['count']}) - {info['meta'].get('capella_model_name') if info['meta'] else 'Unknown'}"
-        }
+                    "type": "embedding_file",
+                    "path": info["path"],
+                    "meta": info["meta"],
+                    "count": info["count"],
+                    "display_name": f"Embeddings ({info['count']}) - {info['meta'].get('capella_model_name') if info['meta'] else 'Unknown'}"
+                }
 
     # ---------- Embedding creation / loading ----------
 
-    def generate_object_embeddings(self, objects):
-        for obj in objects:
-            # Combine metadata into a single text string
-            metadata_text = f"{obj['name']} {obj['type']} {obj['phase']} {obj['source_component']} {obj['target_component']}"
-            metadata_text = metadata_text.replace("\n", " ")
-            obj["embedding"] = self.client.embeddings.create(
-                input=[metadata_text],
-                model=self.model
-            ).data[0].embedding
+    def _build_embedding_text(self, obj):
+        parts = [
+            obj.get("name", ""),
+            obj.get("type", ""),
+            obj.get("phase", ""),
+            obj.get("source_component", ""),
+            obj.get("target_component", ""),
+        ]
+        metadata_text = " ".join(str(p).strip() for p in parts if p)
+        metadata_text = self._sanitize_embedding_text(metadata_text)
+        if not metadata_text:
+            raise ValueError(f"Empty embedding text for uuid={obj.get('uuid')}")
+        return metadata_text
 
-        self.embeddings = objects
-        print("embeddings generated")
-        return objects
+    def _create_embedding_once(self, text: str, *, context: str = ""):
+        start = time.time()
+        try:
+            response = self.client.embeddings.create(
+                input=[text],
+                model=self.model,
+            )
+            elapsed = time.time() - start
+            print(f"✅ Embedding created in {elapsed:.2f}s [{context}]")
+            return response.data[0].embedding
+        except APIConnectionError as e:
+            elapsed = time.time() - start
+            print(f"❌ APIConnectionError after {elapsed:.2f}s [{context}]")
+            print(f"   Base URL: {self.llm_url}")
+            print(f"   Model: {self.model}")
+            print(f"   Detail: {repr(e)}")
+            raise
+        except APITimeoutError as e:
+            elapsed = time.time() - start
+            print(f"❌ APITimeoutError after {elapsed:.2f}s [{context}]")
+            print(f"   Base URL: {self.llm_url}")
+            print(f"   Model: {self.model}")
+            print(f"   Detail: {repr(e)}")
+            raise
+        except APIStatusError as e:
+            elapsed = time.time() - start
+            print(f"❌ APIStatusError after {elapsed:.2f}s [{context}]")
+            print(f"   Status code: {e.status_code}")
+            print(f"   Base URL: {self.llm_url}")
+            print(f"   Model: {self.model}")
+            print(f"   Detail: {repr(e)}")
+            raise
+        except BadRequestError as e:
+            elapsed = time.time() - start
+            print(f"❌ BadRequestError after {elapsed:.2f}s [{context}]")
+            print(f"   Base URL: {self.llm_url}")
+            print(f"   Model: {self.model}")
+            print(f"   Detail: {repr(e)}")
+            print(f"   Text length: {len(text)}")
+            print(f"   Text repr: {repr(text[:500])}")
+            print(f"   Code points: {[hex(ord(c)) for c in text[:80]]}")
+            self._save_failed_payload(text, context, e)
+            raise
+        except Exception as e:
+            elapsed = time.time() - start
+            print(f"❌ Unexpected error after {elapsed:.2f}s [{context}]")
+            print(f"   Type: {type(e).__name__}")
+            print(f"   Detail: {repr(e)}")
+            print(traceback.format_exc())
+            raise
+
+    def _create_embedding(self, text: str, *, context: str = "", retries: int = 2):
+        for attempt in range(retries + 1):
+            try:
+                return self._create_embedding_once(text, context=context)
+            except (APIConnectionError, APITimeoutError) as e:
+                if attempt >= retries:
+                    raise
+                wait = 2 * (attempt + 1)
+                print(f"🔁 Retrying in {wait}s [{context}] because of {type(e).__name__}")
+                time.sleep(wait)
+
+    def test_connection(self):
+        print("🔎 Testing embeddings connection...")
+        print(f"   Base URL: {self.llm_url}")
+        print(f"   Model: {self.model}")
+        test_vec = self._create_embedding("connection test", context="startup test")
+        print(f"✅ Connection test passed. Vector length = {len(test_vec)}")
+        return True
+
+    def generate_object_embeddings(self, objects, continue_on_error=False):
+        print(f"Creating embeddings for {len(objects)} objects using {self.model}")
+        overall_start = time.time()
+        failed = []
+        completed = []
+
+        for idx, obj in enumerate(objects, start=1):
+            metadata_text = self._build_embedding_text(obj)
+            print(f"[{idx}/{len(objects)}] Embedding: {obj.get('name', '<unnamed>')} ({obj.get('type', 'Unknown')})")
+            try:
+                obj["embedding"] = self._create_embedding(
+                    metadata_text,
+                    context=f"object={obj.get('name', '<unnamed>')} uuid={obj.get('uuid')}"
+                )
+                completed.append(obj)
+            except Exception as e:
+                failed.append({
+                    "uuid": obj.get("uuid"),
+                    "name": obj.get("name"),
+                    "type": obj.get("type"),
+                    "error_type": type(e).__name__,
+                    "error": repr(e),
+                })
+                print(f"⚠️ Failed: {obj.get('name', '<unnamed>')} ({type(e).__name__})")
+                if not continue_on_error:
+                    raise
+
+            if idx == 1 or idx % 25 == 0 or idx == len(objects):
+                print(f"📍 Progress: {idx}/{len(objects)} processed")
+
+        self.embeddings = completed
+        elapsed = time.time() - overall_start
+        print(f"✅ Generated embeddings for {len(self.embeddings)} object(s) in {elapsed:.1f}s")
+
+        if failed:
+            failure_file = Path(self.embedding_file).with_suffix(".failures.json")
+            with open(failure_file, "w", encoding="utf-8") as f:
+                json.dump(failed, f, indent=2)
+            print(f"⚠️ Failed on {len(failed)} object(s)")
+            print(f"📝 Failure report saved to {failure_file}")
+
+        return completed
 
     def create_model_embeddings(self, model):
         def get_project_requirements(model):
@@ -347,6 +488,7 @@ class EmbeddingManager:
 
             # SA
             phase = "System Analysis SA"
+            # NOTE: This currently reuses OA requirements for downstream phases.
             for component in model.oa.all_requirements:
                 add_unique_object(object_data, get_req_info(component, phase))
             for component in model.sa.all_components:
@@ -366,6 +508,7 @@ class EmbeddingManager:
 
             # LA
             phase = "Logical Architecture LA"
+            # NOTE: This currently reuses OA requirements for downstream phases.
             for component in model.oa.all_requirements:
                 add_unique_object(object_data, get_req_info(component, phase))
             for obj in model.la.all_capabilities:
@@ -389,6 +532,7 @@ class EmbeddingManager:
 
             # PA
             phase = "Physical Architecture PA"
+            # NOTE: This currently reuses OA requirements for downstream phases.
             for component in model.oa.all_requirements:
                 add_unique_object(object_data, get_req_info(component, phase))
             for component in model.pa.all_components:
@@ -409,10 +553,19 @@ class EmbeddingManager:
                 add_unique_object(object_data, get_component_exchange_info(obj, phase))
             for obj in model.pa.all_physical_paths:
                 add_unique_object(object_data, get_object_info(obj, phase))
-            for obj in model.pa.all_physical_exchanges:
-                add_unique_object(object_data, get_component_exchange_info(obj, phase))
             for obj in model.pa.diagrams:
                 add_unique_object(object_data, get_diagram_info(obj, phase))
+
+            phase_counts = {}
+            type_counts = {}
+            for obj in object_data:
+                phase_counts[obj["phase"]] = phase_counts.get(obj["phase"], 0) + 1
+                type_counts[obj["type"]] = type_counts.get(obj["type"], 0) + 1
+
+            print("📦 Objects collected by phase:")
+            for phase_name, count in phase_counts.items():
+                print(f"   - {phase_name}: {count}")
+            print(f"📦 Total collected: {len(object_data)}")
 
             # Generate + save
             self.generate_object_embeddings(object_data)
@@ -436,10 +589,15 @@ class EmbeddingManager:
 
     @staticmethod
     def cosine_similarity(vec1, vec2):
-        return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+        norm1 = np.linalg.norm(vec1)
+        norm2 = np.linalg.norm(vec2)
+        if norm1 == 0 or norm2 == 0:
+            return 0.0
+        return np.dot(vec1, vec2) / (norm1 * norm2)
 
     def find_similar_objects(self, query, top_n=10):
-        query_embedding = self.client.embeddings.create(input=[query], model=self.model).data[0].embedding
+        query_text = self._sanitize_embedding_text(query)
+        query_embedding = self._create_embedding(query_text, context=f"query={query_text[:80]}")
         similarities = []
         for obj in self.embeddings:
             similarity = self.cosine_similarity(query_embedding, obj["embedding"])

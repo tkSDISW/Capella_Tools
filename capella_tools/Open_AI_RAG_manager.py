@@ -41,8 +41,8 @@ from pathlib import Path
 
 
 class ChatGPTAnalyzer:
-    ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.pdf', '.docx', '.sysml'}
-    TEXT_BASED_EXTS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.sysml'}
+    ALLOWED_EXTENSIONS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html', '.pdf', '.docx', '.sysml','.csv'}
+    TEXT_BASED_EXTS = {'.yaml', '.yml', '.txt', '.xml', '.json', '.html','.csv', '.sysml'}
     PDF_EXTS = {'.pdf'}
     DOCX_EXTS = {'.docx'}
 
