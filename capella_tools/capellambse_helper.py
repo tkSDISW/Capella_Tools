@@ -20,6 +20,16 @@ import pandas as pd
 import jinja2
 
 
+def get_parent(obj):
+    """Return the parent/owner of obj.
+    capellambse renamed .owner to .parent in 7.0.1+; this helper
+    supports both versions transparently.
+    """
+    if hasattr(obj, 'parent'):
+        return obj.parent
+    return obj.owner
+
+
 def filter_property_value(value):
     """
     Process a property value to return a clean representation suitable for Jinja reports.
@@ -89,10 +99,10 @@ def Display_Logical_Functional_Chain_Tables(fc):
         Current_Function_Exchange_EI = ''
         Current_Function_Exchange_EIE = ''
         
-        #print(function.owner)
-        if function.owner != None :
-         
-            Current_Function_Owner=function.owner.name
+        #print(get_parent(function))
+        if get_parent(function) != None :
+
+            Current_Function_Owner=get_parent(function).name
             #print("- Entity:",Current_Function_Owner)
             #print("-Function:",function.name)
             Current_Function = function.name
@@ -417,7 +427,7 @@ def Generate_Function_Report(oa):
     {% if oa.summary %}
         <p><b>Summary:</b>{{ oa.summary }}</p>
     {% endif %}
-    <p><b>Owning Component or Actor:</b>  {{ oa.owner.name if oa.owner.name else "none" }}</p>
+    <p><b>Parent Component or Actor:</b>  {{ oa.parent.name if oa.parent else oa.owner.name if oa.owner else "none" }}</p>
     {% if oa.description %}
         <p><b>Description</b></p>
         <!-- Description contains preformatted HTML content -->
@@ -490,7 +500,7 @@ def Generate_Operational_Activity_Report(oa):
     {% if oa.summary %}
         <p><b>Summary:</b>{{ oa.summary }}</p>
     {% endif %}
-    <p><b>Owning Entity or Actor:</b>  {{ oa.owner.name if oa.owner.name else "none" }}</p>
+    <p><b>Parent Entity or Actor:</b>  {{ oa.parent.name if oa.parent else oa.owner.name if oa.owner else "none" }}</p>
     {% if oa.description %}
         <p><b>Description</b></p>
         <!-- Description contains preformatted HTML content -->
@@ -1214,8 +1224,8 @@ def Display_Component_Report( pc , artifacts = None ):
                 <tr>
                     <td style="text-align:left ; border: 1px solid black">{{ exs.name }}</td>
                     <td style="text-align:left ; border: 1px solid black">{{ exs.uuid }}</td>
-                    <td style="text-align:left ; border: 1px solid black">{{ exs.source.owner.name}}, {{ exs.source.direction }}</td>
-                    <td style="text-align:left ; border: 1px solid black">{{ exs.target.owner.name}}, {{ exs.target.direction }}</td>
+                    <td style="text-align:left ; border: 1px solid black">{{ (exs.source.parent if exs.source.parent else exs.source.owner).name}}, {{ exs.source.direction }}</td>
+                    <td style="text-align:left ; border: 1px solid black">{{ (exs.target.parent if exs.target.parent else exs.target.owner).name}}, {{ exs.target.direction }}</td>
                     <p style="text-align: center;">Component Exchange: <strong> {{ exs.name }}</strong></p>
                     {% if exs.property_value_groups %}
                     <table  style="border: 2px solid black; width:100% " >
@@ -1351,10 +1361,10 @@ def Display_Operational_Processes_Tables(fc):
         Current_Function_Exchange_EI = ''
         Current_Function_Exchange_EIE = ''
         
-        #print(function.owner)
-        if function.owner != None :
-         
-            Current_Function_Owner=function.owner.name
+        #print(get_parent(function))
+        if get_parent(function) != None :
+
+            Current_Function_Owner=get_parent(function).name
             #print("- Entity:",Current_Function_Owner)
             #print("-Function:",function.name)
             Current_Function = function.name
@@ -1474,10 +1484,10 @@ def Display_Operational_Process_Report(fc):
         Current_Function_Exchange_EI = ''
         Current_Function_Exchange_EIE = ''
         
-        #print(function.owner)
-        if function.owner != None :
-         
-            Current_Function_Owner=function.owner.name
+        #print(get_parent(function))
+        if get_parent(function) != None :
+
+            Current_Function_Owner=get_parent(function).name
             #print("- Entity:",Current_Function_Owner)
             #print("-Function:",function.name)
             Current_Function = function.name
@@ -1600,10 +1610,10 @@ def Display_Functional_Chain_Report(fc):
         Current_Function_Exchange_EI = ''
         Current_Function_Exchange_EIE = ''
         
-        #print(function.owner)
-        if function.owner != None :
-         
-            Current_Function_Owner=function.owner.name
+        #print(get_parent(function))
+        if get_parent(function) != None :
+
+            Current_Function_Owner=get_parent(function).name
             print("- Entity:",Current_Function_Owner)
             print("-Function:",function.name)
             Current_Function = function.name
