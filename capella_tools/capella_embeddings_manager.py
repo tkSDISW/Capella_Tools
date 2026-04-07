@@ -432,6 +432,16 @@ class EmbeddingManager:
                 "target_component": ""
             }
 
+        def _port_owner_name(port):
+            """Return the owner/parent name of a port, preferring 'parent' (new API) over 'owner' (deprecated)."""
+            if port is None:
+                return None
+            if hasattr(type(port), "parent"):
+                p = port.parent
+                return p.name if p is not None else None
+            owner = getattr(port, "owner", None)
+            return owner.name if owner is not None else None
+
         def get_component_exchange_info(object, phase):
             # bugfix: use 'object' param rather than undefined 'obj'
             return {
@@ -439,8 +449,8 @@ class EmbeddingManager:
                 "name": object.name,
                 "type": type(object).__name__,
                 "phase": phase,
-                "source_component": object.source.owner.name if getattr(object, "source", None) and getattr(object.source, "owner", None) else None,
-                "target_component": object.target.owner.name if getattr(object, "target", None) and getattr(object.target, "owner", None) else None
+                "source_component": _port_owner_name(getattr(object, "source", None)),
+                "target_component": _port_owner_name(getattr(object, "target", None)),
             }
 
         def get_diagram_info(object, phase):
@@ -523,9 +533,9 @@ class EmbeddingManager:
                 add_unique_object(object_data, get_object_info(obj, phase))
             for obj in model.la.all_interfaces:
                 add_unique_object(object_data, get_object_info(obj, phase))
-            for obj in model.la.component_exchanges:
+            for obj in (model.la.all_component_exchanges if hasattr(type(model.la), "all_component_exchanges") else model.la.component_exchanges):
                 add_unique_object(object_data, get_component_exchange_info(obj, phase))
-            for obj in model.la.actor_exchanges:
+            for obj in (model.la.all_actor_exchanges if hasattr(type(model.la), "all_actor_exchanges") else model.la.actor_exchanges):
                 add_unique_object(object_data, get_component_exchange_info(obj, phase))
             for obj in model.la.diagrams:
                 add_unique_object(object_data, get_diagram_info(obj, phase))
