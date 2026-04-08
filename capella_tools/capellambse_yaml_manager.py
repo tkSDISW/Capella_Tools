@@ -588,8 +588,9 @@ model:
                     if rr not in self.referenced_objects:
                         self.referenced_objects.append(rr) 
 
-        if obj.__class__.__name__ ==  "StateTransition" :  
-            for eff in obj.effects:
+        if obj.__class__.__name__ ==  "StateTransition" :
+            _eff_attr = "effect" if hasattr(type(obj), "effect") else "effects"
+            for eff in getattr(obj, _eff_attr):
                 if eff not in self.referenced_objects:
                     self.referenced_objects.append(eff)
             for t in obj.triggers:
@@ -618,10 +619,12 @@ model:
             for da in obj.do_activity:
                 if da not in self.referenced_objects:
                     self.referenced_objects.append(da)
-            for en in obj.entries:
+            _entry_attr = "entry" if hasattr(type(obj), "entry") else "entries"
+            for en in getattr(obj, _entry_attr):
                 if en not in self.referenced_objects:
                     self.referenced_objects.append(en)
-            for ex in obj.exits:
+            _exit_attr = "exit" if hasattr(type(obj), "exit") else "exits"
+            for ex in getattr(obj, _exit_attr):
                 if ex not in self.referenced_objects:
                     self.referenced_objects.append(ex)
             for apvg in obj.applied_property_value_groups:
@@ -2822,8 +2825,8 @@ model:
                 "outgoing_transitions": [{"name": og.name, "uuid": og.uuid} for og in obj.outgoing_transitions],
                 "incoming_transitions": [{"name": inc.name, "uuid": inc.uuid} for inc in obj.incoming_transitions],
                 "do_activity": [{"name": da.name, "uuid": da.uuid} for da in obj.do_activity],
-                "exits": [{"name": ex.name, "uuid": ex.uuid} for ex in obj.exits],
-                "entries": [{"name": en.name, "uuid": en.uuid} for en in obj.entries],
+                "exits": [{"name": ex.name, "uuid": ex.uuid} for ex in getattr(obj, "exit" if hasattr(type(obj), "exit") else "exits")],
+                "entries": [{"name": en.name, "uuid": en.uuid} for en in getattr(obj, "entry" if hasattr(type(obj), "entry") else "entries")],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
@@ -2871,11 +2874,11 @@ model:
                 "description" :self._get_description(obj),
                 "source" :obj.source,
                 "triggers": [{"name": t.name, "uuid": t.uuid} for t in obj.triggers],
-                "effects": [{"name": ef.name, "uuid": ef.uuid} for ef in obj.effects],
+                "effects": [{"name": ef.name, "uuid": ef.uuid} for ef in getattr(obj, "effect" if hasattr(type(obj), "effect") else "effects")],
                 "source_name":  obj.source.name,
                 "source_uuid":  obj.source.uuid,
-                "dest_name":  obj.destination.name,
-                "dest_uuid":  obj.destination.uuid,
+                "dest_name":  getattr(obj, "target" if hasattr(type(obj), "target") else "destination").name,
+                "dest_uuid":  getattr(obj, "target" if hasattr(type(obj), "target") else "destination").uuid,
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
