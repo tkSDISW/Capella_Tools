@@ -72,11 +72,24 @@ class ChatGPTAnalyzer:
         self.api_key = api_key or config.get("api_key") or get_api_key()
         self.llm_url = base_url or config.get("base_url") or get_base_url()
         self.llm_model = model or config.get("model") or get_model()
-    
+        self.llm_provider = config.get("provider", "Not Specified")
+
+        # Load provider compatibility drop_fields from provider_compatibility_configs.json
+        compat_path = Path.home() / ".secrets" / "provider_compatibility_configs.json"
+        self._drop_fields = set()
+        if compat_path.exists():
+            with compat_path.open() as f:
+                compat_configs = json.load(f)
+            provider_compat = compat_configs.get(self.llm_provider, {})
+            self._drop_fields = set(provider_compat.get("drop_fields", []))
+
         print(f"✅ ChatGPTAnalyzer initialized")
         print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
         print(f"🌐 Base URL: {self.llm_url or 'Default'}")
         print(f"🤖 Model: {self.llm_model}")
+        print(f"🏢 Provider: {self.llm_provider}")
+        if self._drop_fields:
+            print(f"⚠️  Dropping incompatible fields for '{self.llm_provider}': {sorted(self._drop_fields)}")
         self.yaml_content = yaml_content or ""
         self.chat_active = True
         self.messages = []
@@ -124,16 +137,19 @@ class ChatGPTAnalyzer:
         # inside your Open_AI_RAG_manager
 
         try:
-            client = OpenAI(api_key=self.api_key, base_url=self.llm_url )
-            response = client.chat.completions.create(
-                messages=self.messages,
-                model=self.llm_model,
-                seed=42,            #  repeatability
-                temperature=0.0,    #  deterministic choice of highest-probability token
-                top_p=1.0,          #  disables nucleus sampling (keeps distribution intact)
-                presence_penalty=0, #  don't bias against repetition unless you want to
-                frequency_penalty=0 #  same here
-            )
+            client = OpenAI(api_key=self.api_key, base_url=self.llm_url)
+            params = {
+                "messages":         self.messages,
+                "model":            self.llm_model,
+                "seed":             42,   # repeatability
+                "temperature":      0.0,  # deterministic choice of highest-probability token
+                "top_p":            1.0,  # disables nucleus sampling (keeps distribution intact)
+                "presence_penalty": 0,    # don't bias against repetition unless you want to
+                "frequency_penalty": 0    # same here
+            }
+            # Remove fields not supported by this provider
+            params = {k: v for k, v in params.items() if k not in self._drop_fields}
+            response = client.chat.completions.create(**params)
             assistant_message = response.choices[0].message.content
             usage = response.usage
             token_usage_info = (
