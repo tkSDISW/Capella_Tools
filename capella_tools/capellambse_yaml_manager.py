@@ -1,4 +1,3 @@
-
 # Copyright Siemens AG
 # Licensed under the Apache License, Version 2.0 (see full text in LICENSES/Apache-2.0.txt)
 
