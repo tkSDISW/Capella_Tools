@@ -18,6 +18,10 @@ import re
 import base64
 from pathlib import Path
 
+# Class names for diagram objects across capellambse versions:
+# "Diagram" was used in Capella 6.1 and earlier; "DRepresentationDescriptor" in 7.0.1+
+DIAGRAM_CLASS_NAMES = {"Diagram", "DRepresentationDescriptor"}
+
 class CapellaYAMLHandler:
     def __init__(self,parser=None):
         self.file_name = None
@@ -43,6 +47,26 @@ model:
 
     def set_realized_refs(self, True_or_False):
         self.realized_refs = True_or_False
+
+    def _get_parent(self, obj):
+        """Return the parent/owner of obj.
+        capellambse renamed .owner to .parent in 7.0.1+; this helper
+        supports both versions transparently.
+        """
+        if hasattr(obj, 'parent'):
+            return obj.parent
+        return obj.owner
+
+    def _get_description(self, obj):
+        """Safely retrieve obj.description.
+        In capellambse 7.0.1+, accessing .description triggers image embedding
+        which can raise OSError if the description contains inline base64 data
+        URIs that capellambse mistakenly tries to resolve as file paths.
+        """
+        try:
+            return obj.description
+        except OSError:
+            return ""
 
     def generate_teamcenter_yaml_snippet(self, uuid, indent="    "):
         """
@@ -290,7 +314,8 @@ model:
                 if hasattr(dc, "name") and hasattr(dc, "uuid"):  # Avoid AttributeError
                     if dc not in self.referenced_objects:
                         self.referenced_objects.append(dc)
-            for comp in obj.components:
+            _comp_attr = "related_components" if hasattr(type(obj), "related_components") else "components"
+            for comp in getattr(obj, _comp_attr):
                 if comp not in self.referenced_objects:
                     self.referenced_objects.append(comp)
             for physical_port in obj.physical_ports:
@@ -316,11 +341,12 @@ model:
                     if rr not in self.referenced_objects:
                         self.referenced_objects.append(rr)  
 
-        if obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "BEHAVIOR":  
+        if obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "BEHAVIOR":
             for dc in obj.deployed_components:
                     if dc not in self.referenced_objects:
                         self.referenced_objects.append(dc)
-            for comp in obj.components:
+            _comp_attr = "related_components" if hasattr(type(obj), "related_components") else "components"
+            for comp in getattr(obj, _comp_attr):
                 if comp not in self.referenced_objects:
                     self.referenced_objects.append(comp)
             for port in obj.ports:
@@ -356,8 +382,8 @@ model:
                         self.referenced_objects.append(rel)
                 
         if obj.__class__.__name__ ==  "LogicalFunction" or obj.__class__.__name__ ==  "SystemFunction" or obj.__class__.__name__ ==  "PhysicalFunction":
-            if obj.owner not in self.referenced_objects:
-                    self.referenced_objects.append(obj.owner)
+            if self._get_parent(obj) not in self.referenced_objects:
+                    self.referenced_objects.append(self._get_parent(obj))
             for port in obj.inputs:
                 if port not in self.referenced_objects:
                     self.referenced_objects.append(port)
@@ -392,9 +418,9 @@ model:
                         self.referenced_objects.append(rr) 
 
 
-        if obj.__class__.__name__ ==  "OperationalActivity" :  
-            if obj.owner not in self.referenced_objects:
-                    self.referenced_objects.append(obj.owner)
+        if obj.__class__.__name__ ==  "OperationalActivity" :
+            if self._get_parent(obj) not in self.referenced_objects:
+                    self.referenced_objects.append(self._get_parent(obj))
             for apvg in obj.applied_property_value_groups:
                 if apvg not in self.referenced_objects:
                     self.referenced_objects.append(apvg)
@@ -562,8 +588,9 @@ model:
                     if rr not in self.referenced_objects:
                         self.referenced_objects.append(rr) 
 
-        if obj.__class__.__name__ ==  "StateTransition" :  
-            for eff in obj.effects:
+        if obj.__class__.__name__ ==  "StateTransition" :
+            _eff_attr = "effect" if hasattr(type(obj), "effect") else "effects"
+            for eff in getattr(obj, _eff_attr):
                 if eff not in self.referenced_objects:
                     self.referenced_objects.append(eff)
             for t in obj.triggers:
@@ -592,10 +619,12 @@ model:
             for da in obj.do_activity:
                 if da not in self.referenced_objects:
                     self.referenced_objects.append(da)
-            for en in obj.entries:
+            _entry_attr = "entry" if hasattr(type(obj), "entry") else "entries"
+            for en in getattr(obj, _entry_attr):
                 if en not in self.referenced_objects:
                     self.referenced_objects.append(en)
-            for ex in obj.exits:
+            _exit_attr = "exit" if hasattr(type(obj), "exit") else "exits"
+            for ex in getattr(obj, _exit_attr):
                 if ex not in self.referenced_objects:
                     self.referenced_objects.append(ex)
             for apvg in obj.applied_property_value_groups:
@@ -669,7 +698,8 @@ model:
                     self.referenced_objects.append(req)
 
         if obj.__class__.__name__ ==  "FunctionalExchange" :
-            for ei in obj.exchange_items:
+            _ei_attr = "exchanged_items" if hasattr(type(obj), "exchanged_items") else "exchange_items"
+            for ei in getattr(obj, _ei_attr):
                 if ei not in self.referenced_objects:
                     self.referenced_objects.append(ei)
             #for fc in obj.involving_functional_chains:
@@ -729,9 +759,10 @@ model:
                     self.referenced_objects.append(req)
         if obj.__class__.__name__ ==  "PhysicalLink" :
             #print(obj)
-            for obj in obj.exchanges:
-                if obj not in self.referenced_objects:
-                    self.referenced_objects.append(obj)
+            _exc_attr = "allocated_component_exchanges" if hasattr(type(obj), "allocated_component_exchanges") else "exchanges"
+            for exc in getattr(obj, _exc_attr):
+                if exc not in self.referenced_objects:
+                    self.referenced_objects.append(exc)
              # Only attempt to access `physical_paths` if the object has that attribute
             if hasattr(obj, "physical_paths"):
                 for ppath in obj.physical_paths:
@@ -760,9 +791,10 @@ model:
             for inv in obj.involved_items:
                 if inv not in self.referenced_objects:
                     self.referenced_objects.append(inv)
-            for obj in obj.exchanges:
-                if obj not in self.referenced_objects:
-                    self.referenced_objects.append(obj)
+            _exc_attr = "allocated_component_exchanges" if hasattr(type(obj), "allocated_component_exchanges") else "exchanges"
+            for exc in getattr(obj, _exc_attr):
+                if exc not in self.referenced_objects:
+                    self.referenced_objects.append(exc)
             for apvg in obj.applied_property_value_groups:
                 if apvg not in self.referenced_objects:
                     self.referenced_objects.append(apvg)
@@ -840,8 +872,10 @@ model:
                     self.referenced_objects.append(req)
                     
         if obj.__class__.__name__ ==  "ExchangeItemElement" :
-            if obj.abstract_type not in self.referenced_objects:
-                self.referenced_objects.append(obj.abstract_type)
+            _type_attr = "type" if hasattr(type(obj), "type") else "abstract_type"
+            _obj_type = getattr(obj, _type_attr)
+            if _obj_type not in self.referenced_objects:
+                self.referenced_objects.append(_obj_type)
             for apvg in obj.applied_property_value_groups:
                 if apvg not in self.referenced_objects:
                     self.referenced_objects.append(apvg)
@@ -860,7 +894,7 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
-        if obj.__class__.__name__ ==  "Diagram" :
+        if obj.__class__.__name__ in DIAGRAM_CLASS_NAMES:
             for node in obj.nodes:
                 if node not in self.referenced_objects:
                     self.referenced_objects.append(node)
@@ -868,9 +902,9 @@ model:
             if obj.type not in self.referenced_objects:
                 self.referenced_objects.append(obj.type)
                 
-        if obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort":   
-            if obj.owner not in self.referenced_objects:
-                self.referenced_objects.append(obj.owner)
+        if obj.__class__.__name__  ==  "FunctionInputPort" or obj.__class__.__name__  ==  "FunctionOutputPort"  or obj.__class__.__name__  ==  "PhysicalPort" or obj.__class__.__name__  ==  "ComponentPort":
+            if self._get_parent(obj) not in self.referenced_objects:
+                self.referenced_objects.append(self._get_parent(obj))
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
@@ -942,9 +976,9 @@ model:
       type: {{type}}
       primary_uuid: {{ uuid }}
       description: "{{ description | escape | replace('\n', ' ') }}"
-      owner:
-        name: {{ owner_name }}
-        ref_uuid: {{ owner_uuid }}
+      parent:
+        name: {{ parent_name }}
+        ref_uuid: {{ parent_uuid }}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
@@ -1871,9 +1905,9 @@ model:
       type: {{type}}
       primary_uuid: {{ uuid }}
       description: "{{ description | escape | replace('\n', ' ') }}"
-      owner :
-      - name: {{owner_name}}
-        ref_uuid: {{owner_uuid}}
+      parent:
+      - name: {{parent_name}}
+        ref_uuid: {{parent_uuid}}
       functions owned:
       {% for func in functions %}
        - name: {{ func.name }}
@@ -1950,9 +1984,9 @@ model:
       type: {{type}}
       primary_uuid: {{ uuid }}
       description: "{{ description | escape | replace('\n', ' ') }}"
-      owner:
-       - name: {{owner_name}}
-         ref_uuid: {{owner_uuid}}
+      parent:
+       - name: {{parent_name}}
+         ref_uuid: {{parent_uuid}}
       activities owned:
       {% for act in activities %}
        - name: {{ act.name }}
@@ -2151,14 +2185,14 @@ model:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "is_human":obj.is_human,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "components" : [{"name": c.name , "uuid": c.uuid} for c in obj.components],
                 "allocated_functions": [{"name": f.name , "uuid": f.uuid} for f in obj.allocated_functions],
                 "ports": [{
                     "name": p.name,
                     "uuid": p.uuid,
-                    "description": p.description,
-                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description": e.description,"source_component": e.source.owner.name, "source_component_uuid": e.source.owner.uuid, "target_component": e.target.owner.name, "target_component_uuid": e.target.owner.uuid} for e in getattr(p, 'exchanges', [])]
+                    "description": self._get_description(p),
+                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description": self._get_description(e),"source_component": self._get_parent(e.source).name, "source_component_uuid": self._get_parent(e.source).uuid, "target_component": self._get_parent(e.target).name, "target_component_uuid": self._get_parent(e.target).uuid} for e in getattr(p, 'exchanges', [])]
                          } for p in obj.ports],
                  "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                  "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2187,7 +2221,7 @@ model:
                 "uuid" : obj.uuid,
                 "is_human":obj.is_human,
                 "is_actor":obj.is_actor,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "entities": [{"name": ent.name , "uuid": ent.uuid} for ent in obj.entities],
                 "activities": [{"name": a.name , "uuid": a.uuid} for a in obj.activities],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
@@ -2216,7 +2250,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "involved": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2242,7 +2276,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "involved": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved],
                 "involved_chains": [{"name": inv.name , "uuid": inv.uuid, "type": inv.__class__.__name__ } for inv in obj.involved_chains],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
@@ -2275,21 +2309,21 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
-                "owner_name" :obj.owner.name if obj.owner else None,
-                "owner_uuid" :obj.owner.uuid if obj.owner else None,
-                "functions" :[{"name": func.name, "uuid": func.uuid} for func in obj.functions],
+                "description" :self._get_description(obj),
+                "parent_name" :self._get_parent(obj).name if self._get_parent(obj) else None,
+                "parent_uuid" :self._get_parent(obj).uuid if self._get_parent(obj) else None,
+                "child_functions" :[{"name": func.name, "uuid": func.uuid} for func in obj.functions],
                 "inputs": [{
                     "name": p.name,
                     "uuid": p.uuid,
-                    "description": p.description,
-                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":e.description, "source_component": e.source.owner.name, "source_component_uuid": e.source.owner.uuid, "target_component": e.target.owner.name, "target_component_uuid": e.target.owner.uuid  } for e in getattr(p, 'exchanges', [])]
+                    "description": self._get_description(p),
+                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":self._get_description(e), "source_component": self._get_parent(e.source).name, "source_component_uuid": self._get_parent(e.source).uuid, "target_component": self._get_parent(e.target).name, "target_component_uuid": self._get_parent(e.target).uuid} for e in getattr(p, 'exchanges', [])]
                          } for p in obj.inputs],
                 "outputs": [{
                     "name": p.name,
                     "uuid": p.uuid,
-                    "description": p.description,
-                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":e.description, "source_component": e.source.owner.name, "source_component_uuid": e.source.owner.uuid, "target_component": e.target.owner.name, "target_component_uuid": e.target.owner.uuid } for e in getattr(p, 'exchanges', [])]
+                    "description": self._get_description(p),
+                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":self._get_description(e), "source_component": self._get_parent(e.source).name, "source_component_uuid": self._get_parent(e.source).uuid, "target_component": self._get_parent(e.target).name, "target_component_uuid": self._get_parent(e.target).uuid} for e in getattr(p, 'exchanges', [])]
                          } for p in obj.outputs],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2314,21 +2348,21 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
-                "owner_name" :obj.owner.name if obj.owner else None,
-                "owner_uuid" :obj.owner.uuid if obj.owner else None,
-                "activities" :[{"name": func.name, "uuid": func.uuid} for func in obj.activities],
+                "description" :self._get_description(obj),
+                "parent_name" :self._get_parent(obj).name if self._get_parent(obj) else None,
+                "parent_uuid" :self._get_parent(obj).uuid if self._get_parent(obj) else None,
+                "child activities" :[{"name": func.name, "uuid": func.uuid} for func in obj.activities],
                 "inputs": [{
                     "name": p.name,
                     "uuid": p.uuid,
-                    "description": p.description,
-                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":e.description, "source_component": e.source.owner.name, "source_component_uuid": e.source.owner.uuid, "target_component": e.target.owner.name, "target_component_uuid": e.target.owner.uuid  } for e in getattr(p, 'exchanges', [])]
+                    "description": self._get_description(p),
+                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":self._get_description(e), "source_component": self._get_parent(e.source).name, "source_component_uuid": self._get_parent(e.source).uuid, "target_component": self._get_parent(e.target).name, "target_component_uuid": self._get_parent(e.target).uuid} for e in getattr(p, 'exchanges', [])]
                          } for p in obj.inputs],
                 "outputs": [{
                     "name": p.name,
                     "uuid": p.uuid,
-                    "description": p.description,
-                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":e.description, "source_component": e.source.owner.name, "source_component_uuid": e.source.owner.uuid, "target_component": e.target.owner.name, "target_component_uuid": e.target.owner.uuid } for e in getattr(p, 'exchanges', [])]
+                    "description": self._get_description(p),
+                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description":self._get_description(e), "source_component": self._get_parent(e.source).name, "source_component_uuid": self._get_parent(e.source).uuid, "target_component": self._get_parent(e.target).name, "target_component_uuid": self._get_parent(e.target).uuid} for e in getattr(p, 'exchanges', [])]
                          } for p in obj.outputs],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2354,7 +2388,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "includes_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.includes],
                 "extended_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.extends],
                 "involved_activities" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_activities],
@@ -2383,7 +2417,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "includes_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.includes],
                 "extended_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.extends],
                 "involved_functions" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_functions],
@@ -2409,7 +2443,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "involved_functions" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_functions],
                 "involved_components" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_components],
                 "involved_chains" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_chains],
@@ -2437,12 +2471,12 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
-                "source_activity": obj.source.owner.name,
-                "source_activity_uuid": obj.source.owner.uuid,
-                "target_activity": obj.target.owner.name, 
-                "target_activity_uuid": obj.target.owner.uuid ,
-                "involving_operational_processes" :[{"name": op.name, "uuid": op.uuid} for op in obj.involving_operational_processes ],
+                "description" :self._get_description(obj),
+                "source_activity": self._get_parent(obj.source).name,
+                "source_activity_uuid": self._get_parent(obj.source).uuid,
+                "target_activity": self._get_parent(obj.target).name,
+                "target_activity_uuid": self._get_parent(obj.target).uuid,
+                "involving_ops" :[{"name": op.name, "uuid": op.uuid} for op in obj.involving_operational_processes ],
                 "exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in obj.exchange_items],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2466,13 +2500,13 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "source_function": obj.source.name,
                 "source_function_uuid": obj.source.uuid,
                 "target_function": obj.target.name , 
                 "target_function_uuid": obj.target.uuid ,
-                "involving_functional_chains" :[{"name": fc.name, "uuid": fc.uuid} for fc in obj.involving_functional_chains ],
-                "exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in obj.exchange_items],
+                "involving_fcs" :[{"name": fc.name, "uuid": fc.uuid} for fc in obj.involving_functional_chains ],
+                "exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in getattr(obj, "exchanged_items" if hasattr(type(obj), "exchanged_items") else "exchange_items")],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
@@ -2496,11 +2530,11 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
-                "source_component": obj.source.owner.name,
-                "source_component_uuid": obj.source.owner.uuid,
-                "target_component": obj.target.owner.name, 
-                "target_component_uuid": obj.target.owner.uuid ,
+                "description" :self._get_description(obj),
+                "source_component": self._get_parent(obj.source).name,
+                "source_component_uuid": self._get_parent(obj.source).uuid,
+                "target_component": self._get_parent(obj.target).name,
+                "target_component_uuid": self._get_parent(obj.target).uuid,
                 "exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in obj.exchange_items],
                 "allocated_functional_exchanges": [{"name": fe.name, "uuid": fe.uuid} for fe in obj.allocated_functional_exchanges],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
@@ -2525,7 +2559,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "source_entity": obj.source.name,
                 "source_entity_uuid": obj.source.uuid,
                 "target_entity": obj.target.name, 
@@ -2547,18 +2581,18 @@ model:
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
             
-        elif obj.__class__.__name__ ==  "PhysicalLink" : 
+        elif obj.__class__.__name__ ==  "PhysicalLink" :
             #print(obj)
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
-                "source_component": obj.source.owner.name,
-                "source_component_uuid": obj.source.owner.uuid,
-                "target_component": obj.target.owner.name, 
-                "target_component_uuid": obj.target.owner.uuid ,
-                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in obj.exchanges],
+                "description" :self._get_description(obj),
+                "source_component": self._get_parent(obj.source).name,
+                "source_component_uuid": self._get_parent(obj.source).uuid,
+                "target_component": self._get_parent(obj.target).name,
+                "target_component_uuid": self._get_parent(obj.target).uuid,
+                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in getattr(obj, "allocated_component_exchanges" if hasattr(type(obj), "allocated_component_exchanges") else "exchanges")],
                 "physical_paths": [{"name": pp.name, "uuid": pp.uuid} for pp in obj.physical_paths],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2582,9 +2616,9 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "involved_items": [{"name": inv.name , "uuid": inv.uuid} for inv in obj.involved_items],
-                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in obj.exchanges],
+                "allocated_component_exchanges": [{"name": ce.name, "uuid": ce.uuid} for ce in getattr(obj, "allocated_component_exchanges" if hasattr(type(obj), "allocated_component_exchanges") else "exchanges")],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
@@ -2609,8 +2643,8 @@ model:
                     "name": obj.name,
                     "uuid" : obj.uuid,
                     "is_human":obj.is_human,
-                    "description" :obj.description,
-                    "components" : [{"name": c.name , "uuid": c.uuid} for c in obj.components],
+                    "description" :self._get_description(obj),
+                    "components" : [{"name": c.name , "uuid": c.uuid} for c in getattr(obj, "related_components" if hasattr(type(obj), "related_components") else "components")],
                     "deployed_components": [
                         {"name": getattr(dc, "name", None), "uuid": getattr(dc, "uuid", None)}
                         for dc in getattr(obj, "deployed_components", [])  # Ensure it's iterable
@@ -2619,8 +2653,8 @@ model:
                     "physical_ports": [{
                         "name": p.name,
                         "uuid": p.uuid,
-                        "description": p.description,
-                        "links": [{"name": link.name, "uuid": link.uuid, "description": link.description,"source_component": link.source.owner.name, "source_component_uuid": link.source.owner.uuid, "target_component": link.target.owner.name, "target_component_uuid": link.target.owner.uuid} for link in p.links]
+                        "description": self._get_description(p),
+                        "links": [{"name": link.name, "uuid": link.uuid, "description": self._get_description(link),"source_component": self._get_parent(link.source).name, "source_component_uuid": self._get_parent(link.source).uuid, "target_component": self._get_parent(link.target).name, "target_component_uuid": self._get_parent(link.target).uuid} for link in p.links]
                              } for p in obj.physical_ports],
                      "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                      "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2639,21 +2673,21 @@ model:
             
                 
                
-        elif obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "BEHAVIOR":  
+        elif obj.__class__.__name__  ==  "PhysicalComponent" and obj.nature  ==  "BEHAVIOR":
                 data = {
                 "type" : obj.__class__.__name__,
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "is_human":obj.is_human,
-                "description" :obj.description,
-                "components" : [{"name": c.name , "uuid": c.uuid} for c in obj.components],
+                "description" :self._get_description(obj),
+                "components" : [{"name": c.name , "uuid": c.uuid} for c in getattr(obj, "related_components" if hasattr(type(obj), "related_components") else "components")],
                 "allocated_functions": [{"name": f.name , "uuid": f.uuid} for f in obj.allocated_functions],
                 "ports": [{
                     "name": p.name,
                     "uuid": p.uuid,
-                    "description": p.description,
-                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description": e.description,"source_component": e.source.owner.name, "source_component_uuid": e.source.owner.uuid, "target_component": e.target.owner.name, "target_component_uuid": e.target.owner.uuid} for e in getattr(p, 'exchanges', [])]
+                    "description": self._get_description(p),
+                    "exchanges": [{"name": e.name, "uuid": e.uuid, "description": self._get_description(e),"source_component": self._get_parent(e.source).name, "source_component_uuid": self._get_parent(e.source).uuid, "target_component": self._get_parent(e.target).name, "target_component_uuid": self._get_parent(e.target).uuid} for e in getattr(p, 'exchanges', [])]
                          } for p in obj.ports],
                  "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                  "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2676,11 +2710,11 @@ model:
 
                 data = {
                 "type" : obj.__class__.__name__,
-                "owner_name": obj.owner.name if obj.parent else None,                
-                "owner_uuid": obj.owner.uuid if obj.parent else None,
+                "parent_name": self._get_parent(obj).name if self._get_parent(obj) else None,
+                "parent_uuid": self._get_parent(obj).uuid if self._get_parent(obj) else None,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
@@ -2704,7 +2738,7 @@ model:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "value" : obj.value,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid ,"value": pv.value } for apv in obj.applied_property_values],
                 "property_values": [{"name": pv.name, "uuid": pv.uuid , "value": pv.value} for pv in obj.property_values],
@@ -2730,7 +2764,7 @@ model:
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
@@ -2755,7 +2789,7 @@ model:
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "regions": [{
                     "name": region.name,
                     "uuid": region.uuid,
@@ -2787,12 +2821,12 @@ model:
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "outgoing_transitions": [{"name": og.name, "uuid": og.uuid} for og in obj.outgoing_transitions],
                 "incoming_transitions": [{"name": inc.name, "uuid": inc.uuid} for inc in obj.incoming_transitions],
                 "do_activity": [{"name": da.name, "uuid": da.uuid} for da in obj.do_activity],
-                "exits": [{"name": ex.name, "uuid": ex.uuid} for ex in obj.exits],
-                "entries": [{"name": en.name, "uuid": en.uuid} for en in obj.entries],
+                "exits": [{"name": ex.name, "uuid": ex.uuid} for ex in getattr(obj, "exit" if hasattr(type(obj), "exit") else "exits")],
+                "entries": [{"name": en.name, "uuid": en.uuid} for en in getattr(obj, "entry" if hasattr(type(obj), "entry") else "entries")],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
@@ -2813,7 +2847,7 @@ model:
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "outgoing_transitions": [{"name": og.name, "uuid": og.uuid} for og in obj.outgoing_transitions],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2837,14 +2871,14 @@ model:
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "source" :obj.source,
                 "triggers": [{"name": t.name, "uuid": t.uuid} for t in obj.triggers],
-                "effects": [{"name": ef.name, "uuid": ef.uuid} for ef in obj.effects],
+                "effects": [{"name": ef.name, "uuid": ef.uuid} for ef in getattr(obj, "effect" if hasattr(type(obj), "effect") else "effects")],
                 "source_name":  obj.source.name,
                 "source_uuid":  obj.source.uuid,
-                "destination_name":  obj.destination.name,
-                "destination_uuid":  obj.destination.uuid,
+                "dest_name":  getattr(obj, "target" if hasattr(type(obj), "target") else "destination").name,
+                "dest_uuid":  getattr(obj, "target" if hasattr(type(obj), "target") else "destination").uuid,
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
@@ -2865,7 +2899,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "elements": [{"name": e.name, "uuid": e.uuid} for e in obj.elements],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
@@ -2884,15 +2918,15 @@ model:
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
             
 
-        elif obj.__class__.__name__ ==  "ExchangeItemElement" :   
-            
+        elif obj.__class__.__name__ ==  "ExchangeItemElement" :
+            _abstract_type = getattr(obj, "type" if hasattr(type(obj), "type") else "abstract_type")
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
                 "uuid" : obj.uuid,
-                "description" :obj.description,
-                "abstract_type_name" : obj.abstract_type.name if obj.abstract_type else None,
-                "abstract_type_uuid" : obj.abstract_type.uuid if obj.abstract_type else None,
+                "description" :self._get_description(obj),
+                "abstract_type_name" : _abstract_type.name if _abstract_type else None,
+                "abstract_type_uuid" : _abstract_type.uuid if _abstract_type else None,
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
@@ -2923,12 +2957,12 @@ model:
             self.yaml_content = self.yaml_content + template.render(data)
             
 
-        elif obj.__class__.__name__ ==  "Diagram" :   
+        elif obj.__class__.__name__ in DIAGRAM_CLASS_NAMES:
 
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "uuid":obj.uuid,
                 "nodes":obj.nodes              
             }
@@ -2944,7 +2978,7 @@ model:
             data = {
                 "type" : obj.__class__.__name__,
                 "name": obj.name,
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "uuid":obj.uuid,
                 "type_name":obj.type.name,
                 "type_uuid":obj.type.uuid
@@ -2983,7 +3017,7 @@ model:
                 "type" : obj.__class__.__name__,
                 "name": obj.name,  
                 "long_name": obj.long_name,   
-                "description" :obj.description,
+                "description" :self._get_description(obj),
                 "uuid":obj.uuid,
                 "source_name":  obj.source.long_name,
                 "source_uuid":  obj.source.uuid,
@@ -3001,9 +3035,10 @@ model:
         else :
             #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processing.")
            # print(obj)
+            _has_name = any(c.__name__ == "AbstractNamedElement" for c in type(obj).__mro__)
             data = {
                 "type" : obj.__class__.__name__,
-                "name": getattr(obj, "name", None), # Safe access to name
+                "name": obj.name if _has_name else None,
                 "uuid":  getattr(obj, "uuid", None),  # Safe access to uuid
                 "description" : getattr(obj, "description", None),  # Safe access to description
                 "applied_property_value_groups": [

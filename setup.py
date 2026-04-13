@@ -4,8 +4,8 @@ setup(
     version="1.0",
     packages=find_packages(),
     install_requires=[
-        "capellambse==0.6.20",  # Include other dependencies if needed
-        "capellambse_context_diagrams==0.6.3",
+        "capellambse",  # Include other dependencies if needed
+        "capellambse_context_diagrams",
         "cairosvg",
         "polarion",
         "openai",
