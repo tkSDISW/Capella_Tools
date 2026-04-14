@@ -2563,7 +2563,7 @@ model:
                 "source_entity_uuid": obj.source.uuid,
                 "target_entity": obj.target.name, 
                 "target_entity_uuid": obj.target.uuid ,
-                "allocated_exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in obj.allocated_exchange_items],
+                "allocated_exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in (obj.convoyed_informations if hasattr(obj, "convoyed_informations") else obj.allocated_exchange_items)],
                 "allocated_interactions": [{"name": fe.name, "uuid": fe.uuid} for fe in obj.allocated_interactions],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
