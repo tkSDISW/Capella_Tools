@@ -67,6 +67,18 @@ model:
         except OSError:
             return ""
 
+    def _safe_name(self, obj):
+        """Return obj.name, suppressing capellambse FutureWarnings for
+        synthetic or unnamed elements (e.g. AbstractCapabilityInclude,
+        unnamed transitions). Returns None if obj has no name attribute."""
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            try:
+                return obj.name
+            except AttributeError:
+                return None
+
     def generate_teamcenter_yaml_snippet(self, uuid, indent="    "):
         """
         Generate Teamcenter metadata snippet with proper YAML indentation.
@@ -2388,8 +2400,8 @@ model:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "description" :self._get_description(obj),
-                "includes_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.includes],
-                "extended_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.extends],
+                "includes_capabilities" :[{"name": self._safe_name(t_obj.target), "uuid": t_obj.target.uuid} for t_obj in obj.includes],
+                "extended_capabilities" :[{"name": self._safe_name(t_obj.target), "uuid": t_obj.target.uuid} for t_obj in obj.extends],
                 "involved_activities" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_activities],
                 "involved_entities" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_entities],
                 "involved_processes" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_processes],
@@ -2417,8 +2429,8 @@ model:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "description" :self._get_description(obj),
-                "includes_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.includes],
-                "extended_capabilities" :[{"name": t_obj.target.name, "uuid": t_obj.target.uuid} for t_obj in obj.extends],
+                "includes_capabilities" :[{"name": self._safe_name(t_obj.target), "uuid": t_obj.target.uuid} for t_obj in obj.includes],
+                "extended_capabilities" :[{"name": self._safe_name(t_obj.target), "uuid": t_obj.target.uuid} for t_obj in obj.extends],
                 "involved_functions" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_functions],
                 "involved_components" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_components],
                 "involved_chains" :[{"name": t_obj.name, "uuid": t_obj.uuid} for t_obj in obj.involved_chains],
@@ -2564,7 +2576,7 @@ model:
                 "target_entity": obj.target.name, 
                 "target_entity_uuid": obj.target.uuid ,
                 "allocated_exchange_items": [{"name": ei.name, "uuid": ei.uuid} for ei in (obj.convoyed_informations if hasattr(obj, "convoyed_informations") else obj.allocated_exchange_items)],
-                "allocated_interactions": [{"name": fe.name, "uuid": fe.uuid} for fe in obj.allocated_interactions],
+                "allocated_interactions": [{"name": self._safe_name(fe), "uuid": fe.uuid} for fe in obj.allocated_interactions],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints]
@@ -2821,11 +2833,11 @@ model:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "description" :self._get_description(obj),
-                "outgoing_transitions": [{"name": og.name, "uuid": og.uuid} for og in obj.outgoing_transitions],
-                "incoming_transitions": [{"name": inc.name, "uuid": inc.uuid} for inc in obj.incoming_transitions],
-                "do_activity": [{"name": da.name, "uuid": da.uuid} for da in obj.do_activity],
-                "exits": [{"name": ex.name, "uuid": ex.uuid} for ex in getattr(obj, "exit" if hasattr(type(obj), "exit") else "exits")],
-                "entries": [{"name": en.name, "uuid": en.uuid} for en in getattr(obj, "entry" if hasattr(type(obj), "entry") else "entries")],
+                "outgoing_transitions": [{"name": self._safe_name(og), "uuid": og.uuid} for og in obj.outgoing_transitions],
+                "incoming_transitions": [{"name": self._safe_name(inc), "uuid": inc.uuid} for inc in obj.incoming_transitions],
+                "do_activity": [{"name": self._safe_name(da), "uuid": da.uuid} for da in obj.do_activity],
+                "exits": [{"name": self._safe_name(ex), "uuid": ex.uuid} for ex in getattr(obj, "exit" if hasattr(type(obj), "exit") else "exits")],
+                "entries": [{"name": self._safe_name(en), "uuid": en.uuid} for en in getattr(obj, "entry" if hasattr(type(obj), "entry") else "entries")],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
@@ -2868,12 +2880,12 @@ model:
             data = {
                 "type" : obj.__class__.__name__,
                 "parent_uuid": obj.parent.uuid if obj.parent else None,
-                "name": obj.name,
+                "name": self._safe_name(obj),
                 "uuid" : obj.uuid,
                 "description" :self._get_description(obj),
                 "source" :obj.source,
-                "triggers": [{"name": t.name, "uuid": t.uuid} for t in obj.triggers],
-                "effects": [{"name": ef.name, "uuid": ef.uuid} for ef in getattr(obj, "effect" if hasattr(type(obj), "effect") else "effects")],
+                "triggers": [{"name": self._safe_name(t), "uuid": t.uuid} for t in obj.triggers],
+                "effects": [{"name": self._safe_name(ef), "uuid": ef.uuid} for ef in getattr(obj, "effect" if hasattr(type(obj), "effect") else "effects")],
                 "source_name":  obj.source.name,
                 "source_uuid":  obj.source.uuid,
                 "dest_name":  getattr(obj, "target" if hasattr(type(obj), "target") else "destination").name,
