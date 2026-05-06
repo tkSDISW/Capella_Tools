@@ -187,12 +187,21 @@ class ChatGPTAnalyzer:
         except Exception as e:
             error_type = type(e).__name__
             tb = traceback.format_exc()
-        
+
             display(Markdown("❌ **Error communicating with the OpenAI-compatible API.**"))
             display(Markdown(f"**Exception:** `{error_type}`  \n**Message:** `{str(e)}`"))
-        
+
+            # Print raw API response body so the real error reason is visible
+            raw_body = getattr(e, "body", None) or getattr(e, "response", None)
+            if raw_body is not None:
+                try:
+                    body_text = raw_body if isinstance(raw_body, str) else raw_body.text
+                    print(f"📡 Raw API response body: {body_text}")
+                except Exception:
+                    print(f"📡 Raw API response body: {raw_body}")
+
             if "401" in str(e) or "Unauthorized" in str(e):
-                display(Markdown("🔐 **It looks like your API key may be missing or invalid.**"))
+                display(Markdown("🔐 **It looks like your API key may be missing or invalid** — see raw response above for the actual reason."))
             elif "403" in str(e) or "Permission" in str(e):
                 display(Markdown("🚫 **You may not have access to this model or endpoint.**"))
             elif "Name or service not known" in str(e) or "Failed to establish a new connection" in str(e):
