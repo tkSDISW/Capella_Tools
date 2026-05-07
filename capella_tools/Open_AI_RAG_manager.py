@@ -132,33 +132,54 @@ class ChatGPTAnalyzer:
         })
         print(f"✅ File `{filepath}` added to messages for analysis.")
         
-    def get_response(self):
+    def get_response(self, max_retries: int = 3):
         """Send messages to ChatGPT and get a response with separate token usage info."""
-        # inside your Open_AI_RAG_manager
+
+        params = {
+            "messages":         self.messages,
+            "model":            self.llm_model,
+            "seed":             42,
+            "temperature":      0.0,
+            "top_p":            1.0,
+            "presence_penalty": 0,
+            "frequency_penalty": 0,
+        }
+        params = {k: v for k, v in params.items() if k not in self._drop_fields}
 
         try:
-            client = OpenAI(api_key=self.api_key, base_url=self.llm_url)
-            params = {
-                "messages":         self.messages,
-                "model":            self.llm_model,
-                "seed":             42,   # repeatability
-                "temperature":      0.0,  # deterministic choice of highest-probability token
-                "top_p":            1.0,  # disables nucleus sampling (keeps distribution intact)
-                "presence_penalty": 0,    # don't bias against repetition unless you want to
-                "frequency_penalty": 0    # same here
-            }
-            # Remove fields not supported by this provider
-            params = {k: v for k, v in params.items() if k not in self._drop_fields}
-            response = client.chat.completions.create(**params)
+            # Retry loop — handles transient nginx 401s from the reverse proxy
+            last_exc = None
+            response = None
+            for attempt in range(max_retries):
+                try:
+                    # Fresh client each attempt avoids stale connections losing auth header
+                    client = OpenAI(api_key=self.api_key, base_url=self.llm_url)
+                    response = client.chat.completions.create(**params)
+                    last_exc = None
+                    break
+                except Exception as exc:
+                    last_exc = exc
+                    err_str = str(exc)
+                    is_nginx_401 = ("401" in err_str or "Unauthorized" in err_str) and "nginx" in err_str
+                    if is_nginx_401 and attempt < max_retries - 1:
+                        wait = 2 ** attempt  # 1 s, 2 s
+                        print(f"⚠️ Transient proxy 401 (attempt {attempt + 1}/{max_retries}), retrying in {wait}s…")
+                        time.sleep(wait)
+                    else:
+                        break
+
+            if last_exc is not None:
+                raise last_exc
+
             assistant_message = response.choices[0].message.content
             usage = response.usage
             token_usage_info = (
                 f"Tokens used: prompt={usage.prompt_tokens}, "
                 f"completion={usage.completion_tokens}, total={usage.total_tokens}"
             ) if usage else "Token usage unavailable."
-    
+
             self.messages.append({"role": "assistant", "content": assistant_message})
-            
+
             # Strip unwanted code fences
             if assistant_message.startswith("```html"):
                 assistant_message = assistant_message[7:]
@@ -166,24 +187,21 @@ class ChatGPTAnalyzer:
                 assistant_message = assistant_message[:-3]
             if assistant_message.startswith("```python"):
                 assistant_message = assistant_message[9:]
-            # Clean up with BeautifulSoup
 
             soup = BeautifulSoup(assistant_message, "html.parser")
             for tag in soup(["script", "style"]):
                 tag.decompose()
             assistant_message_cleaned = str(soup)
-    
-            # Display response and then token usage separately
+
             if "<table" in assistant_message_cleaned or "<html" in assistant_message_cleaned:
                 display(HTML(assistant_message_cleaned))
             else:
                 display(Markdown(f"**Response:**\n\n{assistant_message_cleaned}"))
-    
-            # Display token info separately
+
             display(Markdown(f"**Token Usage Info:**\n\n{token_usage_info}"))
-    
+
             return assistant_message_cleaned
-    
+
         except Exception as e:
             error_type = type(e).__name__
             tb = traceback.format_exc()
@@ -191,7 +209,6 @@ class ChatGPTAnalyzer:
             display(Markdown("❌ **Error communicating with the OpenAI-compatible API.**"))
             display(Markdown(f"**Exception:** `{error_type}`  \n**Message:** `{str(e)}`"))
 
-            # Print raw API response body so the real error reason is visible
             raw_body = getattr(e, "body", None) or getattr(e, "response", None)
             if raw_body is not None:
                 try:
@@ -209,7 +226,6 @@ class ChatGPTAnalyzer:
             elif "model" in str(e).lower():
                 display(Markdown("🤖 **There may be an issue with the model name.** Double-check your configuration."))
 
-            # Optionally show traceback in collapsed view
             print("📄 Full Traceback (for debugging):")
             print(tb)
 
