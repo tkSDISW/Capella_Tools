@@ -153,7 +153,11 @@ class ChatGPTAnalyzer:
             for attempt in range(max_retries):
                 try:
                     # Fresh client each attempt avoids stale connections losing auth header
-                    client = OpenAI(api_key=self.api_key, base_url=self.llm_url)
+                    client = OpenAI(
+                        api_key=self.api_key,
+                        base_url=self.llm_url,
+                        default_headers={"x-api-key": self.api_key},
+                    )
                     response = client.chat.completions.create(**params)
                     last_exc = None
                     break

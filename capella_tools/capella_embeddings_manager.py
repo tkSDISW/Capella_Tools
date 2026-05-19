@@ -81,7 +81,11 @@ class EmbeddingManager:
         self.model = nonempty(model) or nonempty(config.get("model")) or get_model()
 
         from openai import OpenAI
-        self.client = OpenAI(api_key=self.api_key, base_url=self.llm_url)
+        self.client = OpenAI(
+            api_key=self.api_key,
+            base_url=self.llm_url,
+            default_headers={"x-api-key": self.api_key},
+        )
 
         print(f"✅ EmbeddingManager initialized")
         print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
