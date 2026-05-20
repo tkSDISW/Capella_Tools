@@ -82,6 +82,10 @@ class ChatGPTAnalyzer:
                 compat_configs = json.load(f)
             provider_compat = compat_configs.get(self.llm_provider, {})
             self._drop_fields = set(provider_compat.get("drop_fields", []))
+            for prefix, model_compat in provider_compat.get("models", {}).items():
+                if self.llm_model.startswith(prefix):
+                    self._drop_fields |= set(model_compat.get("drop_fields", []))
+                    break
 
         print(f"✅ ChatGPTAnalyzer initialized")
         print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
