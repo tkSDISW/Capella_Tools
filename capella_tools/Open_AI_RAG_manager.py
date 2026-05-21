@@ -72,11 +72,28 @@ class ChatGPTAnalyzer:
         self.api_key = api_key or config.get("api_key") or get_api_key()
         self.llm_url = base_url or config.get("base_url") or get_base_url()
         self.llm_model = model or config.get("model") or get_model()
-    
+        self.llm_provider = config.get("provider", "Not Specified")
+
+        # Load provider compatibility drop_fields from provider_compatibility_configs.json
+        compat_path = Path.home() / ".secrets" / "provider_compatibility_configs.json"
+        self._drop_fields = set()
+        if compat_path.exists():
+            with compat_path.open() as f:
+                compat_configs = json.load(f)
+            provider_compat = compat_configs.get(self.llm_provider, {})
+            self._drop_fields = set(provider_compat.get("drop_fields", []))
+            for prefix, model_compat in provider_compat.get("models", {}).items():
+                if self.llm_model.startswith(prefix):
+                    self._drop_fields |= set(model_compat.get("drop_fields", []))
+                    break
+
         print(f"✅ ChatGPTAnalyzer initialized")
         print(f"🔐 API Key: {'Provided' if api_key else 'Loaded from secrets'}")
         print(f"🌐 Base URL: {self.llm_url or 'Default'}")
         print(f"🤖 Model: {self.llm_model}")
+        print(f"🏢 Provider: {self.llm_provider}")
+        if self._drop_fields:
+            print(f"⚠️  Dropping incompatible fields for '{self.llm_provider}': {sorted(self._drop_fields)}")
         self.yaml_content = yaml_content or ""
         self.chat_active = True
         self.messages = []
@@ -119,30 +136,58 @@ class ChatGPTAnalyzer:
         })
         print(f"✅ File `{filepath}` added to messages for analysis.")
         
-    def get_response(self):
+    def get_response(self, max_retries: int = 3):
         """Send messages to ChatGPT and get a response with separate token usage info."""
-        # inside your Open_AI_RAG_manager
+
+        params = {
+            "messages":         self.messages,
+            "model":            self.llm_model,
+            "seed":             42,
+            "temperature":      0.0,
+            "top_p":            1.0,
+            "presence_penalty": 0,
+            "frequency_penalty": 0,
+        }
+        params = {k: v for k, v in params.items() if k not in self._drop_fields}
 
         try:
-            client = OpenAI(api_key=self.api_key, base_url=self.llm_url )
-            response = client.chat.completions.create(
-                messages=self.messages,
-                model=self.llm_model,
-                seed=42,            #  repeatability
-                temperature=0.0,    #  deterministic choice of highest-probability token
-                top_p=1.0,          #  disables nucleus sampling (keeps distribution intact)
-                presence_penalty=0, #  don't bias against repetition unless you want to
-                frequency_penalty=0 #  same here
-            )
+            # Retry loop — handles transient nginx 401s from the reverse proxy
+            last_exc = None
+            response = None
+            for attempt in range(max_retries):
+                try:
+                    # Fresh client each attempt avoids stale connections losing auth header
+                    client = OpenAI(
+                        api_key=self.api_key,
+                        base_url=self.llm_url,
+                        default_headers={"x-api-key": self.api_key},
+                    )
+                    response = client.chat.completions.create(**params)
+                    last_exc = None
+                    break
+                except Exception as exc:
+                    last_exc = exc
+                    err_str = str(exc)
+                    is_nginx_401 = ("401" in err_str or "Unauthorized" in err_str) and "nginx" in err_str
+                    if is_nginx_401 and attempt < max_retries - 1:
+                        wait = 2 ** attempt  # 1 s, 2 s
+                        print(f"⚠️ Transient proxy 401 (attempt {attempt + 1}/{max_retries}), retrying in {wait}s…")
+                        time.sleep(wait)
+                    else:
+                        break
+
+            if last_exc is not None:
+                raise last_exc
+
             assistant_message = response.choices[0].message.content
             usage = response.usage
             token_usage_info = (
                 f"Tokens used: prompt={usage.prompt_tokens}, "
                 f"completion={usage.completion_tokens}, total={usage.total_tokens}"
             ) if usage else "Token usage unavailable."
-    
+
             self.messages.append({"role": "assistant", "content": assistant_message})
-            
+
             # Strip unwanted code fences
             if assistant_message.startswith("```html"):
                 assistant_message = assistant_message[7:]
@@ -150,33 +195,38 @@ class ChatGPTAnalyzer:
                 assistant_message = assistant_message[:-3]
             if assistant_message.startswith("```python"):
                 assistant_message = assistant_message[9:]
-            # Clean up with BeautifulSoup
 
             soup = BeautifulSoup(assistant_message, "html.parser")
             for tag in soup(["script", "style"]):
                 tag.decompose()
             assistant_message_cleaned = str(soup)
-    
-            # Display response and then token usage separately
+
             if "<table" in assistant_message_cleaned or "<html" in assistant_message_cleaned:
                 display(HTML(assistant_message_cleaned))
             else:
                 display(Markdown(f"**Response:**\n\n{assistant_message_cleaned}"))
-    
-            # Display token info separately
+
             display(Markdown(f"**Token Usage Info:**\n\n{token_usage_info}"))
-    
+
             return assistant_message_cleaned
-    
+
         except Exception as e:
             error_type = type(e).__name__
             tb = traceback.format_exc()
-        
+
             display(Markdown("❌ **Error communicating with the OpenAI-compatible API.**"))
             display(Markdown(f"**Exception:** `{error_type}`  \n**Message:** `{str(e)}`"))
-        
+
+            raw_body = getattr(e, "body", None) or getattr(e, "response", None)
+            if raw_body is not None:
+                try:
+                    body_text = raw_body if isinstance(raw_body, str) else raw_body.text
+                    print(f"📡 Raw API response body: {body_text}")
+                except Exception:
+                    print(f"📡 Raw API response body: {raw_body}")
+
             if "401" in str(e) or "Unauthorized" in str(e):
-                display(Markdown("🔐 **It looks like your API key may be missing or invalid.**"))
+                display(Markdown("🔐 **It looks like your API key may be missing or invalid** — see raw response above for the actual reason."))
             elif "403" in str(e) or "Permission" in str(e):
                 display(Markdown("🚫 **You may not have access to this model or endpoint.**"))
             elif "Name or service not known" in str(e) or "Failed to establish a new connection" in str(e):
@@ -184,7 +234,6 @@ class ChatGPTAnalyzer:
             elif "model" in str(e).lower():
                 display(Markdown("🤖 **There may be an issue with the model name.** Double-check your configuration."))
 
-            # Optionally show traceback in collapsed view
             print("📄 Full Traceback (for debugging):")
             print(tb)
 
