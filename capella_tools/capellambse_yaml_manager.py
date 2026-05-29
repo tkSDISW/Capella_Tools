@@ -1,5 +1,5 @@
-# Copyright Siemens AG
-# Licensed under the Apache License, Version 2.0 (see full text in LICENSES/Apache-2.0.txt)
+# Copyright 2024-2026 Open Sun Power, LLC
+# SPDX-License-Identifier: Apache-2.0
 
 # Dot-files are licensed under CC0-1.0 (see full text in LICENSES/CC0-1.0.txt)
 

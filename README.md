@@ -66,4 +66,4 @@ This repository is licensed under the following licenses:
 
 ## Contact
 For questions or support, please contact:
-**Tony Komar** - tony.komar@siemens.com
+**Tony Komar** - tony.komar@opensunpower.com
