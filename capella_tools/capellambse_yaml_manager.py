@@ -21,6 +21,20 @@ from pathlib import Path
 # "Diagram" was used in Capella 6.1 and earlier; "DRepresentationDescriptor" in 7.0.1+
 DIAGRAM_CLASS_NAMES = {"Diagram", "DRepresentationDescriptor"}
 
+
+def _cardinality_value(obj, attr):
+    """Dereference a MultiplicityElement cardinality attribute (min_card/max_card).
+
+    Each is a Single-wrapped Containment reference to a whole NumericValue
+    object, not a plain int -- obj.min_card.value, not obj.min_card. Uses
+    getattr defensively (not obj.min_card directly) for the same
+    cross-capellambse-version reason already established elsewhere in this
+    file (hasattr(type(obj), "related_components")-style checks): older
+    installs may not expose this attribute at all.
+    """
+    card = getattr(obj, attr, None)
+    return card.value if card is not None else None
+
 class CapellaYAMLHandler:
     def __init__(self,parser=None):
         self.file_name = None
@@ -905,6 +919,37 @@ model:
             for req in obj.requirements:
                 if req not in self.referenced_objects:
                     self.referenced_objects.append(req)
+            for rp in getattr(obj, "referenced_properties", []):
+                if rp not in self.referenced_objects:
+                    self.referenced_objects.append(rp)
+
+        if obj.__class__.__name__ == "Class":
+            for prop in getattr(obj, "owned_properties", []):
+                if prop not in self.referenced_objects:
+                    self.referenced_objects.append(prop)
+            _super = getattr(obj, "super", None)
+            if _super is not None and _super not in self.referenced_objects:
+                self.referenced_objects.append(_super)
+            for apvg in obj.applied_property_value_groups:
+                if apvg not in self.referenced_objects:
+                    self.referenced_objects.append(apvg)
+            for apv in obj.applied_property_values:
+                if apv not in self.referenced_objects:
+                    self.referenced_objects.append(apv)
+            for con in obj.constraints:
+                if con not in self.referenced_objects:
+                    self.referenced_objects.append(con)
+
+        if obj.__class__.__name__ == "Property":
+            _prop_type = getattr(obj, "type", None)
+            if _prop_type is not None and _prop_type not in self.referenced_objects:
+                self.referenced_objects.append(_prop_type)
+
+        if obj.__class__.__name__ == "Association":
+            for end in getattr(obj, "roles", []):
+                if end not in self.referenced_objects:
+                    self.referenced_objects.append(end)
+
         if obj.__class__.__name__ in DIAGRAM_CLASS_NAMES:
             for node in obj.nodes:
                 if node not in self.referenced_objects:
@@ -957,7 +1002,7 @@ model:
             return html
 
 
-        img_dir = Path("capella_yaml_images")        
+        img_dir = Path("capella_yaml_images")
 
         """Generate YAML for primary objects and manage references."""
 
@@ -1016,6 +1061,79 @@ model:
       {% endif %}
 """
         
+        property_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      {% if type_name %}type:
+       -name {{ type_name }}
+       -ref_uuid {{ type_uuid }}
+      {% endif %}
+      {% if min_card is not none %}min card: {{ min_card }}{% endif %}
+      {% if max_card is not none %}max card: {{ max_card }}{% endif %}
+      {% if aggregation_kind %}aggregation kind: {{ aggregation_kind }}{% endif %}
+      {% if is_derived %}derived: {{ is_derived }}{% endif %}
+      {% if is_read_only %}read only: {{ is_read_only }}{% endif %}
+      {% if is_part_of_key %}part of key: {{ is_part_of_key }}{% endif %}
+      {% if association_name %}association:
+       -name {{ association_name }}
+       -ref_uuid {{ association_uuid }}
+      {% endif %}
+
+"""
+        class_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      {% if is_primitive %}primitive: {{ is_primitive }}{% endif %}
+      {% if super_name %}generalizes:
+       -name {{ super_name }}
+       -ref_uuid {{ super_uuid }}
+      {% endif %}
+      {% if properties %}properties:
+      {% for p in properties %}
+       - name: {{ p.name }}
+         ref_uuid: {{ p.uuid }}
+         {% if p.type_name %}type_name: {{ p.type_name }}
+         type_uuid: {{ p.type_uuid }}{% endif %}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_value_groups %}applied property value groups:
+      {% for apvg in applied_property_value_groups %}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if applied_property_values %}applied property values:
+      {% for apv in applied_property_values %}
+       - name: {{ apv.name }}
+         ref_uuid: {{ apv.uuid }}
+      {% endfor %}
+      {% endif %}
+      {% if constraints %}constraints:
+      {% for cons in constraints %}
+       - name: {{ cons.name }}
+         ref_uuid: {{ cons.uuid }}
+      {% endfor %}
+      {% endif %}
+
+"""
+        association_template = """
+    - name: {{ name }}
+      type: {{type}}
+      primary_uuid: {{ uuid }}
+      description: "{{ description | escape | replace('\n', ' ') }}"
+      {% if members %}members:
+      {% for m in members %}
+       - name: {{ m.name }}
+         ref_uuid: {{ m.uuid }}
+         {% if m.type_name %}connects to: {{ m.type_name }} ({{ m.type_uuid }}){% endif %}
+      {% endfor %}
+      {% endif %}
+
+"""
         default_template = """
     - name: {{ name }}
       type: {{type}}
@@ -1120,6 +1238,17 @@ model:
       {% if abstract_type_name %}abstract type:
        -name {{ abstract_type_name}}
        -ref_uuid {{abstract_type_uuid}}
+      {% endif %}
+      {% if kind %}kind: {{ kind }}{% endif %}
+      {% if direction %}direction: {{ direction }}{% endif %}
+      {% if is_composite %}composite: {{ is_composite }}{% endif %}
+      {% if min_card is not none %}min card: {{ min_card }}{% endif %}
+      {% if max_card is not none %}max card: {{ max_card }}{% endif %}
+      {% if referenced_properties %}referenced properties:
+      {% for rp in referenced_properties %}
+       - name: {{ rp.name }}
+         ref_uuid: {{ rp.uuid }}
+      {% endfor %}
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
@@ -2938,6 +3067,12 @@ model:
                 "description" :self._get_description(obj),
                 "abstract_type_name" : _abstract_type.name if _abstract_type else None,
                 "abstract_type_uuid" : _abstract_type.uuid if _abstract_type else None,
+                "kind": getattr(getattr(obj, "kind", None), "name", None),
+                "direction": getattr(getattr(obj, "direction", None), "name", None),
+                "is_composite": getattr(obj, "is_composite", None),
+                "min_card": _cardinality_value(obj, "min_card"),
+                "max_card": _cardinality_value(obj, "max_card"),
+                "referenced_properties": [{"name": rp.name, "uuid": rp.uuid} for rp in getattr(obj, "referenced_properties", [])],
                 "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
                 "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
                 "property_value_groups": [{"name": pvg.name, "uuid": pvg.uuid} for pvg in obj.property_value_groups],
@@ -3041,7 +3176,82 @@ model:
             self._track_referenced_objects(obj)
             template = Template(CapellaOutgoingRelation_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
-            self.yaml_content = self.yaml_content + template.render(data) 
+            self.yaml_content = self.yaml_content + template.render(data)
+
+        elif obj.__class__.__name__ == "Property":
+            _prop_type = getattr(obj, "type", None)
+            _assoc = getattr(obj, "association", None)
+            data = {
+                "type": obj.__class__.__name__,
+                "name": obj.name,
+                "uuid": obj.uuid,
+                "description": self._get_description(obj),
+                "type_name": _prop_type.name if _prop_type else None,
+                "type_uuid": _prop_type.uuid if _prop_type else None,
+                "min_card": _cardinality_value(obj, "min_card"),
+                "max_card": _cardinality_value(obj, "max_card"),
+                "aggregation_kind": getattr(getattr(obj, "aggregation_kind", None), "name", None),
+                "is_derived": getattr(obj, "is_derived", None),
+                "is_read_only": getattr(obj, "is_read_only", None),
+                "is_part_of_key": getattr(obj, "is_part_of_key", None),
+                "association_name": _assoc.name if _assoc else None,
+                "association_uuid": _assoc.uuid if _assoc else None,
+            }
+            self._track_referenced_objects(obj)
+            template = Template(property_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)
+
+        elif obj.__class__.__name__ == "Class":
+            _super = getattr(obj, "super", None)
+            _properties = []
+            for p in getattr(obj, "owned_properties", []):
+                _ptype = getattr(p, "type", None)
+                _properties.append({
+                    "name": p.name,
+                    "uuid": p.uuid,
+                    "type_name": _ptype.name if _ptype else None,
+                    "type_uuid": _ptype.uuid if _ptype else None,
+                })
+            data = {
+                "type": obj.__class__.__name__,
+                "name": obj.name,
+                "uuid": obj.uuid,
+                "description": self._get_description(obj),
+                "is_primitive": getattr(obj, "is_primitive", None),
+                "super_name": _super.name if _super else None,
+                "super_uuid": _super.uuid if _super else None,
+                "properties": _properties,
+                "applied_property_value_groups": [{"name": apvg.name, "uuid": apvg.uuid} for apvg in obj.applied_property_value_groups],
+                "applied_property_values": [{"name": apv.name, "uuid": apv.uuid} for apv in obj.applied_property_values],
+                "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
+            }
+            self._track_referenced_objects(obj)
+            template = Template(class_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)
+
+        elif obj.__class__.__name__ == "Association":
+            _members = []
+            for end in getattr(obj, "roles", []):
+                _etype = getattr(end, "type", None)
+                _members.append({
+                    "name": end.name,
+                    "uuid": end.uuid,
+                    "type_name": _etype.name if _etype else None,
+                    "type_uuid": _etype.uuid if _etype else None,
+                })
+            data = {
+                "type": obj.__class__.__name__,
+                "name": obj.name,
+                "uuid": obj.uuid,
+                "description": self._get_description(obj),
+                "members": _members,
+            }
+            self._track_referenced_objects(obj)
+            template = Template(association_template)
+            data["description"] = sanitize_description_images(data["description"], img_dir)
+            self.yaml_content = self.yaml_content + template.render(data)
 
         else :
             #print(obj.name, "is be formatted with default properties, its type", obj.__class__.__name__," is not supported with tailored processing.")
