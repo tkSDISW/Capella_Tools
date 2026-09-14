@@ -1417,7 +1417,7 @@ model:
           ref_uuid: {{ apvg.uuid }}
         {% endfor %}
       {% endif %}
-      {% if exchanges_items %}allocated exchanges items:
+      {% if exchange_items %}allocated exchange items:
       {% for ei in exchange_items %}
        - name: {{  ei.name }}
          ref_uuid: {{ ei.uuid }}
@@ -1465,7 +1465,7 @@ model:
          ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
-      {% if exchanges_items %}allocated exchanges items:
+      {% if exchange_items %}allocated exchange items:
       {% for ei in exchange_items %}
       - name: {{  ei.name }}
         ref_uuid: {{ ei.uuid }}
@@ -1520,7 +1520,7 @@ model:
             ref_uuid: {{ apvg.uuid }}
         {% endfor %}
         {% endif %}
-      {% if exchanges_items %}allocated exchanges items:
+      {% if allocated_exchange_items %}allocated exchange items:
       {% for ei in allocated_exchange_items %}
       - name: {{  ei.name }}
         ref_uuid: {{ ei.uuid }}
@@ -1569,7 +1569,7 @@ model:
             ref_uuid: {{ apvg.uuid }}
         {% endfor %}
         {% endif %}
-      {% if exchanges_items %}allocated exchanges items:
+      {% if exchange_items %}allocated exchange items:
       {% for ei in exchange_items %}
       - name: {{  ei.name }}
         ref_uuid: {{ ei.uuid }}
