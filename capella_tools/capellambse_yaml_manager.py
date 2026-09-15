@@ -1850,6 +1850,7 @@ model:
       primary_uuid: {{ uuid }}
       description: "{{ description | escape | replace('\n', ' ') }}"
       is_human: {{ is_human }}
+      is_actor: {{ is_actor }}
       components:
       {% for comp in components %}
        - name: {{ comp.name }}
@@ -1984,6 +1985,7 @@ model:
       primary_uuid: {{ uuid }}
       description: "{{ description | escape | replace('\n', ' ') }}"
       is_human: {{ is_human }}
+      is_actor: {{ is_actor }}
       components owned:
       {% for comp in components %}
        - name: {{ comp.name }}
@@ -2325,6 +2327,10 @@ model:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "is_human":obj.is_human,
+                # An actor is a component with is_actor set -- capellambse has no
+                # separate actor class, so without this an actor renders exactly
+                # like any other component (Fabric_MCP_Issues/OBS-0009).
+                "is_actor":obj.is_actor,
                 "description" :self._get_description(obj),
                 "components" : [{"name": c.name , "uuid": c.uuid} for c in obj.components],
                 "allocated_functions": [{"name": f.name , "uuid": f.uuid} for f in obj.allocated_functions],
@@ -2783,6 +2789,7 @@ model:
                     "name": obj.name,
                     "uuid" : obj.uuid,
                     "is_human":obj.is_human,
+                    "is_actor":obj.is_actor,
                     "description" :self._get_description(obj),
                     "components" : [{"name": c.name , "uuid": c.uuid} for c in getattr(obj, "related_components" if hasattr(type(obj), "related_components") else "components")],
                     "deployed_components": [
@@ -2820,6 +2827,7 @@ model:
                 "name": obj.name,
                 "uuid" : obj.uuid,
                 "is_human":obj.is_human,
+                "is_actor":obj.is_actor,
                 "description" :self._get_description(obj),
                 "components" : [{"name": c.name , "uuid": c.uuid} for c in getattr(obj, "related_components" if hasattr(type(obj), "related_components") else "components")],
                 "allocated_functions": [{"name": f.name , "uuid": f.uuid} for f in obj.allocated_functions],
