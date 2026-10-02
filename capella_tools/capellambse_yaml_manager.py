@@ -245,18 +245,42 @@ model:
                 self.generate_yaml(ref_obj) 
 
     def generate_traceability_related_objects(self, model, Tstore):
-        """generate YAML content of referenced objects."""
-        #for ref_obj in self.referenced_objects:
-        #            self.generate_yaml(ref_obj)  
-        artifacts = Tstore.all_artifacts
-        for artifact in artifacts:      
-            for link in artifact.artifact_links :
-                 #print(link.link_type, link.artifact_uuid,link.model_element_uuid)
-                 model_element = model.by_uuid(link.model_element_uuid)
-                 #print("Linked Model Element",model_element.name)
-                 if model_element in self.referenced_objects or  model_element in self.primary_objects :
-                    #print("Adding Artifact",artifact.name,artifact.uuid)
-                    self.referenced_objects.append(artifact)
+        """Add published artifacts (Pub4C) for elements already in this fabric.
+
+        An artifact is added only when one of its links points at an object
+        already selected or referenced -- so a fabric carries the requirements
+        bearing on what is being analysed, not the whole published set. Pulling
+        everything would be a coverage question, which the publishing tool is
+        the place to answer.
+
+        Three things are tolerated here, because this runs against whatever
+        traceability file a repo happens to carry rather than a curated one
+        (cousin_back_log/note-0133):
+
+        * A link whose model element is not in THIS model. A traceability file
+          written against another revision, or another model, has them. This
+          used to raise out of by_uuid and lose every artifact including the
+          ones that resolved fine.
+        * A link whose type id matched no ownedLinkTypes entry, which _load_data
+          records as link_type=None. The renderer reads link.link_type.name, so
+          such a link raised at render time -- later, and further from the
+          cause.
+        * The same artifact linked to several selected objects. It was appended
+          once per matching link and rendered once per append, so a well-linked
+          requirement appeared two or three times in the YAML.
+        """
+        for artifact in Tstore.all_artifacts:
+            for link in artifact.artifact_links:
+                if link.link_type is None:
+                    continue
+                try:
+                    model_element = model.by_uuid(link.model_element_uuid)
+                except Exception:
+                    continue
+                if model_element in self.referenced_objects or model_element in self.primary_objects:
+                    if artifact not in self.referenced_objects:
+                        self.referenced_objects.append(artifact)
+                    break  # one link is enough; the rest would re-add it
       
     def _track_referenced_objects(self, obj):
         """Track referenced objects to allow further expansion as primary objects."""
@@ -3104,7 +3128,15 @@ model:
                 "uuid":obj.uuid,
                 "url" :obj.url,
                 "identifier" :obj.identifier,
-                "artifact_links": [{  "name": link.link_type.name, "model_element_uuid": link.model_element_uuid} for link in obj.artifact_links],
+                # Links whose type id matched no ownedLinkTypes entry carry
+                # link_type=None from _load_data, and reading .name on that
+                # raised here -- at render time, well away from the cause. Such
+                # a link has no name to show, so it is left out rather than
+                # rendered as a blank one (cousin_back_log/note-0133).
+                "artifact_links": [
+                    {"name": link.link_type.name, "model_element_uuid": link.model_element_uuid}
+                    for link in obj.artifact_links if link.link_type is not None
+                ],
             }
             # Render the template
             template = Template( Traceability_artifact)
