@@ -13,8 +13,47 @@
 import yaml
 from jinja2 import Template
 import capellambse
+import html
 import re
 import base64
+
+def plain_text_of(rich_text) -> str:
+    """A readable shall statement from Capella's stored rich text.
+
+    Requirements that arrive through the Siemens Teamcenter integration --
+    dragged from Teamcenter and dropped into Capella, which creates the objects
+    there -- store their text as HTML: `<p style="...">The canister shall
+    ...</p>`, with apostrophes already held as numeric entities.
+
+    Rendering that through the template's `| escape` filter escapes it a second
+    time, which is what produced both reported symptoms from one stored value:
+    `&lt;p style=&#34;` (After_Treatment_System_Notebook/Fabric_MCP_Issues/
+    OBS-0019 #2) and `&amp;#x27;` where an apostrophe belongs (OBS-0017 #3).
+    The filter has to stay -- it is what keeps the quoted YAML scalar valid --
+    so the readable form is built here instead, from the raw value, and emitted
+    without it.
+
+    One unescape is correct and two would be wrong: working from the raw value
+    there is exactly one layer of entities to resolve, and a second pass would
+    corrupt any requirement whose text legitimately discusses an entity (a
+    "&amp;" in a title becomes "&" once, and must not then become nothing).
+
+    Returns a single line, safe to drop into a double-quoted YAML scalar.
+    """
+    if rich_text is None:
+        return ""
+    text = html.unescape(str(rich_text))
+    # Block-level tags are sentence boundaries; without this, "...sealed.</p>
+    # <p>The canister..." runs two shall statements together.
+    text = re.sub(r"(?i)</(p|div|li|tr|h[1-6])\s*>", " ", text)
+    text = re.sub(r"(?i)<br\s*/?>", " ", text)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    # Minimal escaping for a double-quoted YAML scalar. Deliberately NOT
+    # jinja's `escape`: that would render an apostrophe as &#39;, reintroducing
+    # an entity into the one field whose whole purpose is being readable.
+    return text.replace("\\", "\\\\").replace('"', '\\"')
+
 from pathlib import Path
 
 # Class names for diagram objects across capellambse versions:
@@ -1193,6 +1232,7 @@ model:
       type: {{type}}
       primary_uuid: {{ uuid }}
       text: "{{ text | escape | replace('\n', ' ') }}"
+      plain text: "{{ plain_text }}"
       long name: {{ long_name }}
       prefix: {{ prefix }}
       chapter name: {{ chapter_name }}
@@ -3185,6 +3225,7 @@ model:
                 "prefix": obj.prefix,
                 "chapter_name" : obj.chapter_name,    
                 "text" : obj.text,
+                "plain_text": plain_text_of(obj.text),
                 "uuid": obj.uuid,
                 "type_name": obj.type.long_name if obj.type else "None",
                 "type_uuid": obj.type.uuid if obj.type else "None",
