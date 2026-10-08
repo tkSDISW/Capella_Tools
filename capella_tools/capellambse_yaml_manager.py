@@ -1437,8 +1437,8 @@ model:
       {% endif %}
       {% if applied_property_value_groups %}applied property value groups:
         {% for apvg in applied_property_value_groups %}
-        - name: {{ apvg.name }}
-          ref_uuid: {{ apvg.uuid }}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
         {% endfor %}
       {% endif %}
       {% if exchange_items %}allocated exchange items:
@@ -1540,8 +1540,8 @@ model:
         ref_uuid: {{ target_entity_uuid  }}
         {% if applied_property_value_groups %}applied property value groups:
         {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid: {{ apvg.uuid }}
+         - name: {{ apvg.name }}
+           ref_uuid: {{ apvg.uuid }}
         {% endfor %}
         {% endif %}
       {% if allocated_exchange_items %}allocated exchange items:
@@ -1589,8 +1589,8 @@ model:
         ref_uuid: {{ target_component_uuid  }}
         {% if applied_property_value_groups %}applied property value groups:
         {% for apvg in applied_property_value_groups %}
-          - name: {{ apvg.name }}
-            ref_uuid: {{ apvg.uuid }}
+         - name: {{ apvg.name }}
+           ref_uuid: {{ apvg.uuid }}
         {% endfor %}
         {% endif %}
       {% if exchange_items %}allocated exchange items:
@@ -1655,8 +1655,8 @@ model:
         ref_uuid: {{ target_component_uuid  }}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
-      - name: {{ apvg.name }}
-        ref_uuid: {{ apvg.uuid }}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if allocated_component_exchanges  %}allocated component exchanges:
@@ -1840,8 +1840,8 @@ model:
       description: "{{ description | escape | replace('\n', ' ') }}"
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
-      - name: {{ apvg.name }}
-        ref_uuid: {{ apvg.uuid }}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
@@ -1894,15 +1894,15 @@ model:
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
             source_component_name: {{ exchange.source_component }}
-            ref__uuid: {{ exchange.source_component_uuid }}
+            source_component_uuid: {{ exchange.source_component_uuid }}
             target_component_name: {{ exchange.target_component }}
-            ref_uuid: {{ exchange.target_component_uuid }}
+            target_component_uuid: {{ exchange.target_component_uuid }}
         {% endfor %}
       {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
-      - name: {{ apvg.name }}
-        ref_uuid: {{ apvg.uuid }}
+       - name: {{ apvg.name }}
+         ref_uuid: {{ apvg.uuid }}
       {% endfor %}
       {% endif %}
       {% if applied_property_values %}applied property values:
@@ -2029,9 +2029,9 @@ model:
           - name: {{ link.name }}
             ref_uuid:  {{ link.uuid }}
             source_component_name: {{ link.source_component }}
-            ref__uuid: {{ link.source_component_uuid }}
+            source_component_uuid: {{ link.source_component_uuid }}
             target_component_name: {{ link.target_component }}
-            ref__uuid: {{ link.target_component_uuid }}
+            target_component_uuid: {{ link.target_component_uuid }}
           {% endfor %}
         {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
@@ -2088,9 +2088,9 @@ model:
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
             source_function_name: {{ exchange.source_component }}
-            ref_uuid: {{ exchange.source_component_uuid }}
+            source_function_uuid: {{ exchange.source_component_uuid }}
             target_function_name: {{ exchange.target_component }}
-            ref_uuid: {{ exchange.target_component_uuid }}
+            target_function_uuid: {{ exchange.target_component_uuid }}
           {% endfor %}
         {% endfor %}
       outputs:
@@ -2102,9 +2102,9 @@ model:
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
             source_function_name: {{ exchange.source_component }}
-            ref_uuid: {{ exchange.source_component_uuid }}
+            source_function_uuid: {{ exchange.source_component_uuid }}
             target_function_name: {{ exchange.target_component }}
-            ref_uuid: {{ exchange.target_component_uuid }}
+            target_function_uuid: {{ exchange.target_component_uuid }}
         {% endfor %}
       {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
@@ -2167,9 +2167,9 @@ model:
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
             source_function_name: {{ exchange.source_component }}
-            ref_uuid: {{ exchange.source_component_uuid }}
+            source_function_uuid: {{ exchange.source_component_uuid }}
             target_function_name: {{ exchange.target_component }}
-            ref_uuid: {{ exchange.target_component_uuid }}
+            target_function_uuid: {{ exchange.target_component_uuid }}
          {% endfor %}
          {% endfor %}
       outputs from:
@@ -2181,9 +2181,9 @@ model:
           - name: {{ exchange.name }}
             ref_uuid:  {{ exchange.uuid }}
             source_function_name: {{ exchange.source_component }}
-            ref_uuid: {{ exchange.source_component_uuid }}
+            source_function_uuid: {{ exchange.source_component_uuid }}
             target_function_name: {{ exchange.target_component }}
-            ref_uuid: {{ exchange.target_component_uuid }}
+            target_function_uuid: {{ exchange.target_component_uuid }}
           {% endfor %}
         {% endfor %}
       {% if applied_property_value_groups %}applied property value groups:
