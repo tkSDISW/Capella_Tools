@@ -333,7 +333,7 @@ model:
 
         Three things are tolerated here, because this runs against whatever
         traceability file a repo happens to carry rather than a curated one
-        (cousin_back_log/note-0133):
+        (cousin_back_log/note-0135):
 
         * A link whose model element is not in THIS model. A traceability file
           written against another revision, or another model, has them. This
@@ -3211,7 +3211,7 @@ model:
                 # link_type=None from _load_data, and reading .name on that
                 # raised here -- at render time, well away from the cause. Such
                 # a link has no name to show, so it is left out rather than
-                # rendered as a blank one (cousin_back_log/note-0133).
+                # rendered as a blank one (cousin_back_log/note-0135).
                 "artifact_links": [
                     {"name": link.link_type.name, "model_element_uuid": link.model_element_uuid}
                     for link in obj.artifact_links if link.link_type is not None
