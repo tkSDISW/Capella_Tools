@@ -11,11 +11,46 @@
 
 
 import yaml
-from jinja2 import Template
+from jinja2 import Environment, Template
 import capellambse
 import html
 import re
 import base64
+
+def yaml_safe(value) -> str:
+    r"""Escape a value for a double-quoted YAML scalar -- and only for that.
+
+    Replaces the `| escape | replace('\n', ' ')` that every description and text
+    field used to go through. Jinja's `escape` is an HTML filter, and it was the
+    wrong tool twice over:
+
+    - It does not escape a BACKSLASH, which is the one character a double-quoted
+      YAML scalar genuinely needs escaped. A description holding a Windows path,
+      a regex, or a unit written m\s therefore produced a fabric that would not
+      load AT ALL: the parser fails on the whole document, not on that one
+      field. 32 fields were exposed to it, and nothing caught it because no
+      fixture model happens to contain a backslash.
+    - It escapes `&`, so text that Capella already stores as HTML came out
+      escaped a second time -- `&amp;#x27;` where an apostrophe belongs, and
+      `&lt;p style=&#34;` for a paragraph tag (Fabric_MCP_Issues/OBS-0017 #3
+      and OBS-0019 #2, which are one defect seen from two angles).
+
+    So: resolve the entities the model stored, once, then escape exactly what the
+    scalar needs. Tags are deliberately left in place -- they are the model's own
+    rich text, and stripping them is a different question, answered separately by
+    `plain_text_of` for requirement text.
+
+    One unescape, not until-stable: there is a single layer of entities here, and
+    a second pass would eat a legitimately written ampersand.
+    """
+    if value is None:
+        return ""
+    text = html.unescape(str(value))
+    text = text.replace(chr(92), chr(92) * 2)
+    text = text.replace(chr(34), chr(92) + chr(34))
+    # What the old replace('\n', ' ') did: keep the scalar on a single line.
+    return re.sub("[" + chr(13) + chr(10) + chr(9) + "]+", " ", text)
+
 
 def plain_text_of(rich_text) -> str:
     """A readable shall statement from Capella's stored rich text.
@@ -59,6 +94,10 @@ from pathlib import Path
 # Class names for diagram objects across capellambse versions:
 # "Diagram" was used in Capella 6.1 and earlier; "DRepresentationDescriptor" in 7.0.1+
 DIAGRAM_CLASS_NAMES = {"Diagram", "DRepresentationDescriptor"}
+
+
+_ENV = Environment()
+_ENV.filters["yaml_safe"] = yaml_safe
 
 
 def _cardinality_value(obj, attr):
@@ -1073,7 +1112,7 @@ model:
     - name: '{{ name }}'
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       nodes or element :
       {% for n in nodes %}
       - name: {{ n.name }}
@@ -1084,7 +1123,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       reference object  :
       - name: {{ type_name }}
         ref_uuid: {{ type_uuid }}
@@ -1094,7 +1133,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       parent:
         name: {{ parent_name }}
         ref_uuid: {{ parent_uuid }}
@@ -1128,7 +1167,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if type_name %}type:
        -name {{ type_name }}
        -ref_uuid {{ type_uuid }}
@@ -1149,7 +1188,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if is_primitive %}primitive: {{ is_primitive }}{% endif %}
       {% if super_name %}generalizes:
        -name {{ super_name }}
@@ -1187,7 +1226,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if members %}members:
       {% for m in members %}
        - name: {{ m.name }}
@@ -1201,7 +1240,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
@@ -1231,7 +1270,7 @@ model:
     - name: {{  name  }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      text: "{{ text | escape | replace('\n', ' ') }}"
+      text: "{{ text | yaml_safe }}"
       plain text: "{{ plain_text }}"
       long name: {{ long_name }}
       prefix: {{ prefix }}
@@ -1251,7 +1290,7 @@ model:
     - name: {{ long_name if long_name.strip() else type_name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       short name: {{ name }}
       type:
         - name: {{ type_name }}
@@ -1267,7 +1306,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if elements %}elements of:
       {% for e in elements %}
        - name: {{ e.name }}
@@ -1298,7 +1337,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if abstract_type_name %}abstract type:
        -name {{ abstract_type_name}}
        -ref_uuid {{abstract_type_uuid}}
@@ -1353,7 +1392,7 @@ model:
     - name: {{ name }}
       type: {{type}} 
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       regions:
       {% if regions %}
         {% for region in regions %}
@@ -1380,7 +1419,7 @@ model:
     - name: {{ name }}
       type: {{ type }}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if outgoing_transitions %}
       outgoing transitions:
         {% for og in outgoing_transitions %}
@@ -1421,7 +1460,7 @@ model:
     - name: {{ name }}
       type: {{ type }}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if outgoing_transitions %}
       outgoing transitions:
         {% for og in outgoing_transitions %}
@@ -1435,7 +1474,7 @@ model:
     - name: {{ name }}
       type: {{ type }}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       guard: {{ guard }}
       {% if triggers %}
       triggers:
@@ -1462,7 +1501,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       source activity:
           - name: {{ source_activity }}
             ref_uuid: {{ source_activity_uuid }}
@@ -1510,7 +1549,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       source function or activity port:
       - name: {{ source_function }}
         ref_uuid: {{ source_function_uuid }}
@@ -1571,7 +1610,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       source entity:
       - name: {{ source_entity }}
         ref_uuid: {{ source_entity_uuid }}
@@ -1620,7 +1659,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       source component:
       - name: {{ source_component }}
         ref_uuid: {{ source_component_uuid }}
@@ -1680,7 +1719,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if physical_paths %}involving physical_paths:
       {% for pp in physical_paths %}
        - name: {{ pp.name }}
@@ -1730,7 +1769,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       involve:
       {% for inv in involved %}
       - name: {{  inv.name }}
@@ -1779,7 +1818,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       involve:
       {% for inv in involved %}
       - name: {{  inv.name }}
@@ -1834,7 +1873,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       involve:
       {% for inv in involved_items %}
       - name: {{  inv.name }}
@@ -1870,14 +1909,14 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       value :  {{ value }}
 """
         property_value_group_template = """
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if applied_property_value_groups %}applied property value groups:
       {% for apvg in applied_property_value_groups %}
        - name: {{ apvg.name }}
@@ -1912,7 +1951,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       is_human: {{ is_human }}
       is_actor: {{ is_actor }}
       components:
@@ -1987,7 +2026,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       is_human: {{ is_human }}
       is_actor: {{ is_actor }}
       entities:
@@ -2047,7 +2086,7 @@ model:
     - name: {{ name }}
       type: {{type}} Node 
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       is_human: {{ is_human }}
       is_actor: {{ is_actor }}
       components owned:
@@ -2110,7 +2149,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       parent:
       - name: {{parent_name}}
         ref_uuid: {{parent_uuid}}
@@ -2189,7 +2228,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       parent:
        - name: {{parent_name}}
          ref_uuid: {{parent_uuid}}
@@ -2262,7 +2301,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if includes_capabilities %}included capability:
       {% for obj in includes_capabilities %}
        - name: {{ obj.name }}
@@ -2323,7 +2362,7 @@ model:
     - name: {{ name }}
       type: {{type}}
       primary_uuid: {{ uuid }}
-      description: "{{ description | escape | replace('\n', ' ') }}"
+      description: "{{ description | yaml_safe }}"
       {% if includes_capabilities %}included capability:
       {% for obj in includes_capabilities %}
        - name: {{ obj.name }}
@@ -2417,7 +2456,7 @@ model:
             self._track_referenced_objects(obj)
 
             # Render the template
-            template = Template(logical_component_template)
+            template = _ENV.from_string(logical_component_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content += template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -2448,7 +2487,7 @@ model:
             self._track_referenced_objects(obj)
 
             # Render the template
-            template = Template(entity_template)
+            template = _ENV.from_string(entity_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2475,7 +2514,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(op_template)
+            template = _ENV.from_string(op_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2502,7 +2541,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(fc_template)
+            template = _ENV.from_string(fc_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2546,7 +2585,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(function_template)
+            template = _ENV.from_string(function_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -2584,7 +2623,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(activity_template)
+            template = _ENV.from_string(activity_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2616,7 +2655,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(oc_template)
+            template = _ENV.from_string(oc_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2642,7 +2681,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(cap_template)
+            template = _ENV.from_string(cap_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2666,7 +2705,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(cap_template)
+            template = _ENV.from_string(cap_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2697,7 +2736,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(interaction_template)
+            template = _ENV.from_string(interaction_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data) 
@@ -2728,7 +2767,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(function_exchange_template)
+            template = _ENV.from_string(function_exchange_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2758,7 +2797,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(component_exchange_template)
+            template = _ENV.from_string(component_exchange_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2785,7 +2824,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(communication_mean_template)
+            template = _ENV.from_string(communication_mean_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2813,7 +2852,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(physical_link_template)
+            template = _ENV.from_string(physical_link_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2838,7 +2877,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(physicalpath_template)
+            template = _ENV.from_string(physicalpath_template)
 
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
@@ -2877,7 +2916,7 @@ model:
                 self._track_referenced_objects(obj)
 
                 # Render the template
-                template = Template(node_component_template)
+                template = _ENV.from_string(node_component_template)
                 data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
                 self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -2911,7 +2950,7 @@ model:
                 self._track_referenced_objects(obj)
 
                 # Render the template
-                template = Template(logical_component_template)
+                template = _ENV.from_string(logical_component_template)
                 data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
                 self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -2936,7 +2975,7 @@ model:
                 self._track_referenced_objects(obj)
         
                 # Render the template
-                template = Template(port_template)
+                template = _ENV.from_string(port_template)
                 data["description"] = sanitize_description_images(data["description"], img_dir)
                 self.yaml_content = self.yaml_content + template.render(data)
                 self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -2961,7 +3000,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(property_value_template)
+            template = _ENV.from_string(property_value_template)
             #print(template)
             #print(data)
             data["description"] = sanitize_description_images(data["description"], img_dir)
@@ -2989,7 +3028,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(property_value_group_template)
+            template = _ENV.from_string(property_value_group_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -3023,7 +3062,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(state_machine_template)
+            template = _ENV.from_string(state_machine_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
@@ -3050,7 +3089,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(state_template)
+            template = _ENV.from_string(state_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)           
         elif obj.__class__.__name__ ==  "InitialPseudoState" :    
@@ -3072,7 +3111,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(psusdo_state_template)
+            template = _ENV.from_string(psusdo_state_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)           
 
@@ -3102,7 +3141,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(transition_template)
+            template = _ENV.from_string(transition_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)           
                       
@@ -3124,7 +3163,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(exchangeitem_template)
+            template = _ENV.from_string(exchangeitem_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)    
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -3156,7 +3195,7 @@ model:
             self._track_referenced_objects(obj)
     
             # Render the template
-            template = Template(exchangeitemelement_template)
+            template = _ENV.from_string(exchangeitemelement_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)     
    
@@ -3179,7 +3218,7 @@ model:
                 ],
             }
             # Render the template
-            template = Template( Traceability_artifact)
+            template = _ENV.from_string( Traceability_artifact)
             self.yaml_content = self.yaml_content + template.render(data)
             
 
@@ -3194,7 +3233,7 @@ model:
             }
             # Render the template
             self._track_referenced_objects(obj)
-            template = Template(diagram)
+            template = _ENV.from_string(diagram)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)     
 
@@ -3213,7 +3252,7 @@ model:
             }
             # Render the template
             self._track_referenced_objects(obj)
-            template = Template(part)
+            template = _ENV.from_string(part)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)                     
 
@@ -3233,7 +3272,7 @@ model:
             }
             # Render the template
             self._track_referenced_objects(obj)
-            template = Template(Requirement_template)
+            template = _ENV.from_string(Requirement_template)
             data["text"] = sanitize_description_images(data["text"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
             self.yaml_content += "\n" + self.generate_teamcenter_yaml_snippet(obj.uuid, indent="      ") + "\n"
@@ -3255,7 +3294,7 @@ model:
             }
             # Render the template
             self._track_referenced_objects(obj)
-            template = Template(CapellaOutgoingRelation_template)
+            template = _ENV.from_string(CapellaOutgoingRelation_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
@@ -3279,7 +3318,7 @@ model:
                 "association_uuid": _assoc.uuid if _assoc else None,
             }
             self._track_referenced_objects(obj)
-            template = Template(property_template)
+            template = _ENV.from_string(property_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
@@ -3308,7 +3347,7 @@ model:
                 "constraints": [{"name": cons.name, "uuid": cons.uuid} for cons in obj.constraints],
             }
             self._track_referenced_objects(obj)
-            template = Template(class_template)
+            template = _ENV.from_string(class_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
@@ -3330,7 +3369,7 @@ model:
                 "members": _members,
             }
             self._track_referenced_objects(obj)
-            template = Template(association_template)
+            template = _ENV.from_string(association_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
@@ -3357,7 +3396,7 @@ model:
                 ]
             }
             # Render the template
-            template = Template(default_template)
+            template = _ENV.from_string(default_template)
             data["description"] = sanitize_description_images(data["description"], img_dir)
             self.yaml_content = self.yaml_content + template.render(data)
 
