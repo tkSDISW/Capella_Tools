@@ -1161,23 +1161,23 @@ model:
         """Generate YAML for primary objects and manage references."""
 
         diagram = """
-    - name: '{{ name }}'
+    - name: {{ name | yaml_str }}
       type: {{type}}
       primary_uuid: {{ uuid }}
       description: "{{ description | yaml_safe }}"
       nodes or element :
       {% for n in nodes %}
-      - name: {{ n.name }}
+      - name: {{ n.name | yaml_str }}
         ref_uuid: {{ n.uuid }}
       {% endfor %}
 """   
         part = """
-    - name: {{ name }}
+    - name: {{ name | yaml_str }}
       type: {{type}}
       primary_uuid: {{ uuid }}
       description: "{{ description | yaml_safe }}"
       reference object  :
-      - name: {{ type_name }}
+      - name: {{ type_name | yaml_str }}
         ref_uuid: {{ type_uuid }}
 """   
 
@@ -1220,7 +1220,7 @@ model:
       type: {{type}}
       primary_uuid: {{ uuid }}
       description: "{{ description | yaml_safe }}"
-      {% if type_name %}type:
+      {% if type_name %}data_type:
        - name: {{ type_name | yaml_str }}
          ref_uuid: {{ type_uuid }}
       {% endif %}
@@ -1327,7 +1327,7 @@ model:
       long name: {{ long_name | yaml_str }}
       prefix: {{ prefix | yaml_str }}
       chapter name: {{ chapter_name | yaml_str }}
-      type:
+      requirement_type:
         - name:  {{ type_name | yaml_str }}
           ref_uuid: {{ type_uuid }}
       {% if relations %}relations:
@@ -1344,7 +1344,7 @@ model:
       primary_uuid: {{ uuid }}
       description: "{{ description | yaml_safe }}"
       short name: {{ name | yaml_str }}
-      type:
+      relation_type:
         - name: {{ type_name | yaml_str }}
           ref_uuid: {{ type_uuid }}
       source:
@@ -1428,14 +1428,14 @@ model:
 
         
         Traceability_artifact = """
-    - name: {{ name }}
+    - name: {{ name | yaml_str }}
       type: {{type}} Polarion Workitem Requirement
       primary_uuid: {{ uuid }}
-      url: {{ url }}
-      identifier: {{ identifier }}
+      url: {{ url | yaml_str }}
+      identifier: {{ identifier | yaml_str }}
       {% if artifact_links %}linked model elements:
       {% for link in artifact_links %}
-       - name: {{ link.name}}
+       - name: {{ link.name | yaml_str }}
          ref_uuid: {{ link.model_element_uuid}}
       {% endfor %}
       {% endif %}
